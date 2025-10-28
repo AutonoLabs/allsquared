@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRoute, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
+import MilestoneManager from "@/components/MilestoneManager";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -33,7 +34,6 @@ export default function ContractDetail() {
 
   const utils = trpc.useUtils();
   const { data: contract, isLoading } = trpc.contracts.get.useQuery({ id: contractId });
-  const { data: milestones } = trpc.milestones.list.useQuery({ contractId });
 
   const signMutation = trpc.contracts.sign.useMutation({
     onSuccess: () => {
@@ -181,56 +181,10 @@ export default function ContractDetail() {
           </Card>
 
           {/* Milestones */}
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Milestones</CardTitle>
-                  <CardDescription>Payment milestones for this contract</CardDescription>
-                </div>
-                {contract.status === "active" && (
-                  <Button size="sm" variant="outline">
-                    Add Milestone
-                  </Button>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              {!milestones || milestones.length === 0 ? (
-                <div className="text-center py-8 text-muted-foreground">
-                  <Clock className="mx-auto h-8 w-8 mb-2 opacity-50" />
-                  <p>No milestones yet</p>
-                  {contract.status === "active" && (
-                    <p className="text-sm mt-1">Add milestones to track progress and payments</p>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {milestones.map((milestone, index) => (
-                    <div key={milestone.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-semibold text-sm">
-                          {index + 1}
-                        </div>
-                        <div>
-                          <h4 className="font-semibold">{milestone.title}</h4>
-                          <p className="text-sm text-muted-foreground">{milestone.description}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <p className="font-semibold">
-                            £{(parseInt(milestone.amount || "0") / 100).toLocaleString("en-GB", { minimumFractionDigits: 2 })}
-                          </p>
-                          <MilestoneBadge status={milestone.status} />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          <MilestoneManager
+            contractId={contractId}
+            userRole={contract.clientId === "current-user-id" ? "client" : "provider"}
+          />
 
           {/* Signatures */}
           {signatures.length > 0 && (
@@ -360,22 +314,5 @@ function StatusBadge({ status }: { status: string }) {
   return <Badge className={config.className}>{config.label}</Badge>;
 }
 
-function MilestoneBadge({ status }: { status: string }) {
-  const statusConfig: Record<string, { label: string; className: string }> = {
-    pending: { label: "Pending", className: "bg-gray-100 text-gray-800" },
-    in_progress: { label: "In Progress", className: "bg-blue-100 text-blue-800" },
-    submitted: { label: "Submitted", className: "bg-purple-100 text-purple-800" },
-    approved: { label: "Approved", className: "bg-green-100 text-green-800" },
-    rejected: { label: "Rejected", className: "bg-red-100 text-red-800" },
-    paid: { label: "Paid", className: "bg-emerald-100 text-emerald-800" },
-  };
 
-  const config = statusConfig[status] || statusConfig.pending;
-
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${config.className}`}>
-      {config.label}
-    </span>
-  );
-}
 
