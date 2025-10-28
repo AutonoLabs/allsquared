@@ -1,9 +1,10 @@
 {
+  "version": 2,
   "buildCommand": "pnpm build",
   "devCommand": "pnpm dev",
   "installCommand": "pnpm install",
   "framework": null,
-  "outputDirectory": "dist",
+  "outputDirectory": "dist/public",
   "env": {
     "VITE_APP_TITLE": "AllSquared",
     "VITE_APP_LOGO": "/logo.png"
@@ -14,6 +15,10 @@
     }
   },
   "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"

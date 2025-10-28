@@ -89,6 +89,14 @@
 - [x] Test build locally (build successful)
 - [ ] Deploy to Vercel
 
+## Vercel Serverless Optimization
+- [x] Refactor server/_core/index.ts (remove port binding)
+- [x] Update vercel.json for serverless functions
+- [x] Create /api/index.ts handler for Vercel
+- [x] Add environment validation (zod)
+- [x] Test build locally (successful)
+- [ ] Deploy to production
+
 ## Phase 10: Full Platform Features (Post-MVP)
 - [ ] AI contract generation (OpenAI integration)
 - [ ] Escrow payment integration (Riverside/Transpact)
