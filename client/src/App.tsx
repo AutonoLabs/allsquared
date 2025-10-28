@@ -16,12 +16,12 @@ import Privacy from "./pages/Privacy";
 import Terms from "./pages/Terms";
 import Dashboard from "./pages/Dashboard";
 import Contracts from "./pages/Contracts";
-import NewContract from "./pages/NewContract";
 import NewContractTypeform from "./pages/NewContractTypeform";
 import ContractDetail from "./pages/ContractDetail";
 import DashboardLayout from "./components/DashboardLayout";
 import Templates from "./pages/Templates";
 import TemplateEditor from "./pages/TemplateEditor";
+import Profile from "./pages/Profile";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -53,6 +53,11 @@ function Router() {
       </Route>
       <Route path="/dashboard/templates/:id">
         <TemplateEditor />
+      </Route>
+      <Route path="/dashboard/profile">
+        <DashboardLayout>
+          <Profile />
+        </DashboardLayout>
       </Route>
       
       {/* Marketing pages - public */}

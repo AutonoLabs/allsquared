@@ -63,7 +63,7 @@
 - [x] Add contract signing workflow
 - [x] Build contract detail view
 - [ ] Implement basic notifications
-- [ ] Add user profile management
+- [x] Add user profile management
 - [x] Create contract list with filters
 - [ ] Apply modern minimalist design system
 - [x] Create Typeform-style contract creation flow
