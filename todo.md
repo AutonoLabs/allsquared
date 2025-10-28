@@ -62,7 +62,7 @@
 - [ ] Create milestone management interface
 - [x] Add contract signing workflow
 - [x] Build contract detail view
-- [ ] Implement basic notifications
+- [x] Implement basic notifications
 - [x] Add user profile management
 - [x] Create contract list with filters
 - [ ] Apply modern minimalist design system

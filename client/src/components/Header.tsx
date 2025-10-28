@@ -3,6 +3,7 @@ import { APP_LOGO, APP_TITLE } from "@/const";
 import { Menu, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
+import NotificationCenter from "./NotificationCenter";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -42,6 +43,7 @@ export default function Header() {
 
         {/* CTA Buttons */}
         <div className="hidden md:flex md:items-center md:space-x-4">
+          <NotificationCenter />
           <Button variant="ghost" asChild>
             <Link href="/contact">Sign In</Link>
           </Button>
