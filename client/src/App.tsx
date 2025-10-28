@@ -20,6 +20,8 @@ import NewContract from "./pages/NewContract";
 import NewContractTypeform from "./pages/NewContractTypeform";
 import ContractDetail from "./pages/ContractDetail";
 import DashboardLayout from "./components/DashboardLayout";
+import Templates from "./pages/Templates";
+import TemplateEditor from "./pages/TemplateEditor";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -43,6 +45,14 @@ function Router() {
         <DashboardLayout>
           <ContractDetail />
         </DashboardLayout>
+      </Route>
+      <Route path="/dashboard/templates">
+        <DashboardLayout>
+          <Templates />
+        </DashboardLayout>
+      </Route>
+      <Route path="/dashboard/templates/:id">
+        <TemplateEditor />
       </Route>
       
       {/* Marketing pages - public */}

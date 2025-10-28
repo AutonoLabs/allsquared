@@ -68,8 +68,8 @@
 - [ ] Apply modern minimalist design system
 - [x] Create Typeform-style contract creation flow
 - [x] Build templates backend (tRPC router)
-- [ ] Build template management panel UI
-- [ ] Add template editor with variables
+- [x] Build template management panel UI
+- [x] Add template editor with variables
 - [ ] Implement template selection in contract creation
 - [ ] Test all MVP features end-to-end
 - [ ] Save checkpoint and push to GitHub
