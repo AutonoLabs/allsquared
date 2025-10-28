@@ -97,6 +97,14 @@
 - [x] Test build locally (successful)
 - [ ] Deploy to production
 
+## Fix Vercel TypeScript Errors
+- [x] Fix Express type errors in server/_core/vite.ts
+- [x] Add explicit types to function parameters
+- [x] Fix Request type imports in cookies.ts and sdk.ts
+- [x] Fix CookieOptions type mismatch
+- [x] Ensure @types/express is installed
+- [x] Test build and redeploy (successful)
+
 ## Phase 10: Full Platform Features (Post-MVP)
 - [ ] AI contract generation (OpenAI integration)
 - [ ] Escrow payment integration (Riverside/Transpact)
