@@ -3,13 +3,16 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import fs from "node:fs";
 import path from "path";
-import { defineConfig } from "vite";
+import { defineConfig, loadEnv } from "vite";
 import { vitePluginManusRuntime } from "vite-plugin-manus-runtime";
 
 
 const plugins = [react(), tailwindcss(), jsxLocPlugin(), vitePluginManusRuntime()];
 
-export default defineConfig({
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+  
+  return {
   plugins,
   resolve: {
     alias: {
@@ -41,4 +44,8 @@ export default defineConfig({
       deny: ["**/.*"],
     },
   },
+  define: {
+    __APP_TITLE__: JSON.stringify(env.VITE_APP_TITLE || 'AllSquared'),
+  },
+};
 });
