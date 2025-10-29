@@ -105,6 +105,14 @@
 - [x] Ensure @types/express is installed
 - [x] Test build and redeploy (successful)
 
+## Fix Vercel Environment Variables
+- [x] Identify all required VITE_ variables
+- [x] Add fallback values for undefined env vars
+- [x] Update const.ts to handle missing vars
+- [x] Test locally with missing env vars
+- [x] Document required Vercel env vars (VERCEL_ENV_VARS.md)
+- [ ] Redeploy to Vercel
+
 ## Phase 10: Full Platform Features (Post-MVP)
 - [ ] AI contract generation (OpenAI integration)
 - [ ] Escrow payment integration (Riverside/Transpact)
