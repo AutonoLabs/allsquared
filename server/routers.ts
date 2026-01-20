@@ -11,6 +11,7 @@ import { aiRouter } from "./routers/ai";
 import { paymentsRouter } from "./routers/payments";
 import { escrowRouter } from "./routers/escrow";
 import { signaturesRouter } from "./routers/signatures";
+import { adminRouter } from "./routers/admin";
 import { updateUser } from "./db";
 import { z } from "zod";
 
@@ -57,6 +58,9 @@ export const appRouter = router({
   payments: paymentsRouter,
   escrow: escrowRouter,
   signatures: signaturesRouter,
+
+  // Admin portal
+  admin: adminRouter,
 });
 
 export type AppRouter = typeof appRouter;

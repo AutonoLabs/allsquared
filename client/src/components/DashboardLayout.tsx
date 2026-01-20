@@ -10,18 +10,21 @@ import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarInset,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
+  SidebarSeparator,
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, FileCode, UserCircle } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, FileCode, UserCircle, Shield, AlertTriangle, CheckSquare, BarChart3, ScrollText } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -32,6 +35,16 @@ const menuItems = [
   { icon: FileText, label: "Contracts", path: "/dashboard/contracts" },
   { icon: FileCode, label: "Templates", path: "/dashboard/templates" },
   { icon: UserCircle, label: "Profile", path: "/dashboard/profile" },
+];
+
+const adminMenuItems = [
+  { icon: Shield, label: "Admin", path: "/admin" },
+  { icon: Users, label: "Users", path: "/admin/users" },
+  { icon: FileText, label: "All Contracts", path: "/admin/contracts" },
+  { icon: AlertTriangle, label: "Disputes", path: "/admin/disputes" },
+  { icon: CheckSquare, label: "KYC Review", path: "/admin/kyc" },
+  { icon: BarChart3, label: "Analytics", path: "/admin/analytics" },
+  { icon: ScrollText, label: "Audit Logs", path: "/admin/audit-logs" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
@@ -123,7 +136,8 @@ function DashboardLayoutContent({
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const activeMenuItem = menuItems.find(item => item.path === location);
+  const activeMenuItem = menuItems.find(item => item.path === location) ||
+    adminMenuItems.find(item => item.path === location || location.startsWith(item.path + '/'));
   const isMobile = useIsMobile();
 
   useEffect(() => {
@@ -230,6 +244,35 @@ function DashboardLayoutContent({
                 );
               })}
             </SidebarMenu>
+
+            {user?.role === 'admin' && (
+              <>
+                <SidebarSeparator className="my-2" />
+                <SidebarGroup>
+                  <SidebarGroupLabel>Admin</SidebarGroupLabel>
+                  <SidebarMenu className="px-2">
+                    {adminMenuItems.map(item => {
+                      const isActive = location === item.path || location.startsWith(item.path + '/');
+                      return (
+                        <SidebarMenuItem key={item.path}>
+                          <SidebarMenuButton
+                            isActive={isActive}
+                            onClick={() => setLocation(item.path)}
+                            tooltip={item.label}
+                            className={`h-10 transition-all font-normal`}
+                          >
+                            <item.icon
+                              className={`h-4 w-4 ${isActive ? "text-primary" : ""}`}
+                            />
+                            <span>{item.label}</span>
+                          </SidebarMenuButton>
+                        </SidebarMenuItem>
+                      );
+                    })}
+                  </SidebarMenu>
+                </SidebarGroup>
+              </>
+            )}
           </SidebarContent>
 
           <SidebarFooter className="p-3">

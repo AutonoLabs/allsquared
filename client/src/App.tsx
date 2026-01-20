@@ -20,9 +20,23 @@ import Contracts from "./pages/Contracts";
 import NewContractTypeform from "./pages/NewContractTypeform";
 import ContractDetail from "./pages/ContractDetail";
 import DashboardLayout from "./components/DashboardLayout";
+import AdminLayout from "./components/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminUsers from "./pages/admin/AdminUsers";
+import AdminUserDetail from "./pages/admin/AdminUserDetail";
+import AdminContracts from "./pages/admin/AdminContracts";
+import AdminDisputes from "./pages/admin/AdminDisputes";
+import AdminKyc from "./pages/admin/AdminKyc";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
+import AdminAuditLogs from "./pages/admin/AdminAuditLogs";
 import Templates from "./pages/Templates";
 import TemplateEditor from "./pages/TemplateEditor";
 import Profile from "./pages/Profile";
+import Billing from "./pages/Billing";
+import PaymentSettings from "./pages/PaymentSettings";
+import Freelancers from "./pages/Freelancers";
+import Clients from "./pages/Clients";
+import LegalServices from "./pages/LegalServices";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -60,7 +74,59 @@ function Router() {
           <Profile />
         </DashboardLayout>
       </Route>
-      
+      <Route path="/dashboard/settings/billing">
+        <DashboardLayout>
+          <Billing />
+        </DashboardLayout>
+      </Route>
+      <Route path="/dashboard/settings/payments">
+        <DashboardLayout>
+          <PaymentSettings />
+        </DashboardLayout>
+      </Route>
+
+      {/* Admin routes - protected for admins only */}
+      <Route path="/admin">
+        <AdminLayout>
+          <AdminDashboard />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/users">
+        <AdminLayout>
+          <AdminUsers />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/users/:id">
+        <AdminLayout>
+          <AdminUserDetail />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/contracts">
+        <AdminLayout>
+          <AdminContracts />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/disputes">
+        <AdminLayout>
+          <AdminDisputes />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/kyc">
+        <AdminLayout>
+          <AdminKyc />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/analytics">
+        <AdminLayout>
+          <AdminAnalytics />
+        </AdminLayout>
+      </Route>
+      <Route path="/admin/audit-logs">
+        <AdminLayout>
+          <AdminAuditLogs />
+        </AdminLayout>
+      </Route>
+
       {/* Marketing pages - public */}
       <Route path="*">
         <div className="flex min-h-screen flex-col">
@@ -75,6 +141,9 @@ function Router() {
               <Route path={"/contact"} component={Contact} />
               <Route path={"/terms"} component={Terms} />
               <Route path={"/privacy"} component={Privacy} />
+              <Route path={"/freelancers"} component={Freelancers} />
+              <Route path={"/clients"} component={Clients} />
+              <Route path={"/legal-services"} component={LegalServices} />
               <Route path={"/404"} component={NotFound} />
               <Route component={NotFound} />
             </Switch>
