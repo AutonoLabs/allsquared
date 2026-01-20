@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import {
   Dialog,
   DialogContent,
@@ -18,6 +19,8 @@ import {
 import { CheckCircle2, XCircle, Clock, Upload, DollarSign } from "lucide-react";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
+import { FileUpload } from "@/components/FileUpload";
+import { FileList } from "@/components/FileList";
 
 interface MilestoneManagerProps {
   contractId: string;
@@ -135,7 +138,7 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
             <CardContent className="space-y-4">
               {/* Submission Info */}
               {milestone.submittedAt && (
-                <div className="bg-muted p-3 rounded-lg space-y-2">
+                <div className="bg-muted p-3 rounded-lg space-y-3">
                   <p className="text-sm font-medium">Submission Details</p>
                   <p className="text-sm text-muted-foreground">
                     Submitted {formatDistanceToNow(new Date(milestone.submittedAt), { addSuffix: true })}
@@ -143,6 +146,16 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
                   {milestone.submissionNotes && (
                     <p className="text-sm">{milestone.submissionNotes}</p>
                   )}
+
+                  {/* Show uploaded deliverables */}
+                  <div className="pt-2">
+                    <p className="text-sm font-medium mb-2">Deliverables</p>
+                    <FileList
+                      entityType="milestone"
+                      entityId={milestone.id}
+                      showDelete={false}
+                    />
+                  </div>
                 </div>
               )}
 
@@ -168,11 +181,11 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
                         Submit for Review
                       </Button>
                     </DialogTrigger>
-                    <DialogContent>
+                    <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
                       <DialogHeader>
                         <DialogTitle>Submit Milestone</DialogTitle>
                         <DialogDescription>
-                          Add notes about the completed work for client review
+                          Upload deliverables and add notes about the completed work for client review
                         </DialogDescription>
                       </DialogHeader>
                       <div className="space-y-4">
@@ -186,13 +199,42 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
                             rows={4}
                           />
                         </div>
+
+                        <Separator />
+
+                        <div className="space-y-2">
+                          <Label>Upload Deliverables</Label>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            Attach files, documents, or images that demonstrate the completed work
+                          </p>
+                          {selectedMilestone && (
+                            <FileUpload
+                              entityType="milestone"
+                              entityId={selectedMilestone}
+                              maxFiles={10}
+                              multiple={true}
+                            />
+                          )}
+                        </div>
+
+                        {/* Show existing files if any */}
+                        {selectedMilestone && (
+                          <div className="space-y-2">
+                            <Label>Uploaded Files</Label>
+                            <FileList
+                              entityType="milestone"
+                              entityId={selectedMilestone}
+                              showDelete={true}
+                            />
+                          </div>
+                        )}
                       </div>
                       <DialogFooter>
                         <Button variant="outline" onClick={() => setSubmitDialogOpen(false)}>
                           Cancel
                         </Button>
                         <Button onClick={handleSubmit} disabled={submitMutation.isPending}>
-                          Submit Milestone
+                          {submitMutation.isPending ? "Submitting..." : "Submit Milestone"}
                         </Button>
                       </DialogFooter>
                     </DialogContent>

@@ -21,6 +21,12 @@ const EnvSchema = z.object({
   VITE_APP_LOGO: z.string().default("/logo.png"),
   VITE_OAUTH_PORTAL_URL: z.string().url().optional(),
   PORT: z.string().optional(),
+
+  // Firebase configuration (optional for development)
+  FIREBASE_PROJECT_ID: z.string().optional(),
+  FIREBASE_CLIENT_EMAIL: z.string().optional(),
+  FIREBASE_PRIVATE_KEY: z.string().optional(),
+  FIREBASE_STORAGE_BUCKET: z.string().optional(),
 });
 
 // Parse and validate environment variables

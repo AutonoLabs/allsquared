@@ -1,33 +1,60 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2, Save, User, Building2, Mail, Phone } from "lucide-react";
+import { Loader2, Save, User, Building2, Mail, Phone, Briefcase } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
+import { UserTypeSelector } from "@/components/UserTypeSelector";
 
 export default function Profile() {
-  const { data: user, isLoading } = trpc.auth.me.useQuery();
-  
-  const [name, setName] = useState(user?.name || "");
-  const [email, setEmail] = useState(user?.email || "");
+  const { data: user, isLoading, refetch } = trpc.auth.me.useQuery();
+  const updateProfileMutation = trpc.auth.updateProfile.useMutation({
+    onSuccess: () => {
+      toast.success("Profile updated successfully");
+      refetch();
+    },
+    onError: (error) => {
+      toast.error(`Failed to update profile: ${error.message}`);
+    },
+  });
+
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  
+  const [showUserTypeSelector, setShowUserTypeSelector] = useState(false);
+
   // Notification preferences
   const [emailNotifications, setEmailNotifications] = useState(true);
   const [contractUpdates, setContractUpdates] = useState(true);
   const [milestoneAlerts, setMilestoneAlerts] = useState(true);
   const [marketingEmails, setMarketingEmails] = useState(false);
 
+  // Populate form fields when user data loads
+  useEffect(() => {
+    if (user) {
+      setName(user.name || "");
+      setEmail(user.email || "");
+      setCompany(user.businessName || "");
+      setPhone(user.phone || "");
+      setAddress(user.address || "");
+    }
+  }, [user]);
+
   const handleSaveProfile = () => {
-    // TODO: Implement profile update mutation
-    toast.success("Profile updated successfully");
+    updateProfileMutation.mutate({
+      name,
+      businessName: company,
+      phone,
+      address,
+    });
   };
 
   const handleSaveNotifications = () => {
@@ -79,6 +106,23 @@ export default function Profile() {
             <div className="flex-1">
               <h3 className="font-semibold">{user?.name || "User"}</h3>
               <p className="text-sm text-muted-foreground">{user?.email}</p>
+              <div className="flex items-center gap-2 mt-2">
+                <Badge variant={user?.userType ? "default" : "secondary"}>
+                  <Briefcase className="h-3 w-3 mr-1" />
+                  {user?.userType === "provider" && "Service Provider"}
+                  {user?.userType === "client" && "Client"}
+                  {user?.userType === "both" && "Provider & Client"}
+                  {!user?.userType && "No Type Selected"}
+                </Badge>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowUserTypeSelector(true)}
+                  className="h-6 px-2 text-xs"
+                >
+                  Change
+                </Button>
+              </div>
             </div>
           </div>
 
@@ -156,9 +200,18 @@ export default function Profile() {
           </div>
 
           <div className="flex justify-end">
-            <Button onClick={handleSaveProfile}>
-              <Save className="mr-2 h-4 w-4" />
-              Save Changes
+            <Button onClick={handleSaveProfile} disabled={updateProfileMutation.isPending}>
+              {updateProfileMutation.isPending ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="mr-2 h-4 w-4" />
+                  Save Changes
+                </>
+              )}
             </Button>
           </div>
         </CardContent>
@@ -287,6 +340,13 @@ export default function Profile() {
           </div>
         </CardContent>
       </Card>
+
+      {/* User Type Selector Dialog */}
+      <UserTypeSelector
+        open={showUserTypeSelector}
+        onClose={() => setShowUserTypeSelector(false)}
+        onComplete={() => refetch()}
+      />
     </div>
   );
 }

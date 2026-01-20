@@ -109,6 +109,18 @@ export async function getUser(id: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function updateUser(id: string, updates: Partial<InsertUser>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .update(users)
+    .set(updates)
+    .where(eq(users.id, id));
+
+  return getUser(id);
+}
+
 // ===== Contract Templates =====
 
 export async function getAllContractTemplates() {
