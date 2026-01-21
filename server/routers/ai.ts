@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { router, protectedProcedure } from '../_core/trpc';
-import { db } from '../db';
+import { getDb } from '../db';
 import { aiGenerations, contractTemplates } from '../../drizzle/schema';
 import { eq } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
@@ -246,6 +246,9 @@ export const aiRouter = router({
     .mutation(async ({ ctx, input }) => {
       const generationId = `aigen_${nanoid(16)}`;
 
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       // Get template if specified
       let templateContent: string | undefined;
       if (input.templateId) {
@@ -308,6 +311,9 @@ export const aiRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       // Get original generation
       const original = await db
         .select()
@@ -368,6 +374,9 @@ export const aiRouter = router({
       }).optional()
     )
     .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       const { page = 1, limit = 10 } = input || {};
 
       const generations = await db
@@ -394,6 +403,9 @@ export const aiRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       const generation = await db
         .select()
         .from(aiGenerations)

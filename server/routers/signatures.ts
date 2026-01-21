@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { router, protectedProcedure, publicProcedure } from '../_core/trpc';
-import { db, createNotification, getContract, updateContract } from '../db';
+import { getDb, createNotification, getContract, updateContract } from '../db';
 import { signatures, contracts, webhookEvents, auditLogs } from '../../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
@@ -214,7 +214,22 @@ export const signaturesRouter = router({
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + input.expiresInDays);
 
-      const signatureRecords = [];
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
+      const signatureRecords: Array<{
+        id: string;
+        contractId: string;
+        userId: string;
+        provider: 'docusign' | 'signwell' | 'internal';
+        providerEnvelopeId?: string;
+        status: 'sent' | 'pending';
+        signatureName: string;
+        expiresAt: Date;
+        sentAt?: Date;
+        createdAt: Date;
+        updatedAt: Date;
+      }> = [];
 
       if (provider === 'docusign') {
         // Create DocuSign envelope
@@ -395,6 +410,9 @@ export const signaturesRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       // Verify access
       const contract = await getContract(input.contractId);
 
@@ -436,6 +454,9 @@ export const signaturesRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       if (!input.agreedToTerms) {
         throw new Error('You must agree to the terms to sign');
       }
@@ -559,6 +580,9 @@ export const signaturesRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       const sig = await db
         .select()
         .from(signatures)
@@ -625,6 +649,9 @@ export const signaturesRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       const sig = await db
         .select()
         .from(signatures)
@@ -686,6 +713,9 @@ export const signaturesRouter = router({
       })
     )
     .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       const webhookId = `webhook_${nanoid(16)}`;
 
       await db.insert(webhookEvents).values({
@@ -801,6 +831,9 @@ export const signaturesRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       const sig = await db
         .select()
         .from(signatures)

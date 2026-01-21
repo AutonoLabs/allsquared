@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { router, protectedProcedure, publicProcedure } from '../_core/trpc';
-import { db } from '../db';
+import { getDb } from '../db';
 import { payments, subscriptions, users, webhookEvents, auditLogs } from '../../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
@@ -81,6 +81,9 @@ function calculatePlatformFee(amount: number, tier: keyof typeof TRANSACTION_FEE
 export const paymentsRouter = router({
   // Get user's subscription status
   getSubscription: protectedProcedure.query(async ({ ctx }) => {
+    const db = await getDb();
+    if (!db) throw new Error('Database not available');
+
     const subscription = await db
       .select()
       .from(subscriptions)
@@ -164,6 +167,9 @@ export const paymentsRouter = router({
 
   // Create or update Stripe customer
   createCustomer: protectedProcedure.mutation(async ({ ctx }) => {
+    const db = await getDb();
+    if (!db) throw new Error('Database not available');
+
     const user = ctx.user;
 
     // Check if user already has a Stripe customer ID
@@ -192,6 +198,9 @@ export const paymentsRouter = router({
 
   // Create Stripe Connect account for providers
   createConnectedAccount: protectedProcedure.mutation(async ({ ctx }) => {
+    const db = await getDb();
+    if (!db) throw new Error('Database not available');
+
     const user = ctx.user;
 
     // Check if user already has a connected account
@@ -254,6 +263,9 @@ export const paymentsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       const user = ctx.user;
 
       // Ensure user has Stripe customer
@@ -319,6 +331,9 @@ export const paymentsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       const user = ctx.user;
 
       // Get user's subscription tier for fee calculation
@@ -419,18 +434,20 @@ export const paymentsRouter = router({
       }).optional()
     )
     .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       const { page = 1, limit = 20, type } = input || {};
 
-      let query = db
+      // Build where condition based on whether type filter is provided
+      const whereCondition = type
+        ? and(eq(payments.userId, ctx.user.id), eq(payments.type, type))
+        : eq(payments.userId, ctx.user.id);
+
+      const paymentsList = await db
         .select()
         .from(payments)
-        .where(eq(payments.userId, ctx.user.id));
-
-      if (type) {
-        query = query.where(and(eq(payments.userId, ctx.user.id), eq(payments.type, type)));
-      }
-
-      const paymentsList = await query
+        .where(whereCondition)
         .orderBy(payments.createdAt)
         .limit(limit)
         .offset((page - 1) * limit);
@@ -444,6 +461,9 @@ export const paymentsRouter = router({
 
   // Cancel subscription
   cancelSubscription: protectedProcedure.mutation(async ({ ctx }) => {
+    const db = await getDb();
+    if (!db) throw new Error('Database not available');
+
     const subscription = await db
       .select()
       .from(subscriptions)
@@ -486,6 +506,9 @@ export const paymentsRouter = router({
 
   // Reactivate subscription
   reactivateSubscription: protectedProcedure.mutation(async ({ ctx }) => {
+    const db = await getDb();
+    if (!db) throw new Error('Database not available');
+
     const subscription = await db
       .select()
       .from(subscriptions)
@@ -562,6 +585,9 @@ export const paymentsRouter = router({
       })
     )
     .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       const webhookId = `webhook_${nanoid(16)}`;
 
       // Store webhook event

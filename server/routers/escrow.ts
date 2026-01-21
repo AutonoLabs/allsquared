@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { router, protectedProcedure, publicProcedure } from '../_core/trpc';
-import { db, createNotification } from '../db';
+import { getDb, createNotification } from '../db';
 import {
   escrowTransactions,
   contracts,
@@ -118,6 +118,9 @@ export const escrowRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       // Verify contract exists and user is the client
       const contract = await db
         .select()
@@ -233,6 +236,9 @@ export const escrowRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       const escrow = await db
         .select()
         .from(escrowTransactions)
@@ -296,6 +302,9 @@ export const escrowRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       // Verify user has access
       const contract = await db
         .select()
@@ -329,6 +338,9 @@ export const escrowRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       const escrow = await db
         .select()
         .from(escrowTransactions)
@@ -452,6 +464,9 @@ export const escrowRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       const escrow = await db
         .select()
         .from(escrowTransactions)
@@ -537,6 +552,9 @@ export const escrowRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       // In production, this would be admin-only
       const escrow = await db
         .select()
@@ -627,6 +645,9 @@ export const escrowRouter = router({
       })
     )
     .mutation(async ({ input }) => {
+      const db = await getDb();
+      if (!db) throw new Error('Database not available');
+
       const webhookId = `webhook_${nanoid(16)}`;
 
       // Store webhook event
@@ -717,6 +738,9 @@ export const escrowRouter = router({
 
   // Get escrow summary for user
   getSummary: protectedProcedure.query(async ({ ctx }) => {
+    const db = await getDb();
+    if (!db) throw new Error('Database not available');
+
     // Get all escrows for contracts where user is client or provider
     const userContracts = await db
       .select()

@@ -102,7 +102,7 @@ app.use('/api', (req, res, next) => {
 // Clean up rate limit store periodically (every 5 minutes)
 setInterval(() => {
   const now = Date.now();
-  for (const [key, value] of rateLimitStore.entries()) {
+  for (const [key, value] of Array.from(rateLimitStore.entries())) {
     if (now > value.resetTime) {
       rateLimitStore.delete(key);
     }
@@ -153,10 +153,7 @@ app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), asyn
     // For now, parse the body directly
     const event = JSON.parse(req.body.toString());
 
-    // Process webhook via tRPC router
-    const { caller } = await import('../routers');
-    // Note: In production, you'd call the webhook handler directly
-
+    // TODO: In production, call the webhook handler directly via tRPC caller
     console.log('Stripe webhook received:', event.type);
 
     res.json({ received: true });

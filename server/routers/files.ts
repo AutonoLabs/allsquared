@@ -102,7 +102,7 @@ export const filesRouter = router({
         fileId: z.string(),
       })
     )
-    .query(async ({ ctx, input }) => {
+    .mutation(async ({ ctx, input }) => {
       if (!ctx.user) {
         throw new Error("User not authenticated");
       }
