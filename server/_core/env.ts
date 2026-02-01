@@ -76,4 +76,6 @@ export const ENV = {
   appId: envVars.VITE_APP_ID ?? "",
   oAuthServerUrl: envVars.OAUTH_SERVER_URL ?? "",
   ownerId: envVars.OWNER_OPEN_ID ?? "",
+  forgeApiUrl: "",  // Legacy - not used with Clerk auth
+  forgeApiKey: "",  // Legacy - not used with Clerk auth
 };
