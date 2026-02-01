@@ -1,4 +1,4 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
@@ -16,7 +16,7 @@ const app = express();
 app.set('trust proxy', 1);
 
 // Security headers (equivalent to helmet.js but inline to avoid additional dependency)
-app.use((req, res, next) => {
+app.use((req: Request, res: Response, next: NextFunction) => {
   // Prevent clickjacking
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
 
@@ -65,8 +65,8 @@ const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
 const RATE_LIMIT_MAX_REQUESTS = 100; // 100 requests per minute
 
 // Rate limiting middleware
-app.use('/api', (req, res, next) => {
-  const clientIp = req.ip || req.socket.remoteAddress || 'unknown';
+app.use('/api', (req: Request, res: Response, next: NextFunction) => {
+  const clientIp = req.ip || req.socket?.remoteAddress || 'unknown';
   const now = Date.now();
 
   const record = rateLimitStore.get(clientIp);
@@ -112,7 +112,7 @@ setInterval(() => {
 // Input sanitization for common XSS patterns
 app.use(express.json({
   limit: "50mb",
-  verify: (req, res, buf) => {
+  verify: (req: Request, res: Response, buf: Buffer) => {
     // Basic XSS pattern detection in JSON body
     const bodyStr = buf.toString();
     const xssPatterns = [
@@ -139,7 +139,7 @@ registerOAuthRoutes(app);
 // =============================================================================
 
 // Stripe webhook
-app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
+app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), async (req: Request, res: Response) => {
   const sig = req.headers['stripe-signature'];
   const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -164,7 +164,7 @@ app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), asyn
 });
 
 // Transpact webhook
-app.post('/api/webhooks/transpact', express.json(), async (req, res) => {
+app.post('/api/webhooks/transpact', express.json(), async (req: Request, res: Response) => {
   const signature = req.headers['x-transpact-signature'];
 
   try {
@@ -181,7 +181,7 @@ app.post('/api/webhooks/transpact', express.json(), async (req, res) => {
 });
 
 // DocuSign webhook
-app.post('/api/webhooks/docusign', express.json(), async (req, res) => {
+app.post('/api/webhooks/docusign', express.json(), async (req: Request, res: Response) => {
   try {
     const event = req.body;
 

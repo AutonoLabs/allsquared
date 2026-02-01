@@ -1,4 +1,4 @@
-import { createClerkClient } from '@clerk/express';
+import { createClerkClient } from '@clerk/backend';
 import type { Request } from 'express';
 import type { User } from '../../drizzle/schema';
 import * as db from '../db';
