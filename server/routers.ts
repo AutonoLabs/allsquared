@@ -12,8 +12,9 @@ import { paymentsRouter } from "./routers/payments";
 import { escrowRouter } from "./routers/escrow";
 import { signaturesRouter } from "./routers/signatures";
 import { adminRouter } from "./routers/admin";
-import { updateUser } from "./db";
+import { updateUser, getUserByClerkId, upsertUser, getUser } from "./db";
 import { z } from "zod";
+import { nanoid } from "nanoid";
 
 export const appRouter = router({
   system: systemRouter,
@@ -27,6 +28,48 @@ export const appRouter = router({
         success: true,
       } as const;
     }),
+    // Sync Clerk user to our database
+    syncClerkUser: publicProcedure
+      .input(
+        z.object({
+          clerkId: z.string().min(1),
+          email: z.string().nullable(),
+          name: z.string().nullable(),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { clerkId, email, name } = input;
+        
+        // Check if user already exists
+        let user = await getUserByClerkId(clerkId);
+        
+        if (user) {
+          // Update existing user
+          await upsertUser({
+            id: user.id,
+            email,
+            name,
+            lastSignedIn: new Date(),
+          });
+          return await getUser(user.id);
+        }
+
+        // Create new user with admin role if first user or matches owner email
+        const userId = `clerk_${nanoid(16)}`;
+        const isFirstUser = true; // TODO: Check if this is the first user
+        
+        await upsertUser({
+          id: userId,
+          clerkId,
+          email,
+          name,
+          loginMethod: 'clerk',
+          role: isFirstUser ? 'admin' : 'user',
+          lastSignedIn: new Date(),
+        });
+
+        return await getUser(userId);
+      }),
     updateProfile: protectedProcedure
       .input(
         z.object({

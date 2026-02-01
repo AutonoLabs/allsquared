@@ -1,4 +1,5 @@
-import { useAuth } from "@/_core/hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
+import { SignIn, SignedIn, SignedOut } from "@/lib/clerk";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -22,13 +23,12 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
+import { APP_LOGO, APP_TITLE } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, FileCode, UserCircle, Shield, AlertTriangle, CheckSquare, BarChart3, ScrollText } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
-import { Button } from "./ui/button";
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
@@ -92,15 +92,15 @@ export default function DashboardLayout({
               </p>
             </div>
           </div>
-          <Button
-            onClick={() => {
-              window.location.href = getLoginUrl();
+          <SignIn 
+            routing="hash"
+            appearance={{
+              elements: {
+                rootBox: "w-full",
+                card: "shadow-none border-0",
+              }
             }}
-            size="lg"
-            className="w-full shadow-lg hover:shadow-xl transition-all"
-          >
-            Sign in
-          </Button>
+          />
         </div>
       </div>
     );

@@ -110,6 +110,18 @@ export async function getUser(id: string) {
   return result.length > 0 ? result[0] : undefined;
 }
 
+export async function getUserByClerkId(clerkId: string) {
+  const db = await getDb();
+  if (!db) {
+    console.warn("[Database] Cannot get user by Clerk ID: database not available");
+    return undefined;
+  }
+
+  const result = await db.select().from(users).where(eq(users.clerkId, clerkId)).limit(1);
+
+  return result.length > 0 ? result[0] : undefined;
+}
+
 export async function updateUser(id: string, updates: Partial<InsertUser>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

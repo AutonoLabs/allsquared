@@ -136,6 +136,7 @@ export const userFeedbackEnum = pgEnum("user_feedback", ["positive", "negative",
  */
 export const users = pgTable("users", {
   id: varchar("id", { length: 64 }).primaryKey(),
+  clerkId: varchar("clerkId", { length: 64 }),  // Clerk user ID for authentication
   name: text("name"),
   email: varchar("email", { length: 320 }),
   loginMethod: varchar("loginMethod", { length: 64 }),
