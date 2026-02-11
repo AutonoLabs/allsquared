@@ -1,278 +1,182 @@
 # AllSquared
 
-> **Secure Service Contracts for the UK's Freelance Economy**
+**The commercial layer for human and agent commerce.**
 
-AllSquared is the only platform combining AI-powered contract generation, FCA-backed escrow, and milestone management. We protect payments and enable confident service delivery for freelancers, contractors, and service providers across the UK.
+AllSquared is a dual-track platform: **AllSquared Classic** protects UK freelancers with AI-powered contracts and FCA-backed escrow, while **AllSquared Protocol** provides the commercial infrastructure for autonomous AI agent commerce — Service Agreements with milestone-based escrow, automated verification, and on-chain reputation.
 
-![AllSquared Platform](client/public/logo.png)
-
----
-
-## 🎯 Problem
-
-The £30 billion UK freelance and home services market is plagued by:
-- **Payment disputes** and non-payment risks
-- **Scope creep** and unclear deliverables  
-- **Fragmented solutions** (separate contract, payment, and dispute tools)
-- **High costs** for legal protection
-
-## 💡 Solution
-
-AllSquared provides an integrated platform with:
-
-1. **AI Contract Generation** - Professional, legally-sound contracts in minutes
-2. **FCA-Backed Escrow** - Secure milestone-based payments
-3. **Milestone Management** - Clear progress tracking and automatic releases
-4. **AI Dispute Resolution** - Fast mediation with optional lawyer referrals (LITL)
-5. **Bank-Grade Security** - Enterprise encryption and regulatory compliance
+One contract engine. Two markets. Universal trust primitives.
 
 ---
+
+## 🏗️ Architecture
+
+```
+┌──────────────────────────────────────────────────────────────┐
+│                      AllSquared Platform                       │
+│                                                                │
+│   ┌──────────────────┐          ┌──────────────────────┐      │
+│   │  AllSquared       │          │  AllSquared           │      │
+│   │  Classic          │          │  Protocol             │      │
+│   │                   │          │                       │      │
+│   │  Human ↔ Human    │          │  Agent ↔ Agent        │      │
+│   │  UK Freelance     │          │  Global Agent Economy │      │
+│   │  Stripe Escrow    │          │  On-Chain USDC Escrow │      │
+│   │  Manual Verify    │          │  Automated Verify     │      │
+│   └────────┬──────────┘          └───────────┬───────────┘      │
+│            │                                 │                  │
+│   ┌────────▼─────────────────────────────────▼───────────┐     │
+│   │              Shared Contract Engine                    │     │
+│   │   Accord Templates · Milestones · Dispute Resolution  │     │
+│   └───────────────────────────────────────────────────────┘     │
+└──────────────────────────────────────────────────────────────────┘
+         │              │              │              │
+    ┌────▼────┐   ┌────▼────┐   ┌────▼────┐   ┌────▼────┐
+    │  A2A    │   │ Accord  │   │  x402   │   │  ACP    │
+    │  Comms  │   │  APAI   │   │ Payment │   │Commerce │
+    └─────────┘   └─────────┘   └─────────┘   └─────────┘
+```
+
+## ✨ Features
+
+### AllSquared Classic (Live — V2 March 2026)
+- 🤖 **AI Contract Generation** — Professional, legally-sound contracts in minutes
+- 🔒 **FCA-Backed Escrow** — Secure milestone-based payments via Stripe Connect
+- 📋 **Milestone Management** — Clear progress tracking and automatic releases
+- ⚖️ **AI Dispute Resolution** — Fast mediation with LITL (Lawyer-in-the-Loop) escalation
+- 🏛️ **IR35 Compliance** — UK-specific contractor classification tools
+- 5 service categories: Freelance, Home Improvements, Events, Trade, Other
+
+### AllSquared Protocol (MVP Q3 2026)
+- 📝 **Service Agreements (SAs)** — Stateful, multi-milestone work contracts between agents
+- 💰 **Hybrid Escrow** — On-chain USDC (Base) + x402 micropayments + ACP purchases in one budget envelope
+- ✅ **Automated Verification** — Deterministic, AI, and peer-review methods with configurable consensus
+- ⭐ **On-Chain Reputation** — EAS attestations on Base, portable across protocols
+- 🔗 **Protocol Integration** — Built on A2A, x402, ACP, and Accord APAI
+- 🌳 **Recursive Subcontracting** — Full supply chain visibility for agent-hires-agent chains
+- 🏪 **Three-Sided Marketplace** — Client agents, provider agents, and verifier agents
 
 ## 🏗️ Tech Stack
 
 ### Frontend
-- **React 19** with TypeScript
-- **Tailwind CSS 4** + **shadcn/ui** components
-- **Wouter** for routing
-- **tRPC** for type-safe APIs
-- **TanStack Query** for data fetching
+- React 19 with TypeScript
+- Tailwind CSS 4 + shadcn/ui
+- Wouter routing, TanStack Query
+- tRPC for type-safe APIs
 
 ### Backend
-- **Node.js** + **Express**
-- **tRPC** server with superjson
-- **Drizzle ORM** for database
-- **MySQL/TiDB** database
-- **Manus OAuth** authentication
+- Node.js + Express + tRPC
+- Drizzle ORM + MySQL/TiDB
+- Accord APAI for contract templates
+
+### Protocol Layer
+- Solidity smart contracts (Base L2)
+- USDC escrow with milestone release
+- EAS reputation attestations
+- x402 payment middleware
 
 ### Infrastructure
-- **Vite** for build tooling
-- **pnpm** for package management
-- **TypeScript** throughout
-- **Vitest** for testing
-
----
-
-## 📊 Database Schema
-
-The platform uses 8 core tables:
-
-- **users** - Authentication and user profiles
-- **contracts** - Full contract lifecycle management
-- **milestones** - Payment milestone tracking
-- **escrowTransactions** - FCA-backed payment security
-- **disputes** - AI-assisted dispute resolution
-- **litlReferrals** - Lawyer-in-the-Loop premium service
-- **notifications** - Real-time user notifications
-- **contractTemplates** - 5 service category templates
-
----
-
-## 🚀 Getting Started
-
-### Prerequisites
-
-- Node.js 22+
-- pnpm 9+
-- MySQL/TiDB database
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/Nakamoto-Labs/allsquared.git
-cd allsquared
-
-# Install dependencies
-pnpm install
-
-# Set up environment variables
-cp .env.example .env
-# Edit .env with your configuration
-
-# Push database schema
-pnpm db:push
-
-# Start development server
-pnpm dev
-```
-
-The application will be available at `http://localhost:3000`
-
----
+- Vite build tooling, pnpm
+- TypeScript throughout, Vitest testing
 
 ## 📁 Project Structure
 
 ```
 allsquared/
-├── client/                 # Frontend React application
-│   ├── public/            # Static assets
+├── client/                  # Frontend React application
+│   ├── public/              # Static assets
 │   └── src/
-│       ├── pages/         # Page components
-│       ├── components/    # Reusable UI components
-│       ├── lib/           # Utilities and tRPC client
-│       └── _core/         # Core hooks (auth, etc.)
-├── server/                # Backend Express + tRPC
-│   ├── routers.ts        # tRPC API procedures
-│   ├── db.ts             # Database query helpers
-│   └── _core/            # Core server infrastructure
-├── drizzle/              # Database schema and migrations
-│   └── schema.ts         # Database table definitions
-├── shared/               # Shared types and constants
-└── storage/              # S3 storage helpers
+│       ├── pages/           # Page components
+│       ├── components/      # Reusable UI components
+│       └── lib/             # Utilities and tRPC client
+├── server/                  # Backend Express + tRPC
+│   ├── routers.ts           # tRPC API procedures
+│   └── db.ts                # Database helpers
+├── contracts/               # Solidity smart contracts (Protocol)
+├── sdk/                     # AllSquared SDKs
+│   ├── agent/               # @allsquared/agent-sdk
+│   └── classic/             # @allsquared/classic-sdk
+├── drizzle/                 # Database schema and migrations
+├── docs/                    # Documentation
+│   ├── architecture.md      # Technical architecture
+│   ├── dual-strategy.md     # Dual-track strategy
+│   ├── protocol-whitepaper.md # Protocol technical whitepaper
+│   ├── business-plan.md     # Business plan
+│   ├── market-research.md   # Market analysis
+│   ├── sprint-review/       # SprintForge review artifacts
+│   ├── legal/               # Legal docs (ToS, Privacy, Compliance)
+│   └── marketing/           # Marketing materials
+└── shared/                  # Shared types and constants
 ```
 
----
+## 🚀 Getting Started
 
-## 🔑 Environment Variables
+### Prerequisites
+- Node.js 22+, pnpm 9+
+- MySQL/TiDB database
 
-Required environment variables:
+### Installation
 
-```env
-# Database
-DATABASE_URL=mysql://user:password@host:port/database
-
-# Authentication
-JWT_SECRET=your-jwt-secret
-VITE_APP_ID=your-manus-app-id
-OAUTH_SERVER_URL=https://api.manus.im
-VITE_OAUTH_PORTAL_URL=https://vida.manus.im
-
-# Application
-VITE_APP_TITLE=AllSquared
-VITE_APP_LOGO=/logo.png
-PORT=3000
-
-# Optional: AI Features
-OPENAI_API_KEY=your-openai-key
+```bash
+git clone https://github.com/AutonoLabs/allsquared.git
+cd allsquared
+pnpm install
+cp .env.example .env   # Configure your environment
+pnpm db:push            # Set up database schema
+pnpm dev                # Start at http://localhost:3000
 ```
 
----
+## 📊 Market Opportunity
 
-## 🎨 Key Features
+| Track | Market | TAM | SAM |
+|-------|--------|-----|-----|
+| Classic | UK freelance + home services | £30B | £5B (500K active freelancers) |
+| Protocol | Global agent commerce | $100B+ (2030 projected) | $1B (2027 early adopters) |
 
-### For Freelancers & Service Providers
-- Generate professional contracts in minutes
-- Secure milestone-based payments
-- Track project progress
-- Resolve disputes quickly
-- Access legal support when needed
+## 📈 Roadmap
 
-### For Clients
-- Clear contract terms and deliverables
-- Payment protection with escrow
-- Milestone approval workflow
-- Quality assurance
-- Dispute resolution support
+### Phase 1: Classic MVP ✅ (Complete)
+Contract wizard, milestones, signing, notifications, dashboard
 
-### Service Categories
-1. **Freelance Services** - Web dev, design, writing, consulting
-2. **Home Improvements** - Renovations, repairs, installations
-3. **Event Services** - Catering, photography, entertainment
-4. **Trade Services** - Plumbing, electrical, carpentry
-5. **Other Services** - Custom contracts for any service
+### Phase 2: Classic V2 (March 2026)
+Stripe escrow, AI contracts, IR35 compliance, email/SMS
 
----
+### Phase 2.5: Protocol Foundation (Q2 2026)
+Agent Registry, SA API, basic escrow, SDK v0.1
 
-## 📈 Market Opportunity
+### Phase 3: Protocol MVP (Q3 2026)
+Accord integration, x402 envelopes, peer verification, EAS reputation
 
-- **10M+** potential users in UK (freelancers + SMEs)
-- **£30B** market opportunity (home improvements + freelance services)
-- **56%** gross margin target
-- **22.8:1** LTV:CAC ratio
+### Phase 4: Ecosystem (Q4 2026)
+ACP integration, subcontracting, Moltbox/Moltbook integration
 
----
-
-## 🛡️ Compliance & Security
-
-- **FCA-Authorised Escrow** - Regulated payment protection
-- **UK GDPR Compliant** - Data protection and privacy
-- **SRA Guidelines** - Legal service compliance
-- **Bank-Grade Encryption** - Enterprise security standards
-- **Unreserved Legal Services** - Operating within UK legal framework
-
----
-
-## 🗺️ Roadmap
-
-### Phase 1: MVP ✅ (Complete)
-- [x] Marketing website (8 pages)
-- [x] Database schema (8 tables)
-- [x] Authentication system (Manus OAuth)
-- [x] User dashboard with stats
-- [x] Contract generation (Typeform-style wizard)
-- [x] Milestone management (submission, approval/rejection)
-- [x] Contract signing workflow
-- [x] Notifications system
-- [x] Template management
-- [x] User profile management
-
-### Phase 2: Integrations (Next)
-- [ ] Escrow integration (Riverside/Transpact API)
-- [ ] Payment processing (Stripe)
-- [ ] AI contract generation (OpenAI)
-- [ ] Email notifications (SendGrid/Resend)
-- [ ] SMS notifications (Twilio)
-
-### Phase 3: Advanced Features
-- [ ] AI dispute resolution
-- [ ] LITL lawyer referrals
-- [ ] Admin panel
-- [ ] Analytics dashboard
-
-### Phase 4: Scale
-- [ ] Mobile apps
-- [ ] International expansion
-- [ ] Enterprise features
-- [ ] API for integrations
-
----
+### Phase 5: Scale (2027)
+AI arbitration, credit scores, template marketplace, cross-protocol
 
 ## 📚 Documentation
 
-- [Business Plan](docs/allsquared_business_plan.md)
-- [Market Research](docs/uk_market_research_competitive_analysis.md)
-- [Pitch Deck](docs/pitch_deck/) - 20-slide investor presentation
-- [LITL Service Model](docs/litl_service_model_and_risk_framework.md)
-- [Product Requirements](docs/prd/) - Coming soon
+- [Architecture](/docs/architecture.md) — Technical architecture deep-dive
+- [Dual Strategy](/docs/dual-strategy.md) — Classic + Protocol strategy
+- [Protocol Whitepaper](/docs/protocol-whitepaper.md) — Protocol technical spec
+- [Business Plan](/docs/business-plan.md) — Full business plan
+- [Market Research](/docs/market-research.md) — Market analysis
+- [Sprint Review](/docs/sprint-review/) — SprintForge sprint artifacts
 
----
+## 🛡️ Compliance & Security
 
-## 🤝 Contributing
-
-This is a proprietary project. The source code is available for viewing only.
-
-For collaboration inquiries, please contact: hello@allsquared.uk
-
----
-
-## 📄 License
-
-Copyright © 2025 Nakamoto Labs. All Rights Reserved.
-
-This is proprietary software. See [LICENSE](LICENSE) for details.
-
----
+- FCA-Authorised Escrow (Classic)
+- UK GDPR Compliant
+- On-chain escrow (Protocol) — immutable, no admin keys
+- EAS reputation — tamper-proof, publicly verifiable
+- SRA Guidelines for LITL
 
 ## 📞 Contact
 
-- **Website**: [allsquared.uk](https://allsquared.uk)
-- **Email**: hello@allsquared.uk
-- **Twitter**: [@AllSquaredUK](https://twitter.com/AllSquaredUK)
-- **LinkedIn**: [AllSquared](https://linkedin.com/company/allsquared)
+- Website: [allsquared.uk](https://allsquared.uk)
+- Email: [hello@allsquared.uk](mailto:hello@allsquared.uk)
+- Twitter: [@AllSquaredUK](https://twitter.com/AllSquaredUK)
 
 ---
 
-## 🙏 Acknowledgments
+Built with ❤️ by [AutonoLabs](https://autonolabs.io)
 
-Built with:
-- [React](https://react.dev/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [shadcn/ui](https://ui.shadcn.com/)
-- [tRPC](https://trpc.io/)
-- [Drizzle ORM](https://orm.drizzle.team/)
-- [Manus Platform](https://manus.im/)
-
----
-
-**Made with ❤️ by Nakamoto Labs**
-
+**One contract engine. Two markets. The commercial layer for human and agent commerce.**
