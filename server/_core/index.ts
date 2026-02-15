@@ -210,6 +210,15 @@ if (process.env.NODE_ENV !== "development") {
   serveStatic(app);
 }
 
+// Start server for standalone deployment (not in Vercel)
+// Vercel sets VERCEL=1 in their environment
+if (!process.env.VERCEL) {
+  const PORT = process.env.PORT || 3300;
+  app.listen(PORT, () => {
+    console.log(`[Server] AllSquared running on http://localhost:${PORT}`);
+  });
+}
+
 // Export for Vercel serverless
 export default app;
 
