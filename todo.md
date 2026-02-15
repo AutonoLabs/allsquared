@@ -73,7 +73,7 @@
 - [x] Build templates backend (tRPC router)
 - [x] Build template management panel UI
 - [x] Add template editor with variables
-- [ ] Implement template selection in contract creation
+- [x] Implement template selection in contract creation
 - [ ] Test all MVP features end-to-end
 - [x] Save checkpoint and push to GitHub
 - [x] Create comprehensive README

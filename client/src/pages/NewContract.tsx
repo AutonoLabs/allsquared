@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -14,7 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2 } from "lucide-react";
+import { ArrowLeft, Loader2, FileText, Check, X } from "lucide-react";
 
 const CONTRACT_CATEGORIES = [
   { value: "freelance", label: "Freelance Services", description: "Web design, writing, consulting, etc." },
@@ -24,9 +25,18 @@ const CONTRACT_CATEGORIES = [
   { value: "other", label: "Other Services", description: "Custom service agreements" },
 ];
 
+interface TemplateData {
+  id: string;
+  name: string;
+  description: string | null;
+  category: string;
+  templateContent: string | null;
+}
+
 export default function NewContract() {
   const [, setLocation] = useLocation();
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState(0); // 0 = template selection, 1 = details, 2 = financial
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateData | null>(null);
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -37,6 +47,9 @@ export default function NewContract() {
     endDate: "",
   });
 
+  // Fetch templates
+  const { data: templates, isLoading: templatesLoading } = trpc.templates.list.useQuery({});
+
   const createMutation = trpc.contracts.create.useMutation({
     onSuccess: (data) => {
       toast.success("Contract created successfully!");
@@ -46,6 +59,34 @@ export default function NewContract() {
       toast.error(error.message || "Failed to create contract");
     },
   });
+
+  const handleSelectTemplate = (template: TemplateData) => {
+    setSelectedTemplate(template);
+    
+    // Parse template content
+    const templateContent = template.templateContent 
+      ? JSON.parse(template.templateContent)
+      : { content: "", variables: [] };
+    
+    // Pre-fill form data
+    setFormData({
+      ...formData,
+      category: template.category,
+      description: templateContent.content || "",
+    });
+    
+    toast.success(`Template "${template.name}" selected`);
+    setStep(1);
+  };
+
+  const handleClearTemplate = () => {
+    setSelectedTemplate(null);
+    setFormData({
+      ...formData,
+      category: "",
+      description: "",
+    });
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,6 +115,7 @@ export default function NewContract() {
 
     // Create contract
     createMutation.mutate({
+      templateId: selectedTemplate?.id,
       title: formData.title,
       description: formData.description,
       category: formData.category,
@@ -84,11 +126,31 @@ export default function NewContract() {
       content: {
         terms: formData.description,
         createdBy: "client",
+        templateId: selectedTemplate?.id,
+        templateName: selectedTemplate?.name,
       },
     });
   };
 
   const selectedCategory = CONTRACT_CATEGORIES.find((c) => c.value === formData.category);
+
+  const getCategoryLabel = (category: string) => {
+    const cat = CONTRACT_CATEGORIES.find(c => c.value === category);
+    return cat?.label || category;
+  };
+
+  const getCategoryColor = (category: string): string => {
+    const colors: Record<string, string> = {
+      freelance: "bg-blue-100 text-blue-800",
+      home_improvement: "bg-green-100 text-green-800",
+      event_services: "bg-purple-100 text-purple-800",
+      trade_services: "bg-orange-100 text-orange-800",
+      other: "bg-gray-100 text-gray-800",
+    };
+    return colors[category] || colors.other;
+  };
+
+  const hasTemplates = templates && templates.length > 0;
 
   return (
     <div className="container max-w-3xl mx-auto py-8">
@@ -96,7 +158,15 @@ export default function NewContract() {
       <div className="mb-8">
         <Button
           variant="ghost"
-          onClick={() => (step === 1 ? setLocation("/dashboard/contracts") : setStep(1))}
+          onClick={() => {
+            if (step === 0) {
+              setLocation("/dashboard/contracts");
+            } else if (step === 1) {
+              setStep(0);
+            } else {
+              setStep(1);
+            }
+          }}
           className="mb-4"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
@@ -104,7 +174,9 @@ export default function NewContract() {
         </Button>
         <h1 className="text-3xl font-bold">Create New Contract</h1>
         <p className="text-muted-foreground mt-1">
-          {step === 1
+          {step === 0
+            ? "Choose a template or start from scratch"
+            : step === 1
             ? "Start by choosing a service category and describing the work"
             : "Add financial details and timeline"}
         </p>
@@ -113,13 +185,24 @@ export default function NewContract() {
       {/* Progress Steps */}
       <div className="flex items-center justify-center mb-8">
         <div className="flex items-center gap-4">
+          <div className={`flex items-center gap-2 ${step >= 0 ? "text-primary" : "text-muted-foreground"}`}>
+            <div
+              className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
+                step >= 0 ? "bg-primary text-primary-foreground" : "bg-muted"
+              }`}
+            >
+              1
+            </div>
+            <span className="font-medium hidden sm:inline">Template</span>
+          </div>
+          <div className="w-12 h-0.5 bg-muted" />
           <div className={`flex items-center gap-2 ${step >= 1 ? "text-primary" : "text-muted-foreground"}`}>
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center font-semibold ${
                 step >= 1 ? "bg-primary text-primary-foreground" : "bg-muted"
               }`}
             >
-              1
+              2
             </div>
             <span className="font-medium hidden sm:inline">Service Details</span>
           </div>
@@ -130,14 +213,92 @@ export default function NewContract() {
                 step >= 2 ? "bg-primary text-primary-foreground" : "bg-muted"
               }`}
             >
-              2
+              3
             </div>
             <span className="font-medium hidden sm:inline">Financial & Timeline</span>
           </div>
         </div>
       </div>
 
-      {/* Form */}
+      {/* Template Selection Step */}
+      {step === 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Choose a Template</CardTitle>
+            <CardDescription>
+              Start with a pre-built template or create from scratch
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {templatesLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="h-8 w-8 animate-spin text-primary" />
+              </div>
+            ) : hasTemplates ? (
+              <>
+                {/* Template Cards */}
+                <div className="grid gap-4 max-h-[400px] overflow-y-auto">
+                  {templates.map((template) => {
+                    const templateContent = template.templateContent 
+                      ? JSON.parse(template.templateContent as string)
+                      : { content: "", variables: [] };
+                    
+                    return (
+                      <button
+                        key={template.id}
+                        onClick={() => handleSelectTemplate(template as TemplateData)}
+                        className="p-4 rounded-lg border-2 border-gray-200 bg-white transition-all text-left hover:border-primary hover:shadow-md flex items-start gap-4"
+                      >
+                        <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <FileText className="h-5 w-5 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold">{template.name}</h3>
+                          <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
+                            {template.description || templateContent.content?.substring(0, 80) + "..."}
+                          </p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <Badge className={getCategoryColor(template.category)}>
+                              {getCategoryLabel(template.category)}
+                            </Badge>
+                            {templateContent.variables && templateContent.variables.length > 0 && (
+                              <Badge variant="outline">
+                                {templateContent.variables.length} variables
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Divider */}
+                <div className="relative py-4">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t" />
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="bg-card px-4 text-muted-foreground">or</span>
+                  </div>
+                </div>
+              </>
+            ) : null}
+
+            {/* Start from Scratch */}
+            <Button 
+              onClick={() => setStep(1)} 
+              variant={hasTemplates ? "outline" : "default"}
+              size="lg" 
+              className="w-full"
+            >
+              {hasTemplates ? "Start from Scratch" : "Create Contract"}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Form Steps */}
       <form onSubmit={handleSubmit}>
         {step === 1 && (
           <Card>
@@ -146,12 +307,38 @@ export default function NewContract() {
               <CardDescription>Describe the service you need</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* Selected Template Banner */}
+              {selectedTemplate && (
+                <div className="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-primary/20">
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-5 w-5 text-primary" />
+                    <div>
+                      <p className="text-sm font-medium">Using template: {selectedTemplate.name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Category and description pre-filled
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleClearTemplate}
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+
               {/* Category Selection */}
               <div className="space-y-2">
                 <Label htmlFor="category">
                   Service Category <span className="text-destructive">*</span>
                 </Label>
-                <Select value={formData.category} onValueChange={(value) => setFormData({ ...formData, category: value })}>
+                <Select 
+                  value={formData.category} 
+                  onValueChange={(value) => setFormData({ ...formData, category: value })}
+                >
                   <SelectTrigger id="category">
                     <SelectValue placeholder="Select a category" />
                   </SelectTrigger>
@@ -283,6 +470,12 @@ export default function NewContract() {
               <div className="bg-muted p-4 rounded-lg space-y-2">
                 <h4 className="font-semibold">Contract Summary</h4>
                 <div className="text-sm space-y-1">
+                  {selectedTemplate && (
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Template:</span>
+                      <span className="font-medium">{selectedTemplate.name}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between">
                     <span className="text-muted-foreground">Category:</span>
                     <span className="font-medium capitalize">{formData.category.replace(/_/g, " ")}</span>
@@ -316,4 +509,3 @@ export default function NewContract() {
     </div>
   );
 }
-
