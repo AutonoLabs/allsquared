@@ -12,7 +12,9 @@ import { paymentsRouter } from "./routers/payments";
 import { escrowRouter } from "./routers/escrow";
 import { signaturesRouter } from "./routers/signatures";
 import { adminRouter } from "./routers/admin";
+import { contactsRouter } from "./routers/contacts";
 import { updateUser, getUserByClerkId, upsertUser, getUser } from "./db";
+import { sendWelcomeEmail } from "./email";
 import { z } from "zod";
 import { nanoid } from "nanoid";
 
@@ -54,19 +56,26 @@ export const appRouter = router({
           return await getUser(user.id);
         }
 
-        // Create new user with admin role if first user or matches owner email
+        // Create new user - superadmin for owner email, else regular user
         const userId = `clerk_${nanoid(16)}`;
-        const isFirstUser = true; // TODO: Check if this is the first user
-        
+        const SUPERADMIN_EMAIL = 'eli@autonolabs.io';
+        const isAdmin = email?.toLowerCase() === SUPERADMIN_EMAIL;
+
         await upsertUser({
           id: userId,
           clerkId,
           email,
           name,
           loginMethod: 'clerk',
-          role: isFirstUser ? 'admin' : 'user',
+          role: isAdmin ? 'admin' : 'user',
           lastSignedIn: new Date(),
         });
+
+        // Send welcome email to new users
+        if (email) {
+          sendWelcomeEmail(email, { name: name || 'there' })
+            .catch(err => console.error('[Email] sendWelcome failed:', err));
+        }
 
         return await getUser(userId);
       }),
@@ -95,6 +104,7 @@ export const appRouter = router({
   notifications: notificationsRouter,
   templates: templatesRouter,
   files: filesRouter,
+  contacts: contactsRouter,
 
   // New integrations
   ai: aiRouter,

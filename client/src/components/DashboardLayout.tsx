@@ -25,7 +25,7 @@ import {
 } from "@/components/ui/sidebar";
 import { APP_LOGO, APP_TITLE } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, FileCode, UserCircle, Shield, AlertTriangle, CheckSquare, BarChart3, ScrollText } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, FileCode, UserCircle, Shield, AlertTriangle, CheckSquare, BarChart3, ScrollText, Contact } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -33,6 +33,7 @@ import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
   { icon: FileText, label: "Contracts", path: "/dashboard/contracts" },
+  { icon: Contact, label: "Contacts", path: "/dashboard/contacts" },
   { icon: FileCode, label: "Templates", path: "/dashboard/templates" },
   { icon: UserCircle, label: "Profile", path: "/dashboard/profile" },
 ];

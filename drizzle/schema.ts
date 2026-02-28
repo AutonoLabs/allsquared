@@ -452,3 +452,17 @@ export const aiGenerations = pgTable("aiGenerations", {
 
 export type AiGeneration = typeof aiGenerations.$inferSelect;
 export type InsertAiGeneration = typeof aiGenerations.$inferInsert;
+
+// CRM: Contact notes and interactions
+export const contactNotes = pgTable("contactNotes", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  ownerId: varchar("ownerId", { length: 64 }).notNull(), // User who created the note
+  contactId: varchar("contactId", { length: 64 }).notNull(), // The contact (another user)
+  content: text("content").notNull(),
+  contractId: varchar("contractId", { length: 64 }), // Optional link to a contract
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export type ContactNote = typeof contactNotes.$inferSelect;
+export type InsertContactNote = typeof contactNotes.$inferInsert;

@@ -7,7 +7,13 @@ import {
   updateMilestone,
   getContract,
   createNotification,
+  getUser,
 } from '../db';
+import {
+  sendMilestoneSubmittedEmail,
+  sendMilestoneApprovedEmail,
+  sendMilestoneRejectedEmail,
+} from '../email';
 
 export const milestonesRouter = router({
   // List milestones for a contract
@@ -164,7 +170,18 @@ export const milestonesRouter = router({
         isRead: 'no',
         createdAt: new Date(),
       });
-      
+
+      // Email client
+      const client = await getUser(contract.clientId);
+      if (client?.email) {
+        sendMilestoneSubmittedEmail(client.email, {
+          milestoneTitle: milestone.title || 'Untitled',
+          contractTitle: contract.title || 'Untitled Contract',
+          contractId: milestone.contractId,
+          providerName: ctx.user.name || 'Provider',
+        }).catch(err => console.error('[Email] sendMilestoneSubmitted failed:', err));
+      }
+
       return { success: true };
     }),
 
@@ -205,7 +222,18 @@ export const milestonesRouter = router({
         isRead: 'no',
         createdAt: new Date(),
       });
-      
+
+      // Email provider
+      const provider = await getUser(contract.providerId);
+      if (provider?.email) {
+        sendMilestoneApprovedEmail(provider.email, {
+          milestoneTitle: milestone.title || 'Untitled',
+          contractTitle: contract.title || 'Untitled Contract',
+          contractId: milestone.contractId,
+          amount: milestone.amount || '0',
+        }).catch(err => console.error('[Email] sendMilestoneApproved failed:', err));
+      }
+
       return { success: true };
     }),
 
@@ -245,7 +273,18 @@ export const milestonesRouter = router({
         isRead: 'no',
         createdAt: new Date(),
       });
-      
+
+      // Email provider
+      const provider = await getUser(contract.providerId);
+      if (provider?.email) {
+        sendMilestoneRejectedEmail(provider.email, {
+          milestoneTitle: milestone.title || 'Untitled',
+          contractTitle: contract.title || 'Untitled Contract',
+          contractId: milestone.contractId,
+          reason: input.reason,
+        }).catch(err => console.error('[Email] sendMilestoneRejected failed:', err));
+      }
+
       return { success: true };
     }),
 });

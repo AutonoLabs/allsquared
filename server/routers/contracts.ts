@@ -5,8 +5,10 @@ import {
   getContract,
   createContract,
   updateContract,
+  getUser,
 } from '../db';
 import { createNotification } from '../db';
+import { sendContractSentEmail, sendContractSignedEmail } from '../email';
 
 export const contractsRouter = router({
   // List user's contracts
@@ -219,8 +221,18 @@ export const contractsRouter = router({
           isRead: 'no',
           createdAt: new Date(),
         });
+
+        // Send email notification
+        const provider = await getUser(contract.providerId);
+        if (provider?.email) {
+          sendContractSentEmail(provider.email, {
+            contractTitle: contract.title || 'Untitled Contract',
+            senderName: ctx.user.name || 'A client',
+            contractId: input.id,
+          }).catch(err => console.error('[Email] sendContractSent failed:', err));
+        }
       }
-      
+
       return { success: true };
     }),
 
@@ -287,7 +299,7 @@ export const contractsRouter = router({
           isRead: 'no',
           createdAt: new Date(),
         });
-        
+
         if (contract.providerId && contract.providerId !== contract.clientId) {
           await createNotification({
             id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
@@ -301,7 +313,25 @@ export const contractsRouter = router({
           });
         }
       }
-      
+
+      // Send email notifications for signing event
+      const emailData = {
+        contractTitle: contract.title || 'Untitled Contract',
+        signerName: input.signatureName,
+        contractId: input.id,
+        allSigned,
+      };
+
+      // Email the other party
+      const otherPartyId = ctx.user.id === contract.clientId ? contract.providerId : contract.clientId;
+      if (otherPartyId) {
+        const otherParty = await getUser(otherPartyId);
+        if (otherParty?.email) {
+          sendContractSignedEmail(otherParty.email, emailData)
+            .catch(err => console.error('[Email] sendContractSigned failed:', err));
+        }
+      }
+
       return { success: true, allSigned };
     }),
 

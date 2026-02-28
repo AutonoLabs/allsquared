@@ -1,7 +1,7 @@
 import { eq, and, or, desc } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { 
-  InsertUser, 
+import {
+  InsertUser,
   users,
   contracts,
   milestones,
@@ -10,6 +10,7 @@ import {
   litlReferrals,
   notifications,
   contractTemplates,
+  contactNotes,
   type Contract,
   type InsertContract,
   type Milestone,
@@ -24,6 +25,8 @@ import {
   type InsertNotification,
   type ContractTemplate,
   type InsertContractTemplate,
+  type ContactNote,
+  type InsertContactNote,
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -389,7 +392,7 @@ export async function markNotificationAsRead(id: string) {
 export async function markAllNotificationsAsRead(userId: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  
+
   await db
     .update(notifications)
     .set({ isRead: "yes" })
@@ -397,6 +400,99 @@ export async function markAllNotificationsAsRead(userId: string) {
       and(
         eq(notifications.userId, userId),
         eq(notifications.isRead, "no")
+      )
+    );
+}
+
+// ── CRM: Contacts ──────────────────────────────────────────────
+
+export async function getUserContacts(userId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  // Get all unique users this person has contracts with
+  const userContracts = await db
+    .select()
+    .from(contracts)
+    .where(
+      or(
+        eq(contracts.clientId, userId),
+        eq(contracts.providerId, userId)
+      )
+    );
+
+  // Extract unique contact IDs
+  const contactIds = new Set<string>();
+  for (const c of userContracts) {
+    if (c.clientId !== userId) contactIds.add(c.clientId);
+    if (c.providerId !== userId) contactIds.add(c.providerId);
+  }
+
+  if (contactIds.size === 0) return [];
+
+  // Fetch user details for each contact
+  const contactUsers = [];
+  for (const id of contactIds) {
+    const user = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    if (user[0]) {
+      // Count contracts with this contact
+      const sharedContracts = userContracts.filter(
+        c => c.clientId === id || c.providerId === id
+      );
+      const activeContracts = sharedContracts.filter(c => c.status === 'active').length;
+      const totalValue = sharedContracts.reduce(
+        (sum, c) => sum + parseInt(c.totalAmount || '0', 10), 0
+      );
+
+      contactUsers.push({
+        ...user[0],
+        contractCount: sharedContracts.length,
+        activeContracts,
+        totalValue,
+        lastContractDate: sharedContracts
+          .sort((a, b) => new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime())[0]
+          ?.createdAt,
+      });
+    }
+  }
+
+  return contactUsers;
+}
+
+export async function getContactNotes(ownerId: string, contactId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  return await db
+    .select()
+    .from(contactNotes)
+    .where(
+      and(
+        eq(contactNotes.ownerId, ownerId),
+        eq(contactNotes.contactId, contactId)
+      )
+    )
+    .orderBy(desc(contactNotes.createdAt));
+}
+
+export async function createContactNote(note: InsertContactNote) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.insert(contactNotes).values(note);
+  return note;
+}
+
+export async function deleteContactNote(id: string, ownerId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db
+    .delete(contactNotes)
+    .where(
+      and(
+        eq(contactNotes.id, id),
+        eq(contactNotes.ownerId, ownerId)
       )
     );
 }

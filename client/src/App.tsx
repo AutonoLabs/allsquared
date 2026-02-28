@@ -1,4 +1,5 @@
 import { Analytics } from "@vercel/analytics/react";
+import CookieConsent from "./components/CookieConsent";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
@@ -37,6 +38,8 @@ import PaymentSettings from "./pages/PaymentSettings";
 import Freelancers from "./pages/Freelancers";
 import Clients from "./pages/Clients";
 import LegalServices from "./pages/LegalServices";
+import Contacts from "./pages/Contacts";
+import ContactDetail from "./pages/ContactDetail";
 
 function Router() {
   // make sure to consider if you need authentication for certain routes
@@ -72,6 +75,16 @@ function Router() {
       <Route path="/dashboard/profile">
         <DashboardLayout>
           <Profile />
+        </DashboardLayout>
+      </Route>
+      <Route path="/dashboard/contacts">
+        <DashboardLayout>
+          <Contacts />
+        </DashboardLayout>
+      </Route>
+      <Route path="/dashboard/contacts/:id">
+        <DashboardLayout>
+          <ContactDetail />
         </DashboardLayout>
       </Route>
       <Route path="/dashboard/settings/billing">
@@ -170,6 +183,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Router />
+          <CookieConsent />
           <Analytics />
         </TooltipProvider>
       </ThemeProvider>
