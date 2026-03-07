@@ -39,11 +39,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.google-analytics.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.google-analytics.com https://*.clerk.accounts.dev",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",
       "img-src 'self' data: https: blob:",
-      "connect-src 'self' https://api.stripe.com https://*.transpact.com https://*.docusign.com https://api.openai.com wss:",
+      "connect-src 'self' https://api.stripe.com https://*.transpact.com https://*.docusign.com https://api.openai.com https://*.clerk.accounts.dev https://*.clerk.dev https://api.clerk.com wss:",
       "frame-src 'self' https://js.stripe.com https://*.docusign.com https://*.signwell.com",
       "object-src 'none'",
     ].join('; ')
