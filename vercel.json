@@ -1,23 +1,15 @@
 {
   "version": 2,
-  "buildCommand": "npm run build",
   "devCommand": "npm run dev",
-  "installCommand": "npm install --legacy-peer-deps",
   "framework": null,
   "outputDirectory": "dist/public",
-  "functions": {
-    "api/index.ts": {
-      "runtime": "@vercel/node@3.0.0",
-      "maxDuration": 30
-    }
-  },
   "env": {
     "VITE_APP_TITLE": "AllSquared",
     "VITE_APP_LOGO": "/logo.png"
   },
   "build": {
     "env": {
-      "NODE_VERSION": "24"
+      "NODE_VERSION": "20"
     }
   },
   "rewrites": [
@@ -57,5 +49,7 @@
         }
       ]
     }
-  ]
+  ],
+  "installCommand": "pnpm install --prod=false",
+  "buildCommand": "pnpm build"
 }
