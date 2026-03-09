@@ -205,8 +205,8 @@ app.use(
   })
 );
 
-// Serve static files in production
-if (process.env.NODE_ENV !== "development") {
+// Serve static files in production (skip on Vercel — CDN handles static assets)
+if (process.env.NODE_ENV !== "development" && !process.env.VERCEL) {
   serveStatic(app);
 }
 
