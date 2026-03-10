@@ -1,6 +1,6 @@
 import express, { Request, Response, NextFunction } from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
-import { registerOAuthRoutes } from "./oauth";
+// import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic } from "./vite";
@@ -131,8 +131,8 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-// OAuth callback under /api/oauth/callback
-registerOAuthRoutes(app);
+// OAuth callback under /api/oauth/callback (Legacy - Disabled)
+// registerOAuthRoutes(app);
 
 // =============================================================================
 // WEBHOOK ROUTES (must be before tRPC to use raw body)
