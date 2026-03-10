@@ -2,15 +2,14 @@
   "version": 2,
   "buildCommand": "pnpm build",
   "outputDirectory": "dist/public",
-  "functions": {
-    "api/index.ts": {
-      "runtime": "nodejs@20.x",
-      "includeFiles": "node_modules/lightningcss/**/*"
-    }
-  },
+  "installCommand": "pnpm install --prod=false",
   "build": {
     "env": {
       "NODE_VERSION": "20"
     }
-  }
+  },
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
