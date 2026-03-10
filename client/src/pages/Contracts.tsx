@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Link } from "wouter";
-import { Plus, Search, FileText, ArrowRight } from "lucide-react";
+import { Plus, Search, FileText, ArrowRight, Calendar, Banknote, Tag } from "lucide-react";
 
 export default function Contracts() {
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
@@ -25,8 +25,7 @@ export default function Contracts() {
   });
 
   const contracts = data?.contracts || [];
-  
-  // Client-side search filter
+
   const filteredContracts = contracts.filter((contract) => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
@@ -39,15 +38,36 @@ export default function Contracts() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 space-y-6">
-        <Skeleton className="h-12 w-64" />
-        <div className="flex gap-4">
-          <Skeleton className="h-10 w-64" />
-          <Skeleton className="h-10 w-48" />
+      <div className="space-y-6 p-2">
+        <div className="flex items-center justify-between">
+          <div>
+            <Skeleton className="h-9 w-48" />
+            <Skeleton className="h-5 w-64 mt-2" />
+          </div>
+          <Skeleton className="h-11 w-40" />
         </div>
-        <div className="space-y-4">
+        <Card className="border-0 shadow-sm">
+          <CardContent className="pt-6">
+            <div className="flex gap-4">
+              <Skeleton className="h-10 flex-1" />
+              <Skeleton className="h-10 w-48" />
+            </div>
+          </CardContent>
+        </Card>
+        <div className="space-y-3">
           {[...Array(5)].map((_, i) => (
-            <Skeleton key={i} className="h-32" />
+            <Card key={i} className="border-0 shadow-sm">
+              <CardContent className="p-5">
+                <div className="flex items-start gap-4">
+                  <Skeleton className="h-10 w-10 rounded-lg" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-5 w-48" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-3 w-64" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
           ))}
         </div>
       </div>
@@ -55,17 +75,17 @@ export default function Contracts() {
   }
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="space-y-6 p-2">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Contracts</h1>
+          <h1 className="text-3xl font-bold tracking-tight">Contracts</h1>
           <p className="text-muted-foreground mt-1">
             Manage all your service agreements
           </p>
         </div>
         <Link href="/dashboard/contracts/new">
-          <Button size="lg">
+          <Button size="lg" className="shadow-sm">
             <Plus className="mr-2 h-5 w-5" />
             New Contract
           </Button>
@@ -73,7 +93,7 @@ export default function Contracts() {
       </div>
 
       {/* Filters */}
-      <Card>
+      <Card className="border-0 shadow-sm">
         <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
@@ -105,17 +125,19 @@ export default function Contracts() {
 
       {/* Contracts List */}
       {filteredContracts.length === 0 ? (
-        <Card>
+        <Card className="border-0 shadow-sm">
           <CardContent className="py-16">
             <div className="text-center">
-              <FileText className="mx-auto h-12 w-12 text-muted-foreground/50" />
-              <h3 className="mt-4 text-lg font-semibold">
+              <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-muted mb-4">
+                <FileText className="h-8 w-8 text-muted-foreground/50" />
+              </div>
+              <h3 className="text-lg font-semibold">
                 {searchQuery || statusFilter ? "No contracts found" : "No contracts yet"}
               </h3>
-              <p className="text-sm text-muted-foreground mt-2 mb-4">
+              <p className="text-sm text-muted-foreground mt-2 mb-6 max-w-sm mx-auto">
                 {searchQuery || statusFilter
                   ? "Try adjusting your search or filters"
-                  : "Get started by creating your first contract"}
+                  : "Get started by creating your first contract to manage your freelance work"}
               </p>
               {!searchQuery && !statusFilter && (
                 <Link href="/dashboard/contracts/new">
@@ -129,44 +151,47 @@ export default function Contracts() {
           </CardContent>
         </Card>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-3">
           {filteredContracts.map((contract) => (
             <Link key={contract.id} href={`/dashboard/contracts/${contract.id}`}>
-              <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                <CardContent className="p-6">
-                  <div className="flex items-start justify-between">
+              <Card className="border-0 shadow-sm hover:shadow-md transition-all cursor-pointer group">
+                <CardContent className="p-5">
+                  <div className="flex items-start gap-4">
+                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+                      <FileText className="h-5 w-5 text-primary" />
+                    </div>
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-lg font-semibold truncate">{contract.title}</h3>
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <h3 className="text-base font-semibold truncate">{contract.title}</h3>
                         <StatusBadge status={contract.status} />
                       </div>
-                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
-                        {contract.description}
-                      </p>
-                      <div className="flex flex-wrap items-center gap-4 text-sm">
-                        <div className="flex items-center gap-2">
-                          <span className="text-muted-foreground">Category:</span>
-                          <span className="font-medium capitalize">
-                            {contract.category.replace(/_/g, " ")}
-                          </span>
+                      {contract.description && (
+                        <p className="text-sm text-muted-foreground line-clamp-1 mb-3">
+                          {contract.description}
+                        </p>
+                      )}
+                      <div className="flex flex-wrap items-center gap-4 text-xs text-muted-foreground">
+                        <div className="flex items-center gap-1.5">
+                          <Tag className="h-3.5 w-3.5" />
+                          <span className="capitalize">{contract.category.replace(/_/g, " ")}</span>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <span className="text-muted-foreground">Value:</span>
-                          <span className="font-semibold">
+                        <div className="flex items-center gap-1.5">
+                          <Banknote className="h-3.5 w-3.5" />
+                          <span className="font-medium text-foreground">
                             £{(parseInt(contract.totalAmount || "0") / 100).toLocaleString("en-GB", {
                               minimumFractionDigits: 2,
                             })}
                           </span>
                         </div>
                         {contract.createdAt && (
-                          <div className="flex items-center gap-2">
-                            <span className="text-muted-foreground">Created:</span>
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="h-3.5 w-3.5" />
                             <span>{new Date(contract.createdAt).toLocaleDateString("en-GB")}</span>
                           </div>
                         )}
                       </div>
                     </div>
-                    <ArrowRight className="h-5 w-5 text-muted-foreground ml-4 flex-shrink-0" />
+                    <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-2" />
                   </div>
                 </CardContent>
               </Card>
@@ -186,26 +211,27 @@ export default function Contracts() {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const statusConfig: Record<string, { label: string; className: string }> = {
-    draft: { label: "Draft", className: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200" },
+  const statusConfig: Record<string, { label: string; className: string; dot: string }> = {
+    draft: { label: "Draft", className: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300", dot: "bg-gray-400" },
     pending_signature: {
       label: "Pending Signature",
-      className: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200",
+      className: "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-200",
+      dot: "bg-amber-500",
     },
-    active: { label: "Active", className: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" },
-    completed: { label: "Completed", className: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" },
-    disputed: { label: "Disputed", className: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" },
-    cancelled: { label: "Cancelled", className: "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400" },
+    active: { label: "Active", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-200", dot: "bg-emerald-500" },
+    completed: { label: "Completed", className: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200", dot: "bg-blue-500" },
+    disputed: { label: "Disputed", className: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200", dot: "bg-red-500" },
+    cancelled: { label: "Cancelled", className: "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400", dot: "bg-gray-400" },
   };
 
   const config = statusConfig[status] || statusConfig.draft;
 
   return (
     <span
-      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${config.className}`}
+      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${config.className}`}
     >
+      <span className={`h-1.5 w-1.5 rounded-full ${config.dot}`} />
       {config.label}
     </span>
   );
 }
-

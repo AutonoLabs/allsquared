@@ -3,7 +3,7 @@ import { useRoute, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import MilestoneManager from "@/components/MilestoneManager";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -11,18 +11,19 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { 
-  ArrowLeft, 
-  FileText, 
-  Calendar, 
+import {
+  ArrowLeft,
+  FileText,
+  Calendar,
   DollarSign,
   Users,
   CheckCircle2,
-  Clock,
   AlertCircle,
   Send,
   Edit,
   Trash2,
+  Tag,
+  Banknote,
 } from "lucide-react";
 
 export default function ContractDetail() {
@@ -69,20 +70,44 @@ export default function ContractDetail() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto py-8 space-y-6">
-        <Skeleton className="h-12 w-64" />
-        <Skeleton className="h-96" />
+      <div className="space-y-6 p-2">
+        <Skeleton className="h-8 w-32" />
+        <div className="flex items-center gap-3">
+          <Skeleton className="h-9 w-64" />
+          <Skeleton className="h-6 w-20 rounded-full" />
+        </div>
+        <Skeleton className="h-5 w-96" />
+        <div className="grid gap-6 lg:grid-cols-3">
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="border-0 shadow-sm">
+              <CardHeader><Skeleton className="h-6 w-40" /></CardHeader>
+              <CardContent><Skeleton className="h-32" /></CardContent>
+            </Card>
+            <Card className="border-0 shadow-sm">
+              <CardHeader><Skeleton className="h-6 w-40" /></CardHeader>
+              <CardContent><Skeleton className="h-48" /></CardContent>
+            </Card>
+          </div>
+          <div className="space-y-6">
+            <Card className="border-0 shadow-sm">
+              <CardHeader><Skeleton className="h-6 w-24" /></CardHeader>
+              <CardContent><Skeleton className="h-10 w-full" /></CardContent>
+            </Card>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (!contract) {
     return (
-      <div className="container mx-auto py-16 text-center">
-        <AlertCircle className="mx-auto h-12 w-12 text-muted-foreground" />
-        <h2 className="mt-4 text-2xl font-bold">Contract Not Found</h2>
-        <p className="text-muted-foreground mt-2">This contract doesn't exist or you don't have access to it.</p>
-        <Button className="mt-6" onClick={() => setLocation("/dashboard/contracts")}>
+      <div className="flex flex-col items-center justify-center py-20">
+        <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-muted mb-4">
+          <AlertCircle className="h-8 w-8 text-muted-foreground" />
+        </div>
+        <h2 className="text-2xl font-bold">Contract Not Found</h2>
+        <p className="text-muted-foreground mt-2 mb-6">This contract doesn't exist or you don't have access to it.</p>
+        <Button onClick={() => setLocation("/dashboard/contracts")}>
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Contracts
         </Button>
@@ -94,23 +119,23 @@ export default function ContractDetail() {
   const signatures = contractContent.signatures || [];
 
   return (
-    <div className="container mx-auto py-8 space-y-6">
+    <div className="space-y-6 p-2">
       {/* Header */}
       <div>
-        <Button variant="ghost" onClick={() => setLocation("/dashboard/contracts")} className="mb-4">
+        <Button variant="ghost" size="sm" onClick={() => setLocation("/dashboard/contracts")} className="mb-4 -ml-2">
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Contracts
         </Button>
-        <div className="flex items-start justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
-              <h1 className="text-3xl font-bold">{contract.title}</h1>
+              <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">{contract.title}</h1>
               <StatusBadge status={contract.status} />
             </div>
             <p className="text-muted-foreground">{contract.description}</p>
           </div>
           {contract.status === "draft" && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 shrink-0">
               <Button variant="outline" size="sm" onClick={() => setLocation(`/dashboard/contracts/${contractId}/edit`)}>
                 <Edit className="mr-2 h-4 w-4" />
                 Edit
@@ -136,43 +161,51 @@ export default function ContractDetail() {
         {/* Main Content */}
         <div className="lg:col-span-2 space-y-6">
           {/* Contract Details */}
-          <Card>
+          <Card className="border-0 shadow-sm">
             <CardHeader>
               <CardTitle>Contract Details</CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-start gap-3">
-                  <FileText className="h-5 w-5 text-muted-foreground mt-0.5" />
+            <CardContent>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <div className="h-9 w-9 rounded-lg bg-blue-500/10 flex items-center justify-center shrink-0">
+                    <Tag className="h-4 w-4 text-blue-600" />
+                  </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Category</p>
-                    <p className="font-medium capitalize">{contract.category.replace(/_/g, " ")}</p>
+                    <p className="text-xs text-muted-foreground font-medium">Category</p>
+                    <p className="font-semibold capitalize">{contract.category.replace(/_/g, " ")}</p>
                   </div>
                 </div>
-                <div className="flex items-start gap-3">
-                  <DollarSign className="h-5 w-5 text-muted-foreground mt-0.5" />
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                  <div className="h-9 w-9 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
+                    <Banknote className="h-4 w-4 text-emerald-600" />
+                  </div>
                   <div>
-                    <p className="text-sm text-muted-foreground">Total Value</p>
+                    <p className="text-xs text-muted-foreground font-medium">Total Value</p>
                     <p className="font-semibold text-lg">
                       £{(parseInt(contract.totalAmount || "0") / 100).toLocaleString("en-GB", { minimumFractionDigits: 2 })}
                     </p>
                   </div>
                 </div>
                 {contract.startDate && (
-                  <div className="flex items-start gap-3">
-                    <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                    <div className="h-9 w-9 rounded-lg bg-amber-500/10 flex items-center justify-center shrink-0">
+                      <Calendar className="h-4 w-4 text-amber-600" />
+                    </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">Start Date</p>
-                      <p className="font-medium">{new Date(contract.startDate).toLocaleDateString("en-GB")}</p>
+                      <p className="text-xs text-muted-foreground font-medium">Start Date</p>
+                      <p className="font-semibold">{new Date(contract.startDate).toLocaleDateString("en-GB")}</p>
                     </div>
                   </div>
                 )}
                 {contract.endDate && (
-                  <div className="flex items-start gap-3">
-                    <Calendar className="h-5 w-5 text-muted-foreground mt-0.5" />
+                  <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
+                    <div className="h-9 w-9 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
+                      <Calendar className="h-4 w-4 text-purple-600" />
+                    </div>
                     <div>
-                      <p className="text-sm text-muted-foreground">End Date</p>
-                      <p className="font-medium">{new Date(contract.endDate).toLocaleDateString("en-GB")}</p>
+                      <p className="text-xs text-muted-foreground font-medium">End Date</p>
+                      <p className="font-semibold">{new Date(contract.endDate).toLocaleDateString("en-GB")}</p>
                     </div>
                   </div>
                 )}
@@ -188,15 +221,15 @@ export default function ContractDetail() {
 
           {/* Signatures */}
           {signatures.length > 0 && (
-            <Card>
+            <Card className="border-0 shadow-sm">
               <CardHeader>
                 <CardTitle>Signatures</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
                   {signatures.map((sig: any, index: number) => (
-                    <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
-                      <CheckCircle2 className="h-5 w-5 text-green-600" />
+                    <div key={index} className="flex items-center gap-3 p-3 rounded-lg border bg-emerald-50/50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900">
+                      <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
                       <div>
                         <p className="font-medium">{sig.name}</p>
                         <p className="text-sm text-muted-foreground">
@@ -214,9 +247,9 @@ export default function ContractDetail() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Actions */}
-          <Card>
+          <Card className="border-0 shadow-sm">
             <CardHeader>
-              <CardTitle>Actions</CardTitle>
+              <CardTitle className="text-base">Actions</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               {contract.status === "draft" && (
@@ -270,26 +303,30 @@ export default function ContractDetail() {
                   </DialogContent>
                 </Dialog>
               )}
+              {contract.status !== "draft" && contract.status !== "pending_signature" && contract.status !== "active" && (
+                <p className="text-sm text-muted-foreground text-center py-2">
+                  No actions available for this contract status.
+                </p>
+              )}
             </CardContent>
           </Card>
 
           {/* Parties */}
-          <Card>
+          <Card className="border-0 shadow-sm">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Users className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-base">
+                <Users className="h-4 w-4" />
                 Parties
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <div>
-                <p className="text-sm text-muted-foreground">Client</p>
-                <p className="font-medium">{contract.clientId}</p>
+            <CardContent className="space-y-4">
+              <div className="p-3 rounded-lg bg-muted/50">
+                <p className="text-xs text-muted-foreground font-medium mb-1">Client</p>
+                <p className="font-medium text-sm">{contract.clientId}</p>
               </div>
-              <Separator />
-              <div>
-                <p className="text-sm text-muted-foreground">Service Provider</p>
-                <p className="font-medium">{contract.providerId || "Not assigned"}</p>
+              <div className="p-3 rounded-lg bg-muted/50">
+                <p className="text-xs text-muted-foreground font-medium mb-1">Service Provider</p>
+                <p className="font-medium text-sm">{contract.providerId || "Not assigned"}</p>
               </div>
             </CardContent>
           </Card>
@@ -300,19 +337,21 @@ export default function ContractDetail() {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const statusConfig: Record<string, { label: string; className: string }> = {
-    draft: { label: "Draft", className: "bg-gray-100 text-gray-800" },
-    pending_signature: { label: "Pending Signature", className: "bg-yellow-100 text-yellow-800" },
-    active: { label: "Active", className: "bg-green-100 text-green-800" },
-    completed: { label: "Completed", className: "bg-blue-100 text-blue-800" },
-    disputed: { label: "Disputed", className: "bg-red-100 text-red-800" },
-    cancelled: { label: "Cancelled", className: "bg-gray-100 text-gray-600" },
+  const statusConfig: Record<string, { label: string; className: string; dot: string }> = {
+    draft: { label: "Draft", className: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300", dot: "bg-gray-400" },
+    pending_signature: { label: "Pending Signature", className: "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-200", dot: "bg-amber-500" },
+    active: { label: "Active", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-200", dot: "bg-emerald-500" },
+    completed: { label: "Completed", className: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200", dot: "bg-blue-500" },
+    disputed: { label: "Disputed", className: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200", dot: "bg-red-500" },
+    cancelled: { label: "Cancelled", className: "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400", dot: "bg-gray-400" },
   };
 
   const config = statusConfig[status] || statusConfig.draft;
 
-  return <Badge className={config.className}>{config.label}</Badge>;
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${config.className}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${config.dot}`} />
+      {config.label}
+    </span>
+  );
 }
-
-
-
