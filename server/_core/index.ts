@@ -3,7 +3,8 @@ import { createExpressMiddleware } from "@trpc/server/adapters/express";
 // import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
-import { serveStatic } from "./vite";
+// Dynamic import to avoid pulling vite into Vercel serverless bundle
+// import { serveStatic } from "./vite";
 
 // Create Express app
 const app = express();
@@ -207,7 +208,7 @@ app.use(
 
 // Serve static files in production (skip on Vercel — CDN handles static assets)
 if (process.env.NODE_ENV !== "development" && !process.env.VERCEL) {
-  serveStatic(app);
+  import("./vite").then(({ serveStatic }) => serveStatic(app));
 }
 
 // Start server for standalone deployment (not in Vercel)
