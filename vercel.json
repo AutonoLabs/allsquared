@@ -5,7 +5,7 @@
   "functions": {
     "api/index.ts": {
       "runtime": "nodejs20.x",
-      "handler": "dist/index.js"
+
     }
   },
   "build": {
