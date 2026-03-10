@@ -5,7 +5,7 @@
   "functions": {
     "api/index.ts": {
       "runtime": "nodejs@20.x",
-      "includeFiles": ["node_modules/lightningcss/**/*"]
+      "includeFiles": "node_modules/lightningcss/**/*"
     }
   },
   "build": {
