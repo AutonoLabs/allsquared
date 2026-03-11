@@ -93,7 +93,7 @@ export default function Home() {
                 </Button>
               ) : (
                 <Button size="lg" variant="secondary" className="text-base px-8 h-12 shadow-lg shadow-secondary/25" asChild>
-                  <Link href="/contact">
+                  <Link href="/dashboard">
                     Join Waitlist
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
@@ -400,7 +400,7 @@ export default function Home() {
                 </Button>
               ) : (
                 <Button size="lg" className="text-base px-8 h-12" asChild>
-                  <Link href="/contact">
+                  <Link href="/dashboard">
                     Join Waitlist - It's Free
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
