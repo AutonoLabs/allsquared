@@ -5,6 +5,7 @@ import { createRoot } from "react-dom/client";
 import superjson from "superjson";
 import App from "./App";
 import { ClerkAuthProvider } from "./lib/clerk";
+import { ClerkProvider, useAuth as useClerkAuth } from "@clerk/clerk-react";
 import "./index.css";
 
 const queryClient = new QueryClient();
@@ -24,27 +25,40 @@ queryClient.getMutationCache().subscribe(event => {
   }
 });
 
-const trpcClient = trpc.createClient({
-  links: [
-    httpBatchLink({
-      url: "/api/trpc",
-      transformer: superjson,
-      fetch(input, init) {
-        return globalThis.fetch(input, {
-          ...(init ?? {}),
-          credentials: "include",
-        });
-      },
-    }),
-  ],
-});
+// Inner component that has access to Clerk context for auth tokens
+function AppWithTRPC() {
+  const { getToken } = useClerkAuth();
 
-createRoot(document.getElementById("root")!).render(
-  <ClerkAuthProvider>
+  const trpcClient = trpc.createClient({
+    links: [
+      httpBatchLink({
+        url: "/api/trpc",
+        transformer: superjson,
+        async headers() {
+          const token = await getToken();
+          return token ? { Authorization: `Bearer ${token}` } : {};
+        },
+        fetch(input, init) {
+          return globalThis.fetch(input, {
+            ...(init ?? {}),
+            credentials: "include",
+          });
+        },
+      }),
+    ],
+  });
+
+  return (
     <trpc.Provider client={trpcClient} queryClient={queryClient}>
       <QueryClientProvider client={queryClient}>
         <App />
       </QueryClientProvider>
     </trpc.Provider>
+  );
+}
+
+createRoot(document.getElementById("root")!).render(
+  <ClerkAuthProvider>
+    <AppWithTRPC />
   </ClerkAuthProvider>
 );

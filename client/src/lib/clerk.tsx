@@ -18,7 +18,27 @@ export function ClerkAuthProvider({ children }: ClerkAuthProviderProps) {
   }
   
   return (
-    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+    <ClerkProvider 
+      publishableKey={PUBLISHABLE_KEY}
+      appearance={{
+        layout: {
+          logoImageUrl: '/logo.png',
+          socialButtonsVariant: 'iconButton',
+        },
+        variables: {
+          colorPrimary: '#2563eb',
+          colorBackground: '#ffffff',
+          borderRadius: '0.5rem',
+        },
+        elements: {
+          formButtonPrimary: 'bg-blue-600 hover:bg-blue-700',
+          headerTitle: 'text-xl font-bold',
+          headerSubtitle: 'text-muted-foreground',
+          card: 'shadow-none',
+          footer: 'hidden',
+        },
+      }}
+    >
       {children}
     </ClerkProvider>
   );
