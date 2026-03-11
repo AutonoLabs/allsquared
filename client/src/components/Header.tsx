@@ -59,11 +59,11 @@ export default function Header() {
         <div className="hidden md:flex md:items-center md:gap-3">
           <NotificationCenter />
           <Button variant="ghost" size="sm" asChild>
-            <Link href="/contact">Sign In</Link>
+            <Link href="/dashboard">Sign In</Link>
           </Button>
           <Button size="sm" className="shadow-sm" asChild>
-            <Link href="/contact">
-              Join Waitlist
+            <Link href="/dashboard">
+              Get Started Free
               <ChevronRight className="ml-1 h-4 w-4" />
             </Link>
           </Button>
@@ -105,10 +105,10 @@ export default function Header() {
             ))}
             <div className="pt-4 space-y-2 border-t mt-2">
               <Button variant="outline" className="w-full" asChild>
-                <Link href="/contact">Sign In</Link>
+                <Link href="/dashboard">Sign In</Link>
               </Button>
               <Button className="w-full" asChild>
-                <Link href="/contact">Join Waitlist</Link>
+                <Link href="/dashboard">Get Started Free</Link>
               </Button>
             </div>
           </div>
