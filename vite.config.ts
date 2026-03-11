@@ -24,6 +24,16 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: path.resolve(import.meta.dirname, "dist/public"),
       emptyOutDir: true,
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            'vendor-react': ['react', 'react-dom'],
+            'vendor-clerk': ['@clerk/clerk-react'],
+            'vendor-ui': ['lucide-react', 'framer-motion'],
+            'vendor-trpc': ['@trpc/client', '@trpc/react-query', '@tanstack/react-query'],
+          },
+        },
+      },
     },
     server: {
       host: true,
