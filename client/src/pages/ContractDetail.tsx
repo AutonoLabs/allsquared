@@ -34,6 +34,7 @@ export default function ContractDetail() {
   const [isSignDialogOpen, setIsSignDialogOpen] = useState(false);
 
   const utils = trpc.useUtils();
+  const { data: currentUser } = trpc.auth.me.useQuery();
   const { data: contract, isLoading } = trpc.contracts.get.useQuery({ id: contractId });
 
   const signMutation = trpc.contracts.sign.useMutation({
@@ -216,7 +217,7 @@ export default function ContractDetail() {
           {/* Milestones */}
           <MilestoneManager
             contractId={contractId}
-            userRole={contract.clientId === "current-user-id" ? "client" : "provider"}
+            userRole={currentUser && contract.clientId === currentUser.id ? "client" : "provider"}
           />
 
           {/* Signatures */}

@@ -67,7 +67,9 @@ function Router() {
         </DashboardLayout>
       </Route>
       <Route path="/dashboard/templates/:id">
-        <TemplateEditor />
+        <DashboardLayout>
+          <TemplateEditor />
+        </DashboardLayout>
       </Route>
       <Route path="/dashboard/profile">
         <DashboardLayout>
