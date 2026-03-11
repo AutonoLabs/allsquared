@@ -312,7 +312,7 @@ export default function Profile() {
             <div>
               <h4 className="font-medium">Authentication</h4>
               <p className="text-sm text-muted-foreground">
-                Managed through Manus OAuth
+                Managed through Clerk
               </p>
             </div>
             <Button variant="outline" disabled>
