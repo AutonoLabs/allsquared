@@ -134,6 +134,14 @@
   input[type="radio"]:not(:disabled) {
     @apply cursor-pointer;
   }
+  button:not(:disabled):not([data-no-hover]),
+  [role="button"]:not([aria-disabled="true"]):not([data-no-hover]) {
+    @apply transition-all duration-200;
+  }
+  button:not(:disabled):not([data-no-hover]):hover,
+  [role="button"]:not([aria-disabled="true"]):not([data-no-hover]):hover {
+    @apply shadow-sm;
+  }
 }
 
 @layer components {

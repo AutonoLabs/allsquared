@@ -1,18 +1,18 @@
 import { APP_LOGO, APP_TITLE } from "@/const";
 import { Link } from "wouter";
-import { Shield, Mail } from "lucide-react";
+import { Shield, Mail, Twitter, Linkedin, Github } from "lucide-react";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t bg-muted/30">
+    <footer className="border-t bg-gradient-to-b from-muted/30 to-muted/10">
       <div className="container py-12 md:py-16">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
           {/* Brand */}
           <div className="space-y-4 md:col-span-1">
-            <Link href="/" className="flex items-center gap-3">
-              <img src={APP_LOGO} alt={APP_TITLE} className="h-8 w-auto" />
+            <Link href="/" className="flex items-center gap-3 group">
+              <img src={APP_LOGO} alt={APP_TITLE} className="h-8 w-auto transition-transform group-hover:scale-105" />
               <span className="font-bold text-lg tracking-tight">{APP_TITLE}</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed">
@@ -21,6 +21,20 @@ export default function Footer() {
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <Shield className="h-4 w-4 text-primary" />
               <span>FCA-Regulated Escrow</span>
+            </div>
+            <div className="flex items-center gap-3 pt-2">
+              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-lg hover:bg-muted">
+                <Twitter className="h-4 w-4" />
+                <span className="sr-only">Twitter</span>
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-lg hover:bg-muted">
+                <Linkedin className="h-4 w-4" />
+                <span className="sr-only">LinkedIn</span>
+              </a>
+              <a href="#" className="text-muted-foreground hover:text-foreground transition-colors p-1.5 rounded-lg hover:bg-muted">
+                <Github className="h-4 w-4" />
+                <span className="sr-only">GitHub</span>
+              </a>
             </div>
           </div>
 

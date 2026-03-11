@@ -392,21 +392,21 @@ export default function Home() {
             </p>
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
               {isAuthenticated ? (
-                <Button size="lg" className="text-base px-8 h-12" asChild>
+                <Button size="lg" className="text-base px-8 h-12 shadow-md hover:shadow-lg hover:scale-[1.02] transition-all duration-200" asChild>
                   <Link href="/dashboard">
                     Go to Dashboard
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
               ) : (
-                <Button size="lg" className="text-base px-8 h-12" asChild>
+                <Button size="lg" className="text-base px-8 h-12 shadow-md hover:shadow-lg hover:scale-[1.02] transition-all duration-200" asChild>
                   <Link href="/dashboard">
                     Join Waitlist - It's Free
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
               )}
-              <Button size="lg" variant="outline" className="text-base px-8 h-12" asChild>
+              <Button size="lg" variant="outline" className="text-base px-8 h-12 hover:scale-[1.02] transition-all duration-200" asChild>
                 <Link href="/pricing">View Pricing</Link>
               </Button>
             </div>
