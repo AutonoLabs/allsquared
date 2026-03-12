@@ -1,536 +1,772 @@
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { toast } from "sonner";
-import { ArrowRight, ArrowLeft, Check, Loader2, FileText, Sparkles } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { toast } from "sonner";
+import {
+  ArrowRight,
+  ArrowLeft,
+  Check,
+  Loader2,
+  FileText,
+  Code2,
+  UserCheck,
+  Lock,
+  ScrollText,
+  Shield,
+  Download,
+  Save,
+  Send,
+  CheckCircle2,
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
-const CONTRACT_CATEGORIES = [
-  { value: "freelance", label: "Freelance Services", emoji: "💼", description: "Web design, writing, consulting" },
-  { value: "home_improvement", label: "Home Improvement", emoji: "🏠", description: "Renovations, repairs, installations" },
-  { value: "event_services", label: "Event Services", emoji: "🎉", description: "Photography, catering, entertainment" },
-  { value: "trade_services", label: "Trade Services", emoji: "🔧", description: "Plumbing, electrical, carpentry" },
-  { value: "other", label: "Other Services", emoji: "📋", description: "Custom service agreements" },
-];
+// ── Types ──────────────────────────────────────────────────────────────
 
-interface QuestionConfig {
-  id: string;
-  type: string;
-  question: string;
-  placeholder: string;
-  prefix?: string;
+interface VariableDef {
+  name: string;
+  label: string;
+  type: "text" | "textarea" | "date" | "select";
+  required?: boolean;
+  default?: string;
+  group: string;
+  options?: string[];
 }
 
-const BASE_QUESTIONS: QuestionConfig[] = [
-  { id: "category", type: "choice", question: "What type of service contract do you need?", placeholder: "" },
-  { id: "title", type: "text", question: "What's the name of this project?", placeholder: "e.g., Website Design for Small Business" },
-  { id: "description", type: "textarea", question: "Describe the work to be done", placeholder: "Be specific about deliverables, timeline, and requirements..." },
-  { id: "totalAmount", type: "number", question: "What's the total contract value?", placeholder: "0.00", prefix: "£" },
-  { id: "providerEmail", type: "email", question: "Do you know the service provider's email? (Optional)", placeholder: "provider@example.com" },
-  { id: "startDate", type: "date", question: "When should the work start? (Optional)", placeholder: "" },
-  { id: "endDate", type: "date", question: "When should it be completed? (Optional)", placeholder: "" },
-];
+interface ClauseOption {
+  id: string;
+  label: string;
+  summary: string;
+}
 
-interface TemplateData {
+interface LegalTemplate {
   id: string;
   name: string;
   description: string | null;
   category: string;
-  templateContent: string | null;
+  templateSlug: string | null;
+  variables: VariableDef[];
+  clauseBanks: Record<string, ClauseOption[]>;
 }
+
+// ── Constants ──────────────────────────────────────────────────────────
+
+const STEP_LABELS = [
+  "Select Agreement",
+  "Fill Details",
+  "Select Clauses",
+  "Preview",
+  "Save & Sign",
+];
+
+const TEMPLATE_ICONS: Record<string, typeof FileText> = {
+  "msa-uk": FileText,
+  "software-dev-uk": Code2,
+  "freelancer-uk": UserCheck,
+  "escrow-uk": Lock,
+  "tos-uk": ScrollText,
+  "privacy-uk": Shield,
+};
+
+const TEMPLATE_DESCRIPTIONS: Record<string, string> = {
+  "msa-uk": "Comprehensive services agreement for UK engagements",
+  "software-dev-uk": "Software development with agile delivery & IP terms",
+  "freelancer-uk": "Freelancer/contractor engagement with IR35 provisions",
+  "escrow-uk": "Escrow payment annexure for milestone-based projects",
+  "tos-uk": "Website/platform terms of service for UK compliance",
+  "privacy-uk": "GDPR-compliant privacy policy with ICO registration",
+};
+
+// ── Slide animation ────────────────────────────────────────────────────
+
+const slideVariants = {
+  enter: (dir: number) => ({ x: dir > 0 ? 600 : -600, opacity: 0 }),
+  center: { x: 0, opacity: 1 },
+  exit: (dir: number) => ({ x: dir < 0 ? 600 : -600, opacity: 0 }),
+};
+
+// ── Component ──────────────────────────────────────────────────────────
 
 export default function NewContractTypeform() {
   const [, setLocation] = useLocation();
-  const [currentStep, setCurrentStep] = useState(-1); // -1 for template selection
-  const [formData, setFormData] = useState<Record<string, string>>({});
+  const [step, setStep] = useState(0);
   const [direction, setDirection] = useState(1);
-  const [selectedTemplate, setSelectedTemplate] = useState<TemplateData | null>(null);
-  const [showTemplateStep, setShowTemplateStep] = useState(true);
 
-  // Fetch templates
-  const { data: templates, isLoading: templatesLoading } = trpc.templates.list.useQuery({});
+  // Data
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [variables, setVariables] = useState<Record<string, string>>({});
+  const [selectedClauses, setSelectedClauses] = useState<Record<string, string>>({});
+  const [generatedMarkdown, setGeneratedMarkdown] = useState("");
+  const [savedContractId, setSavedContractId] = useState<string | null>(null);
 
-  const createMutation = trpc.contracts.create.useMutation({
+  // Variable group navigation (sub-step within step 2)
+  const [currentGroupIdx, setCurrentGroupIdx] = useState(0);
+
+  // Queries
+  const { data: templates, isLoading: loadingTemplates } =
+    trpc.templateBuilder.listLegalTemplates.useQuery();
+
+  const selectedTemplate = useMemo(
+    () => templates?.find((t) => t.id === selectedTemplateId) ?? null,
+    [templates, selectedTemplateId]
+  );
+
+  const { data: fullTemplate } = trpc.templateBuilder.getLegalTemplate.useQuery(
+    { id: selectedTemplateId! },
+    { enabled: !!selectedTemplateId }
+  );
+
+  // Mutations
+  const generateMutation = trpc.templateBuilder.generateContract.useMutation({
     onSuccess: (data) => {
-      toast.success("Contract created successfully!");
-      setLocation(`/dashboard/contracts/${data.contractId}`);
+      setGeneratedMarkdown(data.generatedMarkdown);
+      setSavedContractId(data.contractId);
     },
-    onError: (error) => {
-      toast.error(error.message || "Failed to create contract");
-    },
+    onError: (err) => toast.error(err.message),
   });
 
-  // Calculate questions based on template
-  const QUESTIONS = BASE_QUESTIONS;
-  const totalSteps = QUESTIONS.length + (showTemplateStep ? 1 : 0);
-  const actualStep = showTemplateStep ? currentStep + 1 : currentStep;
-  const progress = ((actualStep + 1) / totalSteps) * 100;
-  
-  const currentQuestion = currentStep >= 0 ? QUESTIONS[currentStep] : null;
+  const saveMutation = trpc.templateBuilder.saveContractDraft.useMutation({
+    onSuccess: (data) => {
+      setSavedContractId(data.contractId);
+      toast.success("Contract saved!");
+      goTo(4); // go to final step
+    },
+    onError: (err) => toast.error(err.message),
+  });
 
-  // Handle template selection
-  const handleSelectTemplate = (template: TemplateData) => {
-    setSelectedTemplate(template);
-    
-    // Parse template content
-    const templateContent = template.templateContent 
-      ? JSON.parse(template.templateContent)
-      : { content: "", variables: [] };
-    
-    // Pre-fill form data from template
-    const newFormData: Record<string, string> = {
-      ...formData,
-      category: template.category,
-      description: templateContent.content || "",
-    };
-    
-    setFormData(newFormData);
-    
-    // Move to first question (skip category since it's pre-filled)
-    setDirection(1);
-    setCurrentStep(1); // Skip to title since category is set
-    toast.success(`Using "${template.name}" template`);
-  };
-
-  const handleSkipTemplate = () => {
-    setShowTemplateStep(false);
-    setDirection(1);
-    setCurrentStep(0);
-  };
-
-  const handleNext = () => {
-    if (!currentQuestion) return;
-    
-    const value = formData[currentQuestion.id];
-    
-    // Validation
-    if (currentQuestion.id === "category" && !value) {
-      toast.error("Please select a category");
-      return;
-    }
-    if (currentQuestion.id === "title" && !value) {
-      toast.error("Please enter a project name");
-      return;
-    }
-    if (currentQuestion.id === "description" && !value) {
-      toast.error("Please describe the work");
-      return;
-    }
-    if (currentQuestion.id === "totalAmount") {
-      if (!value) {
-        toast.error("Please enter the contract value");
-        return;
-      }
-      const amount = parseFloat(value);
-      if (isNaN(amount) || amount <= 0) {
-        toast.error("Please enter a valid amount");
-        return;
+  // Derived
+  const variableGroups = useMemo(() => {
+    if (!selectedTemplate) return [];
+    const groups: { name: string; vars: VariableDef[] }[] = [];
+    const seen = new Set<string>();
+    for (const v of selectedTemplate.variables) {
+      if (!seen.has(v.group)) {
+        seen.add(v.group);
+        groups.push({
+          name: v.group,
+          vars: selectedTemplate.variables.filter((x) => x.group === v.group),
+        });
       }
     }
+    return groups;
+  }, [selectedTemplate]);
 
-    if (currentStep < QUESTIONS.length - 1) {
-      setDirection(1);
-      setCurrentStep(currentStep + 1);
-    } else {
-      // Submit
-      handleSubmit();
+  const clauseCategories = useMemo(() => {
+    if (!selectedTemplate) return [];
+    return Object.entries(selectedTemplate.clauseBanks);
+  }, [selectedTemplate]);
+
+  const progress = ((step + 1) / 5) * 100;
+
+  // ── Navigation ─────────────────────────────────────────────────────
+
+  function goTo(s: number) {
+    setDirection(s > step ? 1 : -1);
+    setStep(s);
+  }
+
+  function handleBack() {
+    if (step === 1 && currentGroupIdx > 0) {
+      setCurrentGroupIdx(currentGroupIdx - 1);
+      return;
     }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 0) {
-      setDirection(-1);
-      setCurrentStep(currentStep - 1);
-    } else if (currentStep === 0 && showTemplateStep) {
-      setDirection(-1);
-      setCurrentStep(-1);
+    if (step > 0) {
+      goTo(step - 1);
+      if (step - 1 === 1) setCurrentGroupIdx(variableGroups.length - 1);
     } else {
       setLocation("/dashboard/contracts");
     }
-  };
+  }
 
-  const handleSubmit = () => {
-    const amount = parseFloat(formData.totalAmount);
-    
-    createMutation.mutate({
-      templateId: selectedTemplate?.id,
-      title: formData.title,
-      description: formData.description,
-      category: formData.category,
-      providerEmail: formData.providerEmail || undefined,
-      totalAmount: amount,
-      startDate: formData.startDate || undefined,
-      endDate: formData.endDate || undefined,
-      content: {
-        terms: formData.description,
-        createdBy: "client",
-        templateId: selectedTemplate?.id,
-        templateName: selectedTemplate?.name,
-      },
-    });
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (currentQuestion && e.key === "Enter" && currentQuestion.type !== "textarea") {
-      e.preventDefault();
-      handleNext();
+  function handleNext() {
+    if (step === 1) {
+      // Validate required vars in current group
+      const group = variableGroups[currentGroupIdx];
+      if (group) {
+        for (const v of group.vars) {
+          if (v.required && !variables[v.name]) {
+            toast.error(`Please fill in "${v.label}"`);
+            return;
+          }
+        }
+      }
+      if (currentGroupIdx < variableGroups.length - 1) {
+        setCurrentGroupIdx(currentGroupIdx + 1);
+        return;
+      }
     }
-  };
 
-  const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? 1000 : -1000,
-      opacity: 0,
-    }),
-    center: {
-      zIndex: 1,
-      x: 0,
-      opacity: 1,
-    },
-    exit: (direction: number) => ({
-      zIndex: 0,
-      x: direction < 0 ? 1000 : -1000,
-      opacity: 0,
-    }),
-  };
+    if (step === 2) {
+      // Generate markdown for preview
+      if (fullTemplate?.templateMarkdown) {
+        let md = fullTemplate.templateMarkdown;
+        for (const [key, value] of Object.entries(variables)) {
+          md = md.replace(new RegExp(`\\[${key}\\]`, "g"), value || `[${key}]`);
+        }
+        setGeneratedMarkdown(md);
+      }
+    }
 
-  const getCategoryLabel = (category: string) => {
-    const cat = CONTRACT_CATEGORIES.find(c => c.value === category);
-    return cat ? cat.label : category;
-  };
+    goTo(step + 1);
+    if (step + 1 === 1) setCurrentGroupIdx(0);
+  }
 
-  const getCategoryColor = (category: string): string => {
-    const colors: Record<string, string> = {
-      freelance: "bg-blue-100 text-blue-800",
-      home_improvement: "bg-green-100 text-green-800",
-      event_services: "bg-purple-100 text-purple-800",
-      trade_services: "bg-orange-100 text-orange-800",
-      other: "bg-gray-100 text-gray-800",
-    };
-    return colors[category] || colors.other;
-  };
+  // ── Step 0: Select Agreement Type ──────────────────────────────────
 
-  // Template selection step
-  const renderTemplateStep = () => {
-    if (templatesLoading) {
+  function renderStep0() {
+    if (loadingTemplates) {
       return (
-        <div className="flex items-center justify-center py-12">
+        <div className="flex items-center justify-center py-20">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
         </div>
       );
     }
 
-    const hasTemplates = templates && templates.length > 0;
+    if (!templates || templates.length === 0) {
+      return (
+        <div className="text-center py-20 space-y-4">
+          <FileText className="h-12 w-12 text-muted-foreground mx-auto" />
+          <p className="text-lg text-muted-foreground">
+            No legal templates found. Run the seed script first.
+          </p>
+          <code className="text-sm bg-muted px-3 py-1 rounded">
+            npx tsx server/seed-templates.ts
+          </code>
+        </div>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+            Choose your agreement type
+          </h1>
+          <p className="text-muted-foreground mt-2 text-lg">
+            Select a UK legal template to customise
+          </p>
+        </div>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          {templates.map((t) => {
+            const Icon = TEMPLATE_ICONS[t.templateSlug || ""] || FileText;
+            const desc =
+              TEMPLATE_DESCRIPTIONS[t.templateSlug || ""] || t.description || "";
+            return (
+              <button
+                key={t.id}
+                onClick={() => {
+                  setSelectedTemplateId(t.id);
+                  // Pre-fill defaults
+                  const defaults: Record<string, string> = {};
+                  for (const v of t.variables) {
+                    if (v.default) defaults[v.name] = v.default;
+                  }
+                  setVariables(defaults);
+                  // Pre-select first clause option per bank
+                  const clauses: Record<string, string> = {};
+                  for (const [key, opts] of Object.entries(t.clauseBanks)) {
+                    if (opts.length > 0) clauses[key] = opts[0].id;
+                  }
+                  setSelectedClauses(clauses);
+                  setCurrentGroupIdx(0);
+                  goTo(1);
+                }}
+                className="group relative p-6 rounded-2xl border-2 border-border bg-card text-left transition-all hover:border-primary hover:shadow-lg"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0 group-hover:bg-primary/20 transition-colors">
+                    <Icon className="h-6 w-6 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-base">{t.name}</h3>
+                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                      {desc}
+                    </p>
+                    <div className="flex items-center gap-2 mt-3">
+                      <Badge variant="secondary" className="text-xs">
+                        {t.variables.length} fields
+                      </Badge>
+                      {Object.keys(t.clauseBanks).length > 0 && (
+                        <Badge variant="outline" className="text-xs">
+                          {Object.keys(t.clauseBanks).length} clause{Object.keys(t.clauseBanks).length !== 1 ? "s" : ""}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0 mt-1" />
+                </div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Step 1: Fill Variables ──────────────────────────────────────────
+
+  function renderStep1() {
+    if (!selectedTemplate || variableGroups.length === 0) return null;
+    const group = variableGroups[currentGroupIdx];
+
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+            {group.name}
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Step {currentGroupIdx + 1} of {variableGroups.length} — fill in the details
+          </p>
+        </div>
+
+        {/* Sub-progress */}
+        <div className="flex gap-1.5">
+          {variableGroups.map((_, i) => (
+            <div
+              key={i}
+              className={`h-1.5 flex-1 rounded-full transition-colors ${
+                i <= currentGroupIdx ? "bg-primary" : "bg-muted"
+              }`}
+            />
+          ))}
+        </div>
+
+        <div className="space-y-5">
+          {group.vars.map((v) => (
+            <div key={v.name} className="space-y-2">
+              <Label htmlFor={v.name}>
+                {v.label}
+                {v.required && <span className="text-destructive ml-1">*</span>}
+              </Label>
+
+              {v.type === "text" && (
+                <Input
+                  id={v.name}
+                  placeholder={v.default || v.label}
+                  value={variables[v.name] || ""}
+                  onChange={(e) =>
+                    setVariables({ ...variables, [v.name]: e.target.value })
+                  }
+                  className="h-12 text-base"
+                />
+              )}
+
+              {v.type === "textarea" && (
+                <Textarea
+                  id={v.name}
+                  placeholder={v.label}
+                  value={variables[v.name] || ""}
+                  onChange={(e) =>
+                    setVariables({ ...variables, [v.name]: e.target.value })
+                  }
+                  className="min-h-[120px] text-base"
+                />
+              )}
+
+              {v.type === "date" && (
+                <Input
+                  id={v.name}
+                  type="date"
+                  value={variables[v.name] || ""}
+                  onChange={(e) =>
+                    setVariables({ ...variables, [v.name]: e.target.value })
+                  }
+                  className="h-12 text-base"
+                />
+              )}
+
+              {v.type === "select" && v.options && (
+                <Select
+                  value={variables[v.name] || v.default || ""}
+                  onValueChange={(val) =>
+                    setVariables({ ...variables, [v.name]: val })
+                  }
+                >
+                  <SelectTrigger className="h-12 text-base">
+                    <SelectValue placeholder={`Select ${v.label}`} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {v.options.map((opt) => (
+                      <SelectItem key={opt} value={opt}>
+                        {opt}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Step 2: Select Clauses ─────────────────────────────────────────
+
+  function renderStep2() {
+    if (!selectedTemplate) return null;
+
+    if (clauseCategories.length === 0) {
+      return (
+        <div className="space-y-6">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+              Clause Options
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              No optional clauses for this template — your agreement is ready to preview.
+            </p>
+          </div>
+        </div>
+      );
+    }
 
     return (
       <div className="space-y-8">
-        {/* Question Number */}
-        <div className="flex items-center gap-2 text-primary font-medium">
-          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm">
-            <Sparkles className="h-4 w-4" />
-          </div>
-          <span className="text-sm">Quick Start</span>
+        <div>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+            Choose your clauses
+          </h1>
+          <p className="text-muted-foreground mt-2">
+            Select the options that best fit your engagement
+          </p>
         </div>
 
-        {/* Question */}
-        <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-          {hasTemplates 
-            ? "Start with a template or create from scratch?"
-            : "Let's create your contract"}
-        </h1>
-
-        {hasTemplates ? (
-          <div className="space-y-4">
-            <p className="text-lg text-muted-foreground">
-              Templates help you create contracts faster with pre-filled content
-            </p>
-            
-            {/* Template Cards */}
-            <div className="grid gap-4 max-h-[400px] overflow-y-auto pr-2">
-              {templates.map((template) => {
-                const templateContent = template.templateContent 
-                  ? JSON.parse(template.templateContent as string)
-                  : { content: "", variables: [] };
-                
+        {clauseCategories.map(([categoryKey, options]) => (
+          <div key={categoryKey} className="space-y-3">
+            <h2 className="text-lg font-semibold capitalize">
+              {categoryKey.replace(/_/g, " ")}
+            </h2>
+            <div className="grid gap-3">
+              {options.map((opt) => {
+                const isSelected = selectedClauses[categoryKey] === opt.id;
                 return (
                   <button
-                    key={template.id}
-                    onClick={() => handleSelectTemplate(template as TemplateData)}
-                    className="p-6 rounded-xl border-2 border-gray-200 bg-white transition-all text-left hover:border-primary hover:shadow-md"
+                    key={opt.id}
+                    onClick={() =>
+                      setSelectedClauses({ ...selectedClauses, [categoryKey]: opt.id })
+                    }
+                    className={`p-5 rounded-xl border-2 text-left transition-all ${
+                      isSelected
+                        ? "border-primary bg-primary/5 shadow-sm"
+                        : "border-border hover:border-primary/50"
+                    }`}
                   >
-                    <div className="flex items-start gap-4">
-                      <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <FileText className="h-6 w-6 text-primary" />
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-colors ${
+                          isSelected ? "border-primary bg-primary" : "border-muted-foreground/30"
+                        }`}
+                      >
+                        {isSelected && <Check className="h-3 w-3 text-primary-foreground" />}
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-lg">{template.name}</h3>
-                        <p className="text-sm text-muted-foreground line-clamp-2 mt-1">
-                          {template.description || templateContent.content?.substring(0, 100) + "..."}
+                      <div>
+                        <h3 className="font-medium">{opt.label}</h3>
+                        <p className="text-sm text-muted-foreground mt-0.5">
+                          {opt.summary}
                         </p>
-                        <div className="flex items-center gap-2 mt-3">
-                          <Badge className={getCategoryColor(template.category)}>
-                            {getCategoryLabel(template.category)}
-                          </Badge>
-                          {templateContent.variables && templateContent.variables.length > 0 && (
-                            <Badge variant="outline">
-                              {templateContent.variables.length} variables
-                            </Badge>
-                          )}
-                        </div>
                       </div>
-                      <ArrowRight className="h-5 w-5 text-muted-foreground" />
                     </div>
                   </button>
                 );
               })}
             </div>
-
-            {/* Skip Option */}
-            <div className="pt-4 border-t">
-              <Button 
-                variant="ghost" 
-                size="lg" 
-                onClick={handleSkipTemplate}
-                className="text-lg"
-              >
-                Start from scratch
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </div>
           </div>
-        ) : (
-          <div className="space-y-4">
-            <p className="text-lg text-muted-foreground">
-              Answer a few questions to create your contract
-            </p>
-            <Button
-              onClick={handleSkipTemplate}
-              size="lg"
-              className="text-lg h-14 px-8"
-            >
-              Get Started
-              <ArrowRight className="ml-2 h-5 w-5" />
-            </Button>
-          </div>
-        )}
+        ))}
       </div>
     );
-  };
+  }
 
-  // Regular question step
-  const renderQuestionStep = () => {
-    if (!currentQuestion) return null;
+  // ── Step 3: Preview ────────────────────────────────────────────────
+
+  function renderStep3() {
+    const markdown = generatedMarkdown || "No content generated yet.";
+
+    // Simple markdown-to-HTML: headings, bold, paragraphs, hr, lists
+    const html = markdownToHtml(markdown);
+
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+              Preview
+            </h1>
+            <p className="text-muted-foreground mt-2">
+              Review your generated agreement
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              window.print();
+            }}
+          >
+            <Download className="h-4 w-4 mr-2" />
+            Export PDF
+          </Button>
+        </div>
+
+        <div
+          className="contract-preview bg-white border rounded-xl p-8 md:p-12 max-h-[60vh] overflow-y-auto shadow-sm print:shadow-none print:border-none print:max-h-none print:p-0"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
+
+        <style>{`
+          .contract-preview {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.7;
+            color: #1a1a1a;
+          }
+          .contract-preview h1 {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 2rem 0 1rem;
+            color: #111;
+          }
+          .contract-preview h2 {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin: 1.5rem 0 0.75rem;
+            color: #222;
+          }
+          .contract-preview h3 {
+            font-family: system-ui, -apple-system, sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 1.25rem 0 0.5rem;
+            color: #333;
+          }
+          .contract-preview p {
+            margin: 0.5rem 0;
+          }
+          .contract-preview hr {
+            border: none;
+            border-top: 1px solid #e5e5e5;
+            margin: 1.5rem 0;
+          }
+          .contract-preview strong {
+            font-weight: 700;
+          }
+          .contract-preview ul, .contract-preview ol {
+            padding-left: 1.5rem;
+            margin: 0.5rem 0;
+          }
+          .contract-preview .unfilled-var {
+            background: #fef3c7;
+            padding: 0 4px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 0.9em;
+          }
+          @media print {
+            body * { visibility: hidden; }
+            .contract-preview, .contract-preview * { visibility: visible; }
+            .contract-preview { position: absolute; left: 0; top: 0; width: 100%; }
+          }
+        `}</style>
+      </div>
+    );
+  }
+
+  // ── Step 4: Save & Sign ────────────────────────────────────────────
+
+  function renderStep4() {
+    const isSaved = !!savedContractId;
 
     return (
       <div className="space-y-8">
-        {/* Question Number */}
-        <div className="flex items-center gap-2 text-primary font-medium">
-          <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm">
-            {currentStep + 1}
-          </div>
-          <span className="text-sm">Question {currentStep + 1}</span>
-          {selectedTemplate && (
-            <Badge variant="outline" className="ml-2">
-              Using: {selectedTemplate.name}
-            </Badge>
-          )}
+        <div className="text-center space-y-4">
+          <motion.div
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ type: "spring", duration: 0.5 }}
+            className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto"
+          >
+            <CheckCircle2 className="h-10 w-10 text-green-600" />
+          </motion.div>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+            Your agreement is ready
+          </h1>
+          <p className="text-muted-foreground text-lg max-w-md mx-auto">
+            {selectedTemplate?.name}
+          </p>
         </div>
 
-        {/* Question */}
-        <h1 className="text-4xl md:text-5xl font-bold leading-tight">
-          {currentQuestion.question}
-        </h1>
-
-        {/* Input */}
-        <div className="space-y-4">
-          {currentQuestion.type === "choice" && (
-            <div className="grid gap-3">
-              {CONTRACT_CATEGORIES.map((category) => (
-                <button
-                  key={category.value}
-                  onClick={() => {
-                    setFormData({ ...formData, category: category.value });
-                    setTimeout(() => handleNext(), 300);
-                  }}
-                  className={`p-6 rounded-xl border-2 transition-all text-left hover:border-primary hover:shadow-md ${
-                    formData.category === category.value
-                      ? "border-primary bg-primary/5"
-                      : "border-gray-200 bg-white"
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <span className="text-4xl">{category.emoji}</span>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg">{category.label}</h3>
-                      <p className="text-sm text-muted-foreground">{category.description}</p>
-                    </div>
-                    {formData.category === category.value && (
-                      <Check className="h-6 w-6 text-primary" />
-                    )}
-                  </div>
-                </button>
-              ))}
-            </div>
-          )}
-
-          {currentQuestion.type === "text" && (
-            <Input
-              type="text"
-              placeholder={currentQuestion.placeholder}
-              value={formData[currentQuestion.id] || ""}
-              onChange={(e) => setFormData({ ...formData, [currentQuestion.id]: e.target.value })}
-              onKeyPress={handleKeyPress}
-              className="text-2xl h-16 px-6 border-2 focus:border-primary"
-              autoFocus
-            />
-          )}
-
-          {currentQuestion.type === "textarea" && (
-            <Textarea
-              placeholder={currentQuestion.placeholder}
-              value={formData[currentQuestion.id] || ""}
-              onChange={(e) => setFormData({ ...formData, [currentQuestion.id]: e.target.value })}
-              className="text-xl p-6 border-2 focus:border-primary min-h-[200px]"
-              autoFocus
-            />
-          )}
-
-          {currentQuestion.type === "number" && (
-            <div className="relative">
-              {currentQuestion.prefix && (
-                <span className="absolute left-6 top-1/2 -translate-y-1/2 text-2xl text-muted-foreground">
-                  {currentQuestion.prefix}
+        {/* Summary */}
+        <div className="bg-card border rounded-xl p-6 space-y-4 max-w-lg mx-auto">
+          <h2 className="font-semibold text-lg">Summary</h2>
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            {variables.CLIENT_NAME && (
+              <>
+                <span className="text-muted-foreground">Client</span>
+                <span className="font-medium">{variables.CLIENT_NAME}</span>
+              </>
+            )}
+            {(variables.SUPPLIER_NAME || variables.DEVELOPER_NAME || variables.CONTRACTOR_NAME) && (
+              <>
+                <span className="text-muted-foreground">Counter-party</span>
+                <span className="font-medium">
+                  {variables.SUPPLIER_NAME || variables.DEVELOPER_NAME || variables.CONTRACTOR_NAME}
                 </span>
-              )}
-              <Input
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder={currentQuestion.placeholder}
-                value={formData[currentQuestion.id] || ""}
-                onChange={(e) => setFormData({ ...formData, [currentQuestion.id]: e.target.value })}
-                onKeyPress={handleKeyPress}
-                className={`text-2xl h-16 border-2 focus:border-primary ${
-                  currentQuestion.prefix ? "pl-12 pr-6" : "px-6"
-                }`}
-                autoFocus
-              />
-            </div>
-          )}
-
-          {currentQuestion.type === "email" && (
-            <Input
-              type="email"
-              placeholder={currentQuestion.placeholder}
-              value={formData[currentQuestion.id] || ""}
-              onChange={(e) => setFormData({ ...formData, [currentQuestion.id]: e.target.value })}
-              onKeyPress={handleKeyPress}
-              className="text-2xl h-16 px-6 border-2 focus:border-primary"
-              autoFocus
-            />
-          )}
-
-          {currentQuestion.type === "date" && (
-            <Input
-              type="date"
-              value={formData[currentQuestion.id] || ""}
-              onChange={(e) => setFormData({ ...formData, [currentQuestion.id]: e.target.value })}
-              onKeyPress={handleKeyPress}
-              className="text-xl h-16 px-6 border-2 focus:border-primary"
-              autoFocus
-            />
-          )}
+              </>
+            )}
+            {variables.CONTRACT_VALUE && (
+              <>
+                <span className="text-muted-foreground">Value</span>
+                <span className="font-medium">
+                  {variables.CURRENCY || "GBP"} {variables.CONTRACT_VALUE}
+                </span>
+              </>
+            )}
+            {variables.START_DATE && (
+              <>
+                <span className="text-muted-foreground">Start Date</span>
+                <span className="font-medium">{variables.START_DATE}</span>
+              </>
+            )}
+            {Object.entries(selectedClauses).map(([key, val]) => (
+              <span key={key} className="contents">
+                <span className="text-muted-foreground capitalize">
+                  {key.replace(/_/g, " ")}
+                </span>
+                <span className="font-medium capitalize">{val.replace(/_/g, " ")}</span>
+              </span>
+            ))}
+          </div>
         </div>
 
         {/* Actions */}
-        {currentQuestion.type !== "choice" && (
-          <div className="flex gap-4 pt-4">
-            <Button
-              onClick={handleNext}
-              size="lg"
-              className="text-lg h-14 px-8"
-              disabled={createMutation.isPending}
-            >
-              {createMutation.isPending ? (
-                <>
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                  Creating...
-                </>
-              ) : currentStep === QUESTIONS.length - 1 ? (
-                <>
-                  <Check className="mr-2 h-5 w-5" />
-                  Create Contract
-                </>
-              ) : (
-                <>
-                  Continue
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </>
-              )}
-            </Button>
-            {(currentQuestion.id === "providerEmail" || 
-              currentQuestion.id === "startDate" || 
-              currentQuestion.id === "endDate") && (
-              <Button
-                onClick={handleNext}
-                variant="ghost"
-                size="lg"
-                className="text-lg h-14"
-              >
-                Skip
-              </Button>
+        <div className="flex flex-col sm:flex-row gap-3 max-w-lg mx-auto">
+          <Button
+            size="lg"
+            variant="outline"
+            className="flex-1 h-14 text-base"
+            disabled={saveMutation.isPending}
+            onClick={() => {
+              saveMutation.mutate({
+                contractId: savedContractId || undefined,
+                templateId: selectedTemplateId!,
+                variables,
+                selectedClauses,
+                generatedMarkdown,
+                status: "draft",
+              });
+            }}
+          >
+            {saveMutation.isPending ? (
+              <Loader2 className="h-5 w-5 animate-spin mr-2" />
+            ) : (
+              <Save className="h-5 w-5 mr-2" />
             )}
-          </div>
-        )}
+            Save as Draft
+          </Button>
+          <Button
+            size="lg"
+            className="flex-1 h-14 text-base"
+            disabled={saveMutation.isPending}
+            onClick={() => {
+              saveMutation.mutate({
+                contractId: savedContractId || undefined,
+                templateId: selectedTemplateId!,
+                variables,
+                selectedClauses,
+                generatedMarkdown,
+                status: "pending_signature",
+              });
+            }}
+          >
+            {saveMutation.isPending ? (
+              <Loader2 className="h-5 w-5 animate-spin mr-2" />
+            ) : (
+              <Send className="h-5 w-5 mr-2" />
+            )}
+            Send for Signature
+          </Button>
+        </div>
 
-        {/* Hint */}
-        {currentQuestion.type !== "choice" && (
-          <p className="text-sm text-muted-foreground">
-            Press <kbd className="px-2 py-1 bg-gray-100 rounded border">Enter ↵</kbd> to continue
-          </p>
+        {isSaved && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center"
+          >
+            <Button
+              variant="link"
+              onClick={() => setLocation(`/dashboard/contracts/${savedContractId}`)}
+            >
+              View your contract
+              <ArrowRight className="h-4 w-4 ml-1" />
+            </Button>
+          </motion.div>
         )}
       </div>
     );
-  };
+  }
+
+  // ── Render ──────────────────────────────────────────────────────────
+
+  const stepRenderers = [renderStep0, renderStep1, renderStep2, renderStep3, renderStep4];
+  const showNavButtons = step >= 1 && step <= 3;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 flex flex-col">
-      {/* Progress Bar */}
-      <div className="fixed top-0 left-0 right-0 h-1 bg-gray-200 z-50">
-        <motion.div
-          className="h-full bg-primary"
-          initial={{ width: 0 }}
-          animate={{ width: `${progress}%` }}
-          transition={{ duration: 0.3 }}
-        />
-      </div>
-
-      {/* Header */}
-      <div className="p-4 flex items-center justify-between">
-        <Button variant="ghost" size="sm" onClick={handleBack}>
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back
-        </Button>
-        <div className="text-sm text-muted-foreground">
-          {currentStep === -1 ? (
-            "Choose how to start"
-          ) : (
-            `${currentStep + 1} of ${QUESTIONS.length}`
-          )}
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50/30 flex flex-col">
+      {/* Top progress bar */}
+      <div className="sticky top-0 z-50 bg-background/80 backdrop-blur-sm border-b">
+        <Progress value={progress} className="h-1 rounded-none" />
+        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between">
+          <Button variant="ghost" size="sm" onClick={handleBack}>
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <div className="hidden sm:flex items-center gap-6 text-sm text-muted-foreground">
+            {STEP_LABELS.map((label, i) => (
+              <span
+                key={i}
+                className={`transition-colors ${
+                  i === step
+                    ? "text-primary font-medium"
+                    : i < step
+                      ? "text-foreground"
+                      : ""
+                }`}
+              >
+                {i < step ? (
+                  <Check className="h-4 w-4 inline mr-1 text-primary" />
+                ) : null}
+                {label}
+              </span>
+            ))}
+          </div>
+          <span className="text-sm text-muted-foreground sm:hidden">
+            {step + 1} / 5
+          </span>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex items-center justify-center p-4">
+      {/* Main content */}
+      <div className="flex-1 flex items-start justify-center px-4 py-8 md:py-12">
         <div className="w-full max-w-2xl">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
-              key={currentStep}
+              key={step === 1 ? `step1-${currentGroupIdx}` : `step${step}`}
               custom={direction}
               variants={slideVariants}
               initial="enter"
@@ -538,14 +774,80 @@ export default function NewContractTypeform() {
               exit="exit"
               transition={{
                 x: { type: "spring", stiffness: 300, damping: 30 },
-                opacity: { duration: 0.2 },
+                opacity: { duration: 0.15 },
               }}
             >
-              {currentStep === -1 ? renderTemplateStep() : renderQuestionStep()}
+              {stepRenderers[step]()}
             </motion.div>
           </AnimatePresence>
         </div>
       </div>
+
+      {/* Bottom nav */}
+      {showNavButtons && (
+        <div className="sticky bottom-0 bg-background/80 backdrop-blur-sm border-t">
+          <div className="max-w-2xl mx-auto px-4 py-4 flex justify-between">
+            <Button variant="ghost" onClick={handleBack}>
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+            <Button onClick={handleNext}>
+              {step === 3 ? "Continue" : "Next"}
+              <ArrowRight className="h-4 w-4 ml-2" />
+            </Button>
+          </div>
+        </div>
+      )}
     </div>
   );
+}
+
+// ── Minimal markdown→HTML ────────────────────────────────────────────
+
+function markdownToHtml(md: string): string {
+  let html = md
+    // Escape HTML
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    // Headings
+    .replace(/^### (.+)$/gm, "<h3>$1</h3>")
+    .replace(/^## (.+)$/gm, "<h2>$1</h2>")
+    .replace(/^# (.+)$/gm, "<h1>$1</h1>")
+    // Bold
+    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+    // Horizontal rules
+    .replace(/^---$/gm, "<hr/>")
+    // Unordered lists
+    .replace(/^- (.+)$/gm, "<li>$1</li>")
+    // Ordered lists
+    .replace(/^\d+\. (.+)$/gm, "<li>$1</li>")
+    // Highlight unfilled [VARIABLE] placeholders
+    .replace(
+      /\[([A-Z_]+)\]/g,
+      '<span class="unfilled-var">[$1]</span>'
+    );
+
+  // Wrap consecutive <li> in <ul>
+  html = html.replace(/((?:<li>.+<\/li>\n?)+)/g, "<ul>$1</ul>");
+
+  // Paragraphs: wrap remaining lines
+  html = html
+    .split("\n\n")
+    .map((block) => {
+      const trimmed = block.trim();
+      if (
+        !trimmed ||
+        trimmed.startsWith("<h") ||
+        trimmed.startsWith("<hr") ||
+        trimmed.startsWith("<ul") ||
+        trimmed.startsWith("<ol")
+      ) {
+        return trimmed;
+      }
+      return `<p>${trimmed.replace(/\n/g, "<br/>")}</p>`;
+    })
+    .join("\n");
+
+  return html;
 }
