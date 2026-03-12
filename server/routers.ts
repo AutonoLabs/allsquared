@@ -12,6 +12,7 @@ import { paymentsRouter } from "./routers/payments";
 import { escrowRouter } from "./routers/escrow";
 import { signaturesRouter } from "./routers/signatures";
 import { adminRouter } from "./routers/admin";
+import { templateBuilderRouter } from "./routers/templateBuilder";
 import { updateUser, getUserByClerkId, upsertUser, getUser } from "./db";
 import { z } from "zod";
 import { nanoid } from "nanoid";
@@ -104,6 +105,9 @@ export const appRouter = router({
 
   // Admin portal
   admin: adminRouter,
+
+  // Contract template builder
+  templateBuilder: templateBuilderRouter,
 });
 
 export type AppRouter = typeof appRouter;

@@ -165,6 +165,10 @@ export const contractTemplates = pgTable("contractTemplates", {
   description: text("description"),
   templateContent: text("templateContent").notNull(), // JSON structure
   isActive: isActiveEnum("isActive").default("yes").notNull(),
+  variables: text("variables"), // JSON - variable definitions
+  clauseBanks: text("clauseBanks"), // JSON - clause bank options
+  templateMarkdown: text("templateMarkdown"), // raw markdown template
+  templateSlug: varchar("templateSlug", { length: 100 }), // unique identifier like "msa-uk"
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
@@ -185,6 +189,9 @@ export const contracts = pgTable("contracts", {
   currency: varchar("currency", { length: 3 }).default("GBP").notNull(),
   status: contractStatusEnum("status").default("draft").notNull(),
   contractContent: text("contractContent").notNull(), // Full contract text
+  selectedClauses: text("selectedClauses"), // JSON - which clauses were selected
+  filledVariables: text("filledVariables"), // JSON - filled variable values
+  generatedMarkdown: text("generatedMarkdown"), // final generated markdown
   clientSignedAt: timestamp("clientSignedAt"),
   providerSignedAt: timestamp("providerSignedAt"),
   startDate: timestamp("startDate"),
