@@ -13,7 +13,8 @@ import { escrowRouter } from "./routers/escrow";
 import { signaturesRouter } from "./routers/signatures";
 import { adminRouter } from "./routers/admin";
 import { templateBuilderRouter } from "./routers/templateBuilder";
-import { updateUser, getUserByClerkId, upsertUser, getUser } from "./db";
+import { updateUser, getUserByClerkId, upsertUser, getUser, getDb } from "./db";
+import { users } from "../drizzle/schema";
 import { z } from "zod";
 import { nanoid } from "nanoid";
 
@@ -57,7 +58,9 @@ export const appRouter = router({
 
         // Create new user with admin role if first user or matches owner email
         const userId = `clerk_${nanoid(16)}`;
-        const isFirstUser = true; // TODO: Check if this is the first user
+        const db = await getDb();
+        const existingUsers = db ? await db.select({ id: users.id }).from(users).limit(1) : [];
+        const isFirstUser = existingUsers.length === 0;
         
         await upsertUser({
           id: userId,
