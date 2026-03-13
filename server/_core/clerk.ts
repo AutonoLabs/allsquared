@@ -1,4 +1,4 @@
-import { createClerkClient } from '@clerk/backend';
+import { createClerkClient, verifyToken } from '@clerk/backend';
 import type { Request } from 'express';
 import type { User } from '../../drizzle/schema';
 import * as db from '../db';
@@ -27,14 +27,17 @@ export async function authenticateClerkRequest(req: Request): Promise<User | nul
       return null;
     }
 
-    // Use Clerk client to verify session
+    // Verify the JWT token directly
     try {
-      const sessions = await clerkClient.sessions.verifySession(token, token);
-      if (!sessions?.userId) {
+      const payload = await verifyToken(token, {
+        secretKey,
+      });
+      
+      if (!payload?.sub) {
         return null;
       }
 
-      const clerkUserId = sessions.userId;
+      const clerkUserId = payload.sub;
 
       // Get user from our database
       let user = await db.getUserByClerkId(clerkUserId);
