@@ -452,7 +452,7 @@ export default function NewContractTypeform() {
               {categoryKey.replace(/_/g, " ")}
             </h2>
             <div className="grid gap-3">
-              {(options as ClauseOption[]).map((opt) => {
+              {(options as ClauseOption[]).map((opt: ClauseOption) => {
                 const isSelected = selectedClauses[categoryKey] === opt.id;
                 return (
                   <button

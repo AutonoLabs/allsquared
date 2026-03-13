@@ -43,77 +43,77 @@
 }
 
 :root {
-  /* AllSquared Deep Blue #1E3A8A */
-  --primary: oklch(0.32 0.09 258);
+  /* Concept B — Modern Creative: Electric Violet */
+  --primary: oklch(0.488 0.243 292);
   --primary-foreground: oklch(1 0 0);
-  --sidebar-primary: var(--color-blue-600);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
-  --radius: 0.65rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.235 0.015 65);
+  --sidebar-primary: oklch(0.541 0.281 293);
+  --sidebar-primary-foreground: oklch(0.97 0.014 292);
+  --chart-1: oklch(0.541 0.281 293);
+  --chart-2: oklch(0.488 0.243 292);
+  --chart-3: oklch(0.627 0.265 303);
+  --chart-4: oklch(0.7 0.17 330);
+  --chart-5: oklch(0.715 0.166 197);
+  --radius: 0.75rem;
+  --background: oklch(0.985 0.002 290);
+  --foreground: oklch(0.175 0.02 285);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.235 0.015 65);
+  --card-foreground: oklch(0.175 0.02 285);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.235 0.015 65);
-  /* AllSquared Bright Green #10B981 */
-  --secondary: oklch(0.70 0.17 166);
+  --popover-foreground: oklch(0.175 0.02 285);
+  /* Deep Indigo secondary */
+  --secondary: oklch(0.277 0.077 281);
   --secondary-foreground: oklch(1 0 0);
-  --muted: oklch(0.967 0.001 286.375);
-  --muted-foreground: oklch(0.552 0.016 285.938);
-  /* AllSquared Orange #F97316 */
-  --accent: oklch(0.70 0.17 40);
+  --muted: oklch(0.967 0.008 290);
+  --muted-foreground: oklch(0.52 0.02 286);
+  /* Hot Pink accent */
+  --accent: oklch(0.656 0.241 354);
   --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.92 0.004 286.32);
-  --input: oklch(0.92 0.004 286.32);
-  --ring: oklch(0.623 0.214 259.815);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.235 0.015 65);
-  --sidebar-accent: oklch(0.967 0.001 286.375);
-  --sidebar-accent-foreground: oklch(0.141 0.005 285.823);
-  --sidebar-border: oklch(0.92 0.004 286.32);
-  --sidebar-ring: oklch(0.623 0.214 259.815);
+  --border: oklch(0.918 0.012 290);
+  --input: oklch(0.918 0.012 290);
+  --ring: oklch(0.541 0.281 293);
+  --sidebar: oklch(0.985 0.002 290);
+  --sidebar-foreground: oklch(0.175 0.02 285);
+  --sidebar-accent: oklch(0.967 0.008 290);
+  --sidebar-accent-foreground: oklch(0.175 0.02 285);
+  --sidebar-border: oklch(0.918 0.012 290);
+  --sidebar-ring: oklch(0.541 0.281 293);
 }
 
 .dark {
-  --primary: var(--color-blue-700);
-  --primary-foreground: var(--color-blue-50);
-  --sidebar-primary: var(--color-blue-500);
-  --sidebar-primary-foreground: var(--color-blue-50);
-  --background: oklch(0.141 0.005 285.823);
-  --foreground: oklch(0.85 0.005 65);
-  --card: oklch(0.21 0.006 285.885);
-  --card-foreground: oklch(0.85 0.005 65);
-  --popover: oklch(0.21 0.006 285.885);
-  --popover-foreground: oklch(0.85 0.005 65);
-  --secondary: oklch(0.24 0.006 286.033);
-  --secondary-foreground: oklch(0.7 0.005 65);
-  --muted: oklch(0.274 0.006 286.033);
-  --muted-foreground: oklch(0.705 0.015 286.067);
-  --accent: oklch(0.274 0.006 286.033);
-  --accent-foreground:  oklch(0.92 0.005 65);
+  --primary: oklch(0.541 0.281 293);
+  --primary-foreground: oklch(0.97 0.014 292);
+  --sidebar-primary: oklch(0.488 0.243 292);
+  --sidebar-primary-foreground: oklch(0.97 0.014 292);
+  --background: oklch(0.145 0.02 285);
+  --foreground: oklch(0.88 0.01 290);
+  --card: oklch(0.2 0.025 285);
+  --card-foreground: oklch(0.88 0.01 290);
+  --popover: oklch(0.2 0.025 285);
+  --popover-foreground: oklch(0.88 0.01 290);
+  --secondary: oklch(0.24 0.03 285);
+  --secondary-foreground: oklch(0.88 0.01 290);
+  --muted: oklch(0.26 0.025 285);
+  --muted-foreground: oklch(0.68 0.02 290);
+  --accent: oklch(0.656 0.241 354);
+  --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.488 0.243 264.376);
-  --chart-1: var(--color-blue-300);
-  --chart-2: var(--color-blue-500);
-  --chart-3: var(--color-blue-600);
-  --chart-4: var(--color-blue-700);
-  --chart-5: var(--color-blue-800);
-  --sidebar: oklch(0.21 0.006 285.885);
-  --sidebar-foreground: oklch(0.85 0.005 65);
-  --sidebar-accent: oklch(0.274 0.006 286.033);
-  --sidebar-accent-foreground:  oklch(0.985 0 0);
+  --ring: oklch(0.541 0.281 293);
+  --chart-1: oklch(0.627 0.265 303);
+  --chart-2: oklch(0.541 0.281 293);
+  --chart-3: oklch(0.488 0.243 292);
+  --chart-4: oklch(0.7 0.17 330);
+  --chart-5: oklch(0.715 0.166 197);
+  --sidebar: oklch(0.2 0.025 285);
+  --sidebar-foreground: oklch(0.88 0.01 290);
+  --sidebar-accent: oklch(0.26 0.025 285);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.488 0.243 264.376);
+  --sidebar-ring: oklch(0.541 0.281 293);
 }
 
 @layer base {
@@ -145,39 +145,61 @@
 }
 
 @layer components {
-  /**
-   * Custom container utility that centers content and adds responsive padding.
-   *
-   * This overrides Tailwind's default container behavior to:
-   * - Auto-center content (mx-auto)
-   * - Add responsive horizontal padding
-   * - Set max-width for large screens
-   *
-   * Usage: <div className="container">...</div>
-   *
-   * For custom widths, use max-w-* utilities directly:
-   * <div className="max-w-6xl mx-auto px-4">...</div>
-   */
   .container {
     width: 100%;
     margin-left: auto;
     margin-right: auto;
-    padding-left: 1rem; /* 16px - mobile padding */
+    padding-left: 1rem;
     padding-right: 1rem;
   }
 
   @media (min-width: 640px) {
     .container {
-      padding-left: 1.5rem; /* 24px - tablet padding */
+      padding-left: 1.5rem;
       padding-right: 1.5rem;
     }
   }
 
   @media (min-width: 1024px) {
     .container {
-      padding-left: 2rem; /* 32px - desktop padding */
+      padding-left: 2rem;
       padding-right: 2rem;
-      max-width: 1280px; /* Standard content width */
+      max-width: 1280px;
     }
+  }
+
+  /* M3-inspired button state layers */
+  .btn-state-layer {
+    position: relative;
+    overflow: hidden;
+  }
+  .btn-state-layer::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    background: currentColor;
+  }
+  .btn-state-layer:hover::before {
+    opacity: 0.08;
+  }
+  .btn-state-layer:active::before {
+    opacity: 0.12;
+  }
+
+  /* Gradient mesh background */
+  .gradient-mesh {
+    background:
+      radial-gradient(ellipse at 20% 50%, oklch(0.541 0.281 293 / 0.15) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, oklch(0.656 0.241 354 / 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 80%, oklch(0.715 0.166 197 / 0.1) 0%, transparent 50%),
+      oklch(0.175 0.04 285);
+  }
+
+  /* Surface tint for M3-style elevated cards */
+  .surface-tint {
+    background: oklch(0.97 0.014 292);
   }
 }
