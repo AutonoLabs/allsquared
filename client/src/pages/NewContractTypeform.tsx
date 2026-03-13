@@ -156,7 +156,7 @@ export default function NewContractTypeform() {
         seen.add(v.group);
         groups.push({
           name: v.group,
-          vars: selectedTemplate.variables.filter((x) => x.group === v.group),
+          vars: selectedTemplate.variables.filter((x: VariableDef) => x.group === v.group),
         });
       }
     }
@@ -277,7 +277,7 @@ export default function NewContractTypeform() {
                   setVariables(defaults);
                   // Pre-select first clause option per bank
                   const clauses: Record<string, string> = {};
-                  for (const [key, opts] of Object.entries(t.clauseBanks)) {
+                  for (const [key, opts] of Object.entries(t.clauseBanks) as [string, ClauseOption[]][]) {
                     if (opts.length > 0) clauses[key] = opts[0].id;
                   }
                   setSelectedClauses(clauses);
@@ -452,7 +452,7 @@ export default function NewContractTypeform() {
               {categoryKey.replace(/_/g, " ")}
             </h2>
             <div className="grid gap-3">
-              {options.map((opt) => {
+              {(options as ClauseOption[]).map((opt) => {
                 const isSelected = selectedClauses[categoryKey] === opt.id;
                 return (
                   <button

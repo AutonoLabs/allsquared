@@ -131,8 +131,8 @@ export const templateBuilderRouter = router({
       z.object({
         contractId: z.string().optional(),
         templateId: z.string(),
-        variables: z.record(z.string()),
-        selectedClauses: z.record(z.string()),
+        variables: z.record(z.string(), z.string()),
+        selectedClauses: z.record(z.string(), z.string()),
         generatedMarkdown: z.string(),
         status: z
           .enum(["draft", "pending_signature"])
@@ -153,7 +153,7 @@ export const templateBuilderRouter = router({
             selectedClauses: JSON.stringify(input.selectedClauses),
             generatedMarkdown: input.generatedMarkdown,
             contractContent: input.generatedMarkdown,
-            status: input.status,
+            status: input.status as any,
             updatedAt: new Date(),
           })
           .where(eq(contracts.id, input.contractId));
@@ -180,20 +180,20 @@ export const templateBuilderRouter = router({
         providerId: ctx.user.id,
         title,
         description: template?.description || "",
-        category: template?.category || "other",
+        category: (template?.category || "other") as any,
         totalAmount: input.variables.CONTRACT_VALUE || "0",
         currency: input.variables.CURRENCY || "GBP",
-        status: input.status,
+        status: input.status as any,
         contractContent: input.generatedMarkdown,
         selectedClauses: JSON.stringify(input.selectedClauses),
         filledVariables: JSON.stringify(input.variables),
         generatedMarkdown: input.generatedMarkdown,
         startDate: input.variables.START_DATE
           ? new Date(input.variables.START_DATE)
-          : undefined,
+          : null,
         createdAt: new Date(),
         updatedAt: new Date(),
-      });
+      } as any);
 
       return { contractId };
     }),

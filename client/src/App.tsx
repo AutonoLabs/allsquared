@@ -108,7 +108,9 @@ function Router() {
           </DashboardLayout>
         </Route>
         <Route path="/dashboard/contracts/new">
-          <NewContractTypeform />
+          <DashboardLayout>
+            <NewContractTypeform />
+          </DashboardLayout>
         </Route>
         <Route path="/dashboard/contracts/:id">
           <DashboardLayout>
