@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
-import { SignIn, SignedIn, SignedOut } from "@/lib/clerk";
+import { SignIn, SignUp, SignedIn, SignedOut } from "@/lib/clerk";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -72,38 +72,7 @@ export default function DashboardLayout({
   }
 
   if (!user) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="flex flex-col items-center gap-8 p-8 max-w-md w-full">
-          <div className="flex flex-col items-center gap-6">
-            <div className="relative group">
-              <div className="relative">
-                <img
-                  src={APP_LOGO}
-                  alt={APP_TITLE}
-                  className="h-20 w-20 rounded-xl object-cover shadow"
-                />
-              </div>
-            </div>
-            <div className="text-center space-y-2">
-              <h1 className="text-2xl font-bold tracking-tight">{APP_TITLE}</h1>
-              <p className="text-sm text-muted-foreground">
-                Please sign in to continue
-              </p>
-            </div>
-          </div>
-          <SignIn 
-            routing="hash"
-            appearance={{
-              elements: {
-                rootBox: "w-full",
-                card: "shadow-none border-0",
-              }
-            }}
-          />
-        </div>
-      </div>
-    );
+    return <AuthScreen />;
   }
 
   return (
@@ -334,5 +303,76 @@ function DashboardLayoutContent({
         <main className="flex-1 p-4">{children}</main>
       </SidebarInset>
     </>
+  );
+}
+
+function AuthScreen() {
+  const [mode, setMode] = useState<"signup" | "signin">("signup");
+
+  const clerkElementProps = {
+    routing: "hash" as const,
+    signInUrl: "/dashboard",
+    signUpUrl: "/dashboard",
+    appearance: {
+      elements: {
+        rootBox: "w-full",
+        card: "shadow-none border-0",
+        footer: "hidden",
+      },
+    },
+  };
+
+  return (
+    <div className="flex items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center gap-8 p-8 max-w-md w-full">
+        <div className="flex flex-col items-center gap-6">
+          <div className="relative group">
+            <div className="relative">
+              <img
+                src={APP_LOGO}
+                alt={APP_TITLE}
+                className="h-20 w-20 rounded-xl object-cover shadow"
+              />
+            </div>
+          </div>
+          <div className="text-center space-y-2">
+            <h1 className="text-2xl font-bold tracking-tight">{APP_TITLE}</h1>
+            <p className="text-sm text-muted-foreground">
+              {mode === "signup"
+                ? "Create your account to get started"
+                : "Sign in to your account"}
+            </p>
+          </div>
+        </div>
+        {mode === "signup" ? (
+          <SignUp {...clerkElementProps} />
+        ) : (
+          <SignIn {...clerkElementProps} />
+        )}
+        <p className="text-sm text-muted-foreground">
+          {mode === "signup" ? (
+            <>
+              Already have an account?{" "}
+              <button
+                onClick={() => setMode("signin")}
+                className="text-primary font-medium hover:underline"
+              >
+                Sign in
+              </button>
+            </>
+          ) : (
+            <>
+              Don't have an account?{" "}
+              <button
+                onClick={() => setMode("signup")}
+                className="text-primary font-medium hover:underline"
+              >
+                Sign up
+              </button>
+            </>
+          )}
+        </p>
+      </div>
+    </div>
   );
 }

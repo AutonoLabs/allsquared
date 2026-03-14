@@ -43,13 +43,13 @@ export default function Home() {
       <section className="relative overflow-hidden gradient-mesh py-28 md:py-40 lg:py-48">
         {/* Decorative geometric shapes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-[oklch(0.656_0.241_354/0.08)] blur-[100px]" />
-          <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-[oklch(0.715_0.166_197/0.1)] blur-[80px]" />
+          <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-[oklch(0.637_0.194_25/0.1)] blur-[100px]" />
+          <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-[oklch(0.78_0.14_175/0.12)] blur-[80px]" />
           {/* Rotated squares — brand motif */}
           <div className="absolute top-20 right-[15%] h-20 w-20 rounded-2xl border border-white/[0.06] rotate-12" />
-          <div className="absolute top-32 right-[12%] h-14 w-14 rounded-xl bg-[oklch(0.656_0.241_354/0.1)] rotate-[-8deg]" />
+          <div className="absolute top-32 right-[12%] h-14 w-14 rounded-xl bg-[oklch(0.637_0.194_25/0.12)] rotate-[-8deg]" />
           <div className="absolute bottom-24 left-[10%] h-16 w-16 rounded-2xl border border-white/[0.06] rotate-[20deg]" />
-          <div className="absolute bottom-36 left-[8%] h-10 w-10 rounded-lg bg-[oklch(0.541_0.281_293/0.12)] rotate-[-15deg]" />
+          <div className="absolute bottom-36 left-[8%] h-10 w-10 rounded-lg bg-[oklch(0.81_0.16_85/0.15)] rotate-[-15deg]" />
         </div>
 
         <div className="container relative">
@@ -61,7 +61,7 @@ export default function Home() {
           >
             <motion.div variants={fadeInUp} className="mb-8">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-1.5 text-sm text-white/80 backdrop-blur-sm">
-                <Sparkles className="h-3.5 w-3.5 text-[oklch(0.656_0.241_354)]" />
+                <Sparkles className="h-3.5 w-3.5 text-[oklch(0.637_0.194_25)]" />
                 Launching Soon in the UK
               </span>
             </motion.div>
@@ -73,7 +73,7 @@ export default function Home() {
               Ship work.
               <br />
               Get paid.{" "}
-              <span className="bg-gradient-to-r from-[oklch(0.656_0.241_354)] via-[oklch(0.541_0.281_293)] to-[oklch(0.715_0.166_197)] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[oklch(0.637_0.194_25)] via-[oklch(0.78_0.14_175)] to-[oklch(0.81_0.16_85)] bg-clip-text text-transparent">
                 No drama.
               </span>
             </motion.h1>
@@ -91,14 +91,14 @@ export default function Home() {
               className="mt-10 flex flex-col gap-4 sm:flex-row"
             >
               {isAuthenticated ? (
-                <Button size="lg" className="btn-state-layer text-base px-8 h-13 bg-white text-[oklch(0.277_0.077_281)] hover:bg-white/90 shadow-lg shadow-white/10 rounded-xl font-semibold" asChild>
+                <Button size="lg" className="btn-state-layer text-base px-8 h-13 bg-white text-[oklch(0.216_0.014_58)] hover:bg-white/90 shadow-lg shadow-white/10 rounded-xl font-semibold" asChild>
                   <Link href="/dashboard">
                     Go to Dashboard
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
               ) : (
-                <Button size="lg" className="btn-state-layer text-base px-8 h-13 bg-white text-[oklch(0.277_0.077_281)] hover:bg-white/90 shadow-lg shadow-white/10 rounded-xl font-semibold" asChild>
+                <Button size="lg" className="btn-state-layer text-base px-8 h-13 bg-white text-[oklch(0.216_0.014_58)] hover:bg-white/90 shadow-lg shadow-white/10 rounded-xl font-semibold" asChild>
                   <Link href="/dashboard">
                     Join the Waitlist
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -120,15 +120,15 @@ export default function Home() {
               className="mt-12 flex flex-wrap items-center gap-6 text-sm text-white/50"
             >
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-[oklch(0.715_0.166_197)]" />
+                <CheckCircle2 className="h-4 w-4 text-[oklch(0.81_0.16_85)]" />
                 <span>FCA-Backed Escrow</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-[oklch(0.715_0.166_197)]" />
+                <CheckCircle2 className="h-4 w-4 text-[oklch(0.81_0.16_85)]" />
                 <span>AI-Powered Contracts</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-[oklch(0.715_0.166_197)]" />
+                <CheckCircle2 className="h-4 w-4 text-[oklch(0.81_0.16_85)]" />
                 <span>Milestone Payments</span>
               </div>
             </motion.div>
@@ -223,37 +223,37 @@ export default function Home() {
                 icon: FileText,
                 title: "AI Contract Generation",
                 description: "Generate professional, legally-sound contracts in minutes for freelance services, home improvements, events, and more.",
-                gradient: "from-[oklch(0.541_0.281_293)] to-[oklch(0.488_0.243_292)]",
+                gradient: "from-[oklch(0.78_0.14_175)] to-[oklch(0.637_0.194_25)]",
               },
               {
                 icon: Shield,
                 title: "FCA-Backed Escrow",
                 description: "Secure payments with FCA-authorised escrow. Funds released only when milestones are met, protecting both parties.",
-                gradient: "from-[oklch(0.715_0.166_197)] to-[oklch(0.58_0.2_210)]",
+                gradient: "from-[oklch(0.81_0.16_85)] to-[oklch(0.72_0.12_175)]",
               },
               {
                 icon: TrendingUp,
                 title: "Milestone Management",
                 description: "Track project progress with clear milestones. Automatic payment releases keep projects moving forward.",
-                gradient: "from-[oklch(0.656_0.241_354)] to-[oklch(0.6_0.25_340)]",
+                gradient: "from-[oklch(0.637_0.194_25)] to-[oklch(0.81_0.16_85)]",
               },
               {
                 icon: MessageSquare,
                 title: "AI Dispute Resolution",
                 description: "Resolve conflicts quickly with AI-assisted mediation. Optional lawyer referrals for complex cases.",
-                gradient: "from-[oklch(0.627_0.265_303)] to-[oklch(0.541_0.281_293)]",
+                gradient: "from-[oklch(0.78_0.14_175)] to-[oklch(0.78_0.14_175)]",
               },
               {
                 icon: Lock,
                 title: "Bank-Grade Security",
                 description: "Your data and funds are protected with enterprise-level encryption and FCA-regulated escrow partners.",
-                gradient: "from-[oklch(0.58_0.2_210)] to-[oklch(0.488_0.243_292)]",
+                gradient: "from-[oklch(0.72_0.12_175)] to-[oklch(0.637_0.194_25)]",
               },
               {
                 icon: Scale,
                 title: "Lawyer-in-the-Loop",
                 description: "Need expert advice? Connect with SRA-regulated solicitors for contract review or legal guidance.",
-                gradient: "from-[oklch(0.656_0.241_354)] to-[oklch(0.715_0.166_197)]",
+                gradient: "from-[oklch(0.637_0.194_25)] to-[oklch(0.81_0.16_85)]",
               },
             ].map((feature) => (
               <motion.div key={feature.title} variants={scaleIn}>
@@ -371,7 +371,7 @@ export default function Home() {
               { value: "99.9%", label: "Payment Success Rate", icon: CheckCircle2 },
             ].map((stat) => (
               <motion.div key={stat.label} variants={scaleIn} className="rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-sm p-8 text-center">
-                <stat.icon className="h-6 w-6 mx-auto mb-4 text-[oklch(0.715_0.166_197)]" />
+                <stat.icon className="h-6 w-6 mx-auto mb-4 text-[oklch(0.81_0.16_85)]" />
                 <div className="font-heading text-4xl font-bold mb-2">{stat.value}</div>
                 <div className="text-white/50 text-sm">{stat.label}</div>
               </motion.div>
