@@ -43,77 +43,77 @@
 }
 
 :root {
-  /* Concept B — Modern Creative: Electric Violet */
-  --primary: oklch(0.488 0.243 292);
+  /* Concept C — Warm & Accessible: Coral + Teal */
+  --primary: oklch(0.637 0.194 25);          /* Warm Coral #F97066 */
   --primary-foreground: oklch(1 0 0);
-  --sidebar-primary: oklch(0.541 0.281 293);
-  --sidebar-primary-foreground: oklch(0.97 0.014 292);
-  --chart-1: oklch(0.541 0.281 293);
-  --chart-2: oklch(0.488 0.243 292);
-  --chart-3: oklch(0.627 0.265 303);
-  --chart-4: oklch(0.7 0.17 330);
-  --chart-5: oklch(0.715 0.166 197);
+  --sidebar-primary: oklch(0.637 0.194 25);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --chart-1: oklch(0.637 0.194 25);          /* Coral */
+  --chart-2: oklch(0.78 0.14 175);           /* Soft Teal #2DD4BF */
+  --chart-3: oklch(0.81 0.16 85);            /* Sunny Yellow #FBBF24 */
+  --chart-4: oklch(0.7 0.17 25);             /* Coral variant */
+  --chart-5: oklch(0.72 0.12 175);           /* Teal variant */
   --radius: 0.75rem;
-  --background: oklch(0.985 0.002 290);
-  --foreground: oklch(0.175 0.02 285);
+  --background: oklch(0.988 0.005 70);       /* Warm white #FFFBF5 */
+  --foreground: oklch(0.216 0.014 58);       /* Stone-900 #1C1917 */
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.175 0.02 285);
+  --card-foreground: oklch(0.216 0.014 58);
   --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.175 0.02 285);
-  /* Deep Indigo secondary */
-  --secondary: oklch(0.277 0.077 281);
-  --secondary-foreground: oklch(1 0 0);
-  --muted: oklch(0.967 0.008 290);
-  --muted-foreground: oklch(0.52 0.02 286);
-  /* Hot Pink accent */
-  --accent: oklch(0.656 0.241 354);
-  --accent-foreground: oklch(1 0 0);
+  --popover-foreground: oklch(0.216 0.014 58);
+  /* Soft Teal secondary */
+  --secondary: oklch(0.78 0.14 175);         /* #2DD4BF */
+  --secondary-foreground: oklch(0.216 0.014 58);
+  --muted: oklch(0.97 0.005 70);
+  --muted-foreground: oklch(0.55 0.014 58);
+  /* Sunny Yellow accent */
+  --accent: oklch(0.81 0.16 85);             /* #FBBF24 */
+  --accent-foreground: oklch(0.216 0.014 58);
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.985 0 0);
-  --border: oklch(0.918 0.012 290);
-  --input: oklch(0.918 0.012 290);
-  --ring: oklch(0.541 0.281 293);
-  --sidebar: oklch(0.985 0.002 290);
-  --sidebar-foreground: oklch(0.175 0.02 285);
-  --sidebar-accent: oklch(0.967 0.008 290);
-  --sidebar-accent-foreground: oklch(0.175 0.02 285);
-  --sidebar-border: oklch(0.918 0.012 290);
-  --sidebar-ring: oklch(0.541 0.281 293);
+  --border: oklch(0.925 0.004 58);           /* Stone-200 #E7E5E4 */
+  --input: oklch(0.925 0.004 58);
+  --ring: oklch(0.637 0.194 25);
+  --sidebar: oklch(0.988 0.005 70);
+  --sidebar-foreground: oklch(0.216 0.014 58);
+  --sidebar-accent: oklch(0.97 0.005 70);
+  --sidebar-accent-foreground: oklch(0.216 0.014 58);
+  --sidebar-border: oklch(0.925 0.004 58);
+  --sidebar-ring: oklch(0.637 0.194 25);
 }
 
 .dark {
-  --primary: oklch(0.541 0.281 293);
-  --primary-foreground: oklch(0.97 0.014 292);
-  --sidebar-primary: oklch(0.488 0.243 292);
-  --sidebar-primary-foreground: oklch(0.97 0.014 292);
-  --background: oklch(0.145 0.02 285);
-  --foreground: oklch(0.88 0.01 290);
-  --card: oklch(0.2 0.025 285);
-  --card-foreground: oklch(0.88 0.01 290);
-  --popover: oklch(0.2 0.025 285);
-  --popover-foreground: oklch(0.88 0.01 290);
-  --secondary: oklch(0.24 0.03 285);
-  --secondary-foreground: oklch(0.88 0.01 290);
-  --muted: oklch(0.26 0.025 285);
-  --muted-foreground: oklch(0.68 0.02 290);
-  --accent: oklch(0.656 0.241 354);
-  --accent-foreground: oklch(1 0 0);
+  --primary: oklch(0.7 0.18 25);             /* Lighter Coral */
+  --primary-foreground: oklch(0.216 0.014 58);
+  --sidebar-primary: oklch(0.637 0.194 25);
+  --sidebar-primary-foreground: oklch(1 0 0);
+  --background: oklch(0.16 0.01 58);
+  --foreground: oklch(0.9 0.005 70);
+  --card: oklch(0.22 0.012 58);
+  --card-foreground: oklch(0.9 0.005 70);
+  --popover: oklch(0.22 0.012 58);
+  --popover-foreground: oklch(0.9 0.005 70);
+  --secondary: oklch(0.7 0.12 175);
+  --secondary-foreground: oklch(0.9 0.005 70);
+  --muted: oklch(0.28 0.01 58);
+  --muted-foreground: oklch(0.68 0.01 58);
+  --accent: oklch(0.81 0.16 85);
+  --accent-foreground: oklch(0.216 0.014 58);
   --destructive: oklch(0.704 0.191 22.216);
   --destructive-foreground: oklch(0.985 0 0);
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.541 0.281 293);
-  --chart-1: oklch(0.627 0.265 303);
-  --chart-2: oklch(0.541 0.281 293);
-  --chart-3: oklch(0.488 0.243 292);
-  --chart-4: oklch(0.7 0.17 330);
-  --chart-5: oklch(0.715 0.166 197);
-  --sidebar: oklch(0.2 0.025 285);
-  --sidebar-foreground: oklch(0.88 0.01 290);
-  --sidebar-accent: oklch(0.26 0.025 285);
+  --ring: oklch(0.7 0.18 25);
+  --chart-1: oklch(0.7 0.18 25);
+  --chart-2: oklch(0.78 0.14 175);
+  --chart-3: oklch(0.81 0.16 85);
+  --chart-4: oklch(0.65 0.15 25);
+  --chart-5: oklch(0.72 0.12 175);
+  --sidebar: oklch(0.22 0.012 58);
+  --sidebar-foreground: oklch(0.9 0.005 70);
+  --sidebar-accent: oklch(0.28 0.01 58);
   --sidebar-accent-foreground: oklch(0.985 0 0);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.541 0.281 293);
+  --sidebar-ring: oklch(0.7 0.18 25);
 }
 
 @layer base {
@@ -192,14 +192,22 @@
   /* Gradient mesh background */
   .gradient-mesh {
     background:
-      radial-gradient(ellipse at 20% 50%, oklch(0.541 0.281 293 / 0.15) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 20%, oklch(0.656 0.241 354 / 0.12) 0%, transparent 50%),
-      radial-gradient(ellipse at 60% 80%, oklch(0.715 0.166 197 / 0.1) 0%, transparent 50%),
-      oklch(0.175 0.04 285);
+      radial-gradient(ellipse at 20% 50%, oklch(0.637 0.194 25 / 0.18) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 20%, oklch(0.78 0.14 175 / 0.14) 0%, transparent 50%),
+      radial-gradient(ellipse at 60% 80%, oklch(0.81 0.16 85 / 0.12) 0%, transparent 50%),
+      oklch(0.22 0.012 58);
   }
 
   /* Surface tint for M3-style elevated cards */
   .surface-tint {
-    background: oklch(0.97 0.014 292);
+    background: oklch(0.988 0.005 70);
+  }
+
+  /* Hide Clerk development mode banner and footer branding */
+  .cl-internal-b3fm6y,
+  .cl-internal-16vtwdp,
+  div[data-testid="development-badge"],
+  .cl-footerAction__signIn .cl-internal-b3fm6y {
+    display: none !important;
   }
 }
