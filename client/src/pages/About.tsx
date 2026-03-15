@@ -61,7 +61,6 @@ export default function About() {
       <section className="py-16 md:py-24 bg-gradient-to-b from-primary/5 via-primary/3 to-background">
         <div className="container">
           <motion.div
-            initial="hidden"
             animate="visible"
             variants={staggerContainer}
             className="mx-auto max-w-3xl text-center space-y-6"
@@ -88,9 +87,6 @@ export default function About() {
       <section className="py-16 md:py-24">
         <div className="container">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
             variants={fadeInUp}
             className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center"
           >
@@ -126,9 +122,6 @@ export default function About() {
       <section className="py-16 md:py-24 bg-gradient-to-b from-muted/50 to-background">
         <div className="container">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
             variants={fadeInUp}
             className="mx-auto max-w-3xl text-center mb-12"
           >
@@ -141,9 +134,6 @@ export default function About() {
           </motion.div>
 
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
             variants={staggerContainer}
             className="grid gap-6 md:grid-cols-2 lg:grid-cols-4"
           >
@@ -175,9 +165,6 @@ export default function About() {
       <section className="py-16 md:py-24">
         <div className="container">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
             variants={fadeInUp}
             className="mx-auto max-w-3xl text-center mb-12"
           >
@@ -190,9 +177,6 @@ export default function About() {
           </motion.div>
 
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
             variants={staggerContainer}
             className="grid gap-8 md:grid-cols-3"
           >
@@ -220,9 +204,6 @@ export default function About() {
       <section className="py-16 md:py-24 bg-gradient-to-b from-muted/50 to-background">
         <div className="container">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
             variants={fadeInUp}
             className="mx-auto max-w-3xl text-center space-y-6"
           >
@@ -247,9 +228,6 @@ export default function About() {
       <section className="py-16 md:py-24">
         <div className="container">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
             variants={fadeInUp}
             className="mx-auto max-w-3xl text-center space-y-8"
           >

@@ -95,7 +95,6 @@ export default function Pricing() {
       <section className="py-16 md:py-24 bg-gradient-to-b from-primary/5 via-primary/3 to-background">
         <div className="container">
           <motion.div
-            initial="hidden"
             animate="visible"
             variants={staggerContainer}
             className="mx-auto max-w-3xl text-center space-y-6"
@@ -121,9 +120,6 @@ export default function Pricing() {
       <section className="py-16 md:py-24">
         <div className="container">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
             variants={staggerContainer}
             className="grid gap-8 lg:grid-cols-3"
           >
@@ -181,9 +177,6 @@ export default function Pricing() {
       <section className="py-16 md:py-24 bg-gradient-to-b from-muted/50 to-background">
         <div className="container">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
             variants={fadeInUp}
             className="mx-auto max-w-3xl text-center mb-12"
           >
@@ -196,9 +189,6 @@ export default function Pricing() {
           </motion.div>
 
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
             variants={staggerContainer}
             className="grid gap-6 md:grid-cols-2 max-w-4xl mx-auto"
           >
@@ -228,9 +218,6 @@ export default function Pricing() {
       <section className="py-16 md:py-24">
         <div className="container">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-50px" }}
             variants={fadeInUp}
             className="mx-auto max-w-3xl"
           >
@@ -266,18 +253,12 @@ export default function Pricing() {
         <div className="container">
           <div className="mx-auto max-w-3xl">
             <motion.h2
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
               variants={fadeInUp}
               className="text-3xl font-bold tracking-tight text-center mb-12"
             >
               Frequently Asked Questions
             </motion.h2>
             <motion.div
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-50px" }}
               variants={staggerContainer}
               className="space-y-6"
             >
@@ -319,9 +300,6 @@ export default function Pricing() {
       <section className="py-16 md:py-24">
         <div className="container">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-100px" }}
             variants={fadeInUp}
             className="mx-auto max-w-3xl text-center space-y-8"
           >
