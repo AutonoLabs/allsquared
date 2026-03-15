@@ -25,7 +25,6 @@ import {
   type ContractTemplate,
   type InsertContractTemplate,
 } from "../drizzle/schema";
-import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
@@ -59,7 +58,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
     };
     const updateSet: Record<string, unknown> = {};
 
-    const textFields = ["name", "email", "loginMethod"] as const;
+    const textFields = ["name", "email", "loginMethod", "clerkId"] as const;
     type TextField = (typeof textFields)[number];
 
     const assignNullable = (field: TextField) => {
@@ -76,12 +75,9 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       values.lastSignedIn = user.lastSignedIn;
       updateSet.lastSignedIn = user.lastSignedIn;
     }
-    if (user.role === undefined) {
-      if (user.id === ENV.ownerId) {
-        user.role = 'admin';
-        values.role = 'admin';
-        updateSet.role = 'admin';
-      }
+    if (user.role !== undefined) {
+      values.role = user.role;
+      updateSet.role = user.role;
     }
 
     if (Object.keys(updateSet).length === 0) {

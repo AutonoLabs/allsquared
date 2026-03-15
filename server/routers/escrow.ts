@@ -9,7 +9,7 @@ import {
   auditLogs,
   webhookEvents
 } from '../../drizzle/schema';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, inArray } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 
 /**
@@ -770,7 +770,7 @@ export const escrowRouter = router({
     const allEscrows = await db
       .select()
       .from(escrowTransactions)
-      .where(eq(escrowTransactions.contractId, allContractIds[0])); // Simplified - would need IN clause
+      .where(inArray(escrowTransactions.contractId, allContractIds));
 
     const summary = allEscrows.reduce(
       (acc, escrow) => {

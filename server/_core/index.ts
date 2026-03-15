@@ -1,10 +1,7 @@
 import express, { Request, Response, NextFunction } from "express";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
-// import { registerOAuthRoutes } from "./oauth";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
-// Dynamic import to avoid pulling vite into Vercel serverless bundle
-// import { serveStatic } from "./vite";
 
 // Create Express app
 const app = express();
@@ -132,9 +129,6 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-// OAuth callback under /api/oauth/callback (Legacy - Disabled)
-// registerOAuthRoutes(app);
-
 // =============================================================================
 // WEBHOOK ROUTES (must be before tRPC to use raw body)
 // =============================================================================
@@ -154,9 +148,7 @@ app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), asyn
     // For now, parse the body directly
     const event = JSON.parse(req.body.toString());
 
-    // TODO: In production, call the webhook handler directly via tRPC caller
-    console.log('Stripe webhook received:', event.type);
-
+    // TODO: In production, verify signature with Stripe's constructEvent
     res.json({ received: true });
   } catch (error) {
     console.error('Stripe webhook error:', error);
@@ -172,8 +164,6 @@ app.post('/api/webhooks/transpact', express.json(), async (req: Request, res: Re
     // Verify signature in production
     const event = req.body;
 
-    console.log('Transpact webhook received:', event.event);
-
     res.json({ received: true });
   } catch (error) {
     console.error('Transpact webhook error:', error);
@@ -185,8 +175,6 @@ app.post('/api/webhooks/transpact', express.json(), async (req: Request, res: Re
 app.post('/api/webhooks/docusign', express.json(), async (req: Request, res: Response) => {
   try {
     const event = req.body;
-
-    console.log('DocuSign webhook received:', event.event);
 
     res.json({ received: true });
   } catch (error) {
