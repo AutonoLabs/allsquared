@@ -76,20 +76,26 @@ export async function syncClerkUser(data: {
   clerkId: string;
   email: string | null;
   name: string | null;
+  emailVerified?: boolean;
 }): Promise<User> {
-  const { clerkId, email, name } = data;
-  
+  const { clerkId, email, name, emailVerified } = data;
+
+  // Determine verified status from Clerk email verification
+  const verified = emailVerified ? 'yes' as const : undefined;
+
   // Check if user already exists
   let user = await db.getUserByClerkId(clerkId);
-  
+
   if (user) {
     // Update existing user
-    await db.upsertUser({
+    const updates: Record<string, unknown> = {
       id: user.id,
       email,
       name,
       lastSignedIn: new Date(),
-    });
+    };
+    if (verified) updates.verified = verified;
+    await db.upsertUser(updates as any);
     return (await db.getUser(user.id))!;
   }
 
@@ -101,6 +107,7 @@ export async function syncClerkUser(data: {
     email,
     name,
     loginMethod: 'clerk',
+    verified: verified || 'no',
     lastSignedIn: new Date(),
   });
 

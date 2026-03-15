@@ -37,6 +37,7 @@ export const appRouter = router({
           clerkId: z.string().min(1),
           email: z.string().nullable(),
           name: z.string().nullable(),
+          emailVerified: z.boolean().optional(),
         })
       )
       .mutation(async ({ input }) => {
@@ -45,14 +46,18 @@ export const appRouter = router({
         // Check if user already exists
         let user = await getUserByClerkId(clerkId);
         
+        const verified = input.emailVerified ? 'yes' as const : undefined;
+
         if (user) {
           // Update existing user
-          await upsertUser({
+          const updates: Record<string, unknown> = {
             id: user.id,
             email,
             name,
             lastSignedIn: new Date(),
-          });
+          };
+          if (verified) updates.verified = verified;
+          await upsertUser(updates as any);
           return await getUser(user.id);
         }
 
@@ -61,7 +66,7 @@ export const appRouter = router({
         const db = await getDb();
         const existingUsers = db ? await db.select({ id: users.id }).from(users).limit(1) : [];
         const isFirstUser = existingUsers.length === 0;
-        
+
         await upsertUser({
           id: userId,
           clerkId,
@@ -69,6 +74,7 @@ export const appRouter = router({
           name,
           loginMethod: 'clerk',
           role: isFirstUser ? 'admin' : 'user',
+          verified: verified || 'no',
           lastSignedIn: new Date(),
         });
 

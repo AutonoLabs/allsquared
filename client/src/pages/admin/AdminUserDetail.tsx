@@ -162,7 +162,14 @@ export default function AdminUserDetail() {
             {user.address && (
               <div>
                 <p className="text-sm text-muted-foreground">Address</p>
-                <p className="font-medium">{user.address}</p>
+                <p className="font-medium">{(() => {
+                  try {
+                    const a = JSON.parse(user.address);
+                    return [a.line1, a.line2, a.city, a.county, a.postcode].filter(Boolean).join(", ");
+                  } catch {
+                    return user.address;
+                  }
+                })()}</p>
               </div>
             )}
             <div>
