@@ -3,45 +3,63 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch, useLocation } from "wouter";
-import { lazy, Suspense, useEffect, useState, useRef } from "react";
+import { lazy, Suspense, useEffect, useState, useRef, ComponentType } from "react";
+
+// Retry wrapper for lazy imports — handles stale chunk hashes after deploys
+function lazyRetry<T extends ComponentType<any>>(
+  factory: () => Promise<{ default: T }>
+): React.LazyExoticComponent<T> {
+  return lazy(() =>
+    factory().catch(() => {
+      // Chunk failed to load — likely stale hash after deploy. Reload once.
+      const key = "chunk-reload";
+      if (!sessionStorage.getItem(key)) {
+        sessionStorage.setItem(key, "1");
+        window.location.reload();
+      }
+      sessionStorage.removeItem(key);
+      return factory(); // try once more after reload flag set
+    })
+  );
+}
 import ErrorBoundary from "./components/ErrorBoundary";
 import Footer from "./components/Footer";
 import Header from "./components/Header";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
 // Lazy-loaded page components
-const Home = lazy(() => import("./pages/Home"));
-const HowItWorks = lazy(() => import("./pages/HowItWorks"));
-const Features = lazy(() => import("./pages/Features"));
-const Pricing = lazy(() => import("./pages/Pricing"));
-const About = lazy(() => import("./pages/About"));
-const Contact = lazy(() => import("./pages/Contact"));
-const Terms = lazy(() => import("./pages/Terms"));
-const Privacy = lazy(() => import("./pages/Privacy"));
-const Freelancers = lazy(() => import("./pages/Freelancers"));
-const Clients = lazy(() => import("./pages/Clients"));
-const LegalServices = lazy(() => import("./pages/LegalServices"));
+const Home = lazyRetry(() => import("./pages/Home"));
+const HowItWorks = lazyRetry(() => import("./pages/HowItWorks"));
+const Features = lazyRetry(() => import("./pages/Features"));
+const Pricing = lazyRetry(() => import("./pages/Pricing"));
+const About = lazyRetry(() => import("./pages/About"));
+const Contact = lazyRetry(() => import("./pages/Contact"));
+const Terms = lazyRetry(() => import("./pages/Terms"));
+const Privacy = lazyRetry(() => import("./pages/Privacy"));
+const Freelancers = lazyRetry(() => import("./pages/Freelancers"));
+const Clients = lazyRetry(() => import("./pages/Clients"));
+const LegalServices = lazyRetry(() => import("./pages/LegalServices"));
 
-const Dashboard = lazy(() => import("./pages/Dashboard"));
-const Contracts = lazy(() => import("./pages/Contracts"));
-const NewContractTypeform = lazy(() => import("./pages/NewContractTypeform"));
-const ContractDetail = lazy(() => import("./pages/ContractDetail"));
-const Templates = lazy(() => import("./pages/Templates"));
-const TemplateEditor = lazy(() => import("./pages/TemplateEditor"));
-const Profile = lazy(() => import("./pages/Profile"));
-const Billing = lazy(() => import("./pages/Billing"));
-const PaymentSettings = lazy(() => import("./pages/PaymentSettings"));
+const Dashboard = lazyRetry(() => import("./pages/Dashboard"));
+const Contracts = lazyRetry(() => import("./pages/Contracts"));
+const NewContractTypeform = lazyRetry(() => import("./pages/NewContractTypeform"));
+const ContractDetail = lazyRetry(() => import("./pages/ContractDetail"));
+const Templates = lazyRetry(() => import("./pages/Templates"));
+const TemplateEditor = lazyRetry(() => import("./pages/TemplateEditor"));
+const Profile = lazyRetry(() => import("./pages/Profile"));
+const Billing = lazyRetry(() => import("./pages/Billing"));
+const PaymentSettings = lazyRetry(() => import("./pages/PaymentSettings"));
 
-const DashboardLayout = lazy(() => import("./components/DashboardLayout"));
-const AdminLayout = lazy(() => import("./components/AdminLayout"));
-const AdminDashboard = lazy(() => import("./pages/admin/AdminDashboard"));
-const AdminUsers = lazy(() => import("./pages/admin/AdminUsers"));
-const AdminUserDetail = lazy(() => import("./pages/admin/AdminUserDetail"));
-const AdminContracts = lazy(() => import("./pages/admin/AdminContracts"));
-const AdminDisputes = lazy(() => import("./pages/admin/AdminDisputes"));
-const AdminKyc = lazy(() => import("./pages/admin/AdminKyc"));
-const AdminAnalytics = lazy(() => import("./pages/admin/AdminAnalytics"));
-const AdminAuditLogs = lazy(() => import("./pages/admin/AdminAuditLogs"));
+const DashboardLayout = lazyRetry(() => import("./components/DashboardLayout"));
+const AdminLayout = lazyRetry(() => import("./components/AdminLayout"));
+const AdminDashboard = lazyRetry(() => import("./pages/admin/AdminDashboard"));
+const AdminUsers = lazyRetry(() => import("./pages/admin/AdminUsers"));
+const AdminUserDetail = lazyRetry(() => import("./pages/admin/AdminUserDetail"));
+const AdminContracts = lazyRetry(() => import("./pages/admin/AdminContracts"));
+const AdminDisputes = lazyRetry(() => import("./pages/admin/AdminDisputes"));
+const AdminKyc = lazyRetry(() => import("./pages/admin/AdminKyc"));
+const AdminAnalytics = lazyRetry(() => import("./pages/admin/AdminAnalytics"));
+const AdminAuditLogs = lazyRetry(() => import("./pages/admin/AdminAuditLogs"));
 
 function PageSpinner() {
   return (
