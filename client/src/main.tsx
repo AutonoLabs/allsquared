@@ -19,7 +19,12 @@ const queryClient = new QueryClient({
 function AppWithTRPC() {
   const { getToken } = useClerkAuth();
 
-  // Stable ref so we don't recreate the client on every render
+  // Store getToken in a ref that updates every render so headers() always
+  // uses the latest Clerk-provided function (not a stale initial one)
+  const getTokenRef = useRef(getToken);
+  getTokenRef.current = getToken;
+
+  // Stable tRPC client — created once, but headers() reads getTokenRef.current
   const trpcClientRef = useRef(
     trpc.createClient({
       links: [
@@ -28,7 +33,7 @@ function AppWithTRPC() {
           transformer: superjson,
           async headers() {
             try {
-              const token = await getToken();
+              const token = await getTokenRef.current();
               return token ? { Authorization: `Bearer ${token}` } : {};
             } catch {
               return {};

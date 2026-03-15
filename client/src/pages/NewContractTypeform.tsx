@@ -115,8 +115,11 @@ export default function NewContractTypeform() {
   const [currentGroupIdx, setCurrentGroupIdx] = useState(0);
 
   // Queries
-  const { data: templates, isLoading: loadingTemplates } =
-    trpc.templateBuilder.listLegalTemplates.useQuery();
+  const { data: templates, isLoading: loadingTemplates, error: templatesError } =
+    trpc.templateBuilder.listLegalTemplates.useQuery(undefined, {
+      retry: 3,
+      retryDelay: 1000,
+    });
 
   const selectedTemplate = useMemo(
     () => templates?.find((t) => t.id === selectedTemplateId) ?? null,
@@ -234,16 +237,33 @@ export default function NewContractTypeform() {
       );
     }
 
+    if (templatesError) {
+      return (
+        <div className="text-center py-20 space-y-4">
+          <FileText className="h-12 w-12 text-destructive mx-auto" />
+          <p className="text-lg text-muted-foreground">
+            Unable to load templates. Please try refreshing the page.
+          </p>
+          <p className="text-sm text-muted-foreground">
+            {templatesError.message}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-primary text-primary-foreground rounded-lg"
+          >
+            Refresh
+          </button>
+        </div>
+      );
+    }
+
     if (!templates || templates.length === 0) {
       return (
         <div className="text-center py-20 space-y-4">
           <FileText className="h-12 w-12 text-muted-foreground mx-auto" />
           <p className="text-lg text-muted-foreground">
-            No legal templates found. Run the seed script first.
+            No templates available yet. Please check back soon.
           </p>
-          <code className="text-sm bg-muted px-3 py-1 rounded">
-            npx tsx server/seed-templates.ts
-          </code>
         </div>
       );
     }
