@@ -335,12 +335,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Social Proof / Stats — Gradient mesh variant */}
-      <section className="py-20 md:py-28 gradient-mesh text-white relative overflow-hidden">
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-10 right-[20%] h-16 w-16 rounded-xl border border-white/[0.05] rotate-12" />
-          <div className="absolute bottom-16 left-[15%] h-12 w-12 rounded-lg border border-white/[0.05] rotate-[-10deg]" />
-        </div>
+      {/* Social Proof / Stats */}
+      <section className="py-20 md:py-28 bg-muted/40 relative overflow-hidden">
         <div className="container relative">
           <motion.div
             initial="hidden"
@@ -349,7 +345,7 @@ export default function Home() {
             variants={fadeInUp}
             className="text-center mb-14"
           >
-            <span className="font-heading inline-block text-xs font-semibold uppercase tracking-[0.2em] text-white/40 mb-4">
+            <span className="font-heading inline-block text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-4">
               Built for Scale
             </span>
             <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
@@ -370,10 +366,10 @@ export default function Home() {
               { value: "10M+", label: "UK Freelancers Served", icon: Users },
               { value: "99.9%", label: "Payment Success Rate", icon: CheckCircle2 },
             ].map((stat) => (
-              <motion.div key={stat.label} variants={scaleIn} className="rounded-2xl border border-white/[0.06] bg-white/[0.04] backdrop-blur-sm p-8 text-center">
-                <stat.icon className="h-6 w-6 mx-auto mb-4 text-[oklch(0.81_0.16_85)]" />
+              <motion.div key={stat.label} variants={scaleIn} className="rounded-2xl border border-border/60 bg-card p-8 text-center">
+                <stat.icon className="h-6 w-6 mx-auto mb-4 text-primary" />
                 <div className="font-heading text-4xl font-bold mb-2">{stat.value}</div>
-                <div className="text-white/50 text-sm">{stat.label}</div>
+                <div className="text-muted-foreground text-sm">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
