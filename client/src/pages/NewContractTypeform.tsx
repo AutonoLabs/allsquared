@@ -149,22 +149,43 @@ export default function NewContractTypeform() {
     onError: (err) => toast.error(err.message),
   });
 
+  // Individual vs Company toggle for "Your Details" section
+  const [clientType, setClientType] = useState<"individual" | "company">("individual");
+
+  // Remap group labels for display
+  const groupDisplayNames: Record<string, string> = {
+    "Client Details": "Your Details",
+  };
+
   // Derived
   const variableGroups = useMemo(() => {
     if (!selectedTemplate) return [];
-    const groups: { name: string; vars: VariableDef[] }[] = [];
+    const groups: { name: string; displayName: string; vars: VariableDef[] }[] = [];
     const seen = new Set<string>();
     for (const v of selectedTemplate.variables) {
       if (!seen.has(v.group)) {
         seen.add(v.group);
+        const vars = selectedTemplate.variables
+          .filter((x: VariableDef) => x.group === v.group)
+          .map((x: VariableDef) => {
+            // Rename "Client Name" based on individual/company toggle
+            if (x.name === "CLIENT_NAME") {
+              return {
+                ...x,
+                label: clientType === "company" ? "Company Name" : "Full Name",
+              };
+            }
+            return x;
+          });
         groups.push({
           name: v.group,
-          vars: selectedTemplate.variables.filter((x: VariableDef) => x.group === v.group),
+          displayName: groupDisplayNames[v.group] || v.group,
+          vars,
         });
       }
     }
     return groups;
-  }, [selectedTemplate]);
+  }, [selectedTemplate, clientType]);
 
   const clauseCategories = useMemo(() => {
     if (!selectedTemplate) return [];
@@ -346,12 +367,40 @@ export default function NewContractTypeform() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-            {group.name}
+            {group.displayName}
           </h1>
           <p className="text-muted-foreground mt-2">
             Step {currentGroupIdx + 1} of {variableGroups.length} — fill in the details
           </p>
         </div>
+
+        {/* Individual / Company toggle for "Your Details" group */}
+        {group.name === "Client Details" && (
+          <div className="flex items-center gap-2 p-1 bg-muted rounded-lg w-fit">
+            <button
+              type="button"
+              onClick={() => setClientType("individual")}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                clientType === "individual"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Individual
+            </button>
+            <button
+              type="button"
+              onClick={() => setClientType("company")}
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
+                clientType === "company"
+                  ? "bg-background text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Company
+            </button>
+          </div>
+        )}
 
         {/* Sub-progress */}
         <div className="flex gap-1.5">
