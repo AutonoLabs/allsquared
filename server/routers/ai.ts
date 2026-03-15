@@ -2,7 +2,7 @@ import { z } from 'zod';
 import { router, protectedProcedure } from '../_core/trpc';
 import { getDb } from '../db';
 import { aiGenerations, contractTemplates } from '../../drizzle/schema';
-import { eq } from 'drizzle-orm';
+import { eq, desc } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 
 // OpenAI API configuration - will be set via environment variable
@@ -383,7 +383,7 @@ export const aiRouter = router({
         .select()
         .from(aiGenerations)
         .where(eq(aiGenerations.userId, ctx.user.id))
-        .orderBy(aiGenerations.createdAt)
+        .orderBy(desc(aiGenerations.createdAt))
         .limit(limit)
         .offset((page - 1) * limit);
 

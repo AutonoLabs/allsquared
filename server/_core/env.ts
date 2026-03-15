@@ -34,11 +34,6 @@ const EnvSchema = z.object({
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_PUBLISHABLE_KEY: z.string().optional(),
   
-  // Legacy Manus vars (optional, for backwards compat during migration)
-  VITE_APP_ID: z.string().optional(),
-  OAUTH_SERVER_URL: z.string().optional(),
-  OWNER_OPEN_ID: z.string().optional(),
-  VITE_OAUTH_PORTAL_URL: z.string().optional(),
 });
 
 // Parse and validate environment variables (soft fail for missing vars)
@@ -72,10 +67,4 @@ export const ENV = {
   // Stripe
   stripeSecretKey: envVars.STRIPE_SECRET_KEY,
   
-  // Legacy (for backwards compat)
-  appId: envVars.VITE_APP_ID ?? "",
-  oAuthServerUrl: envVars.OAUTH_SERVER_URL ?? "",
-  ownerId: envVars.OWNER_OPEN_ID ?? "",
-  forgeApiUrl: "",  // Legacy - not used with Clerk auth
-  forgeApiKey: "",  // Legacy - not used with Clerk auth
 };

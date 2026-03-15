@@ -337,7 +337,6 @@ function AuthScreen() {
         <SignUp
           routing="hash"
           signInUrl="/dashboard"
-          signUpUrl="/dashboard"
           appearance={{
             elements: {
               rootBox: "w-full",

@@ -15,8 +15,9 @@ export async function createContext(
 
   try {
     user = await authenticateClerkRequest(opts.req);
+    console.log('[Auth:context] createContext result:', user ? `user=${user.id}` : 'no user');
   } catch (error) {
-    // Authentication is optional for public procedures.
+    console.log('[Auth:context] createContext auth error (continuing as public):', error);
     user = null;
   }
 
