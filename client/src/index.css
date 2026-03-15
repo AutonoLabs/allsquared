@@ -203,11 +203,13 @@
     background: oklch(0.988 0.005 70);
   }
 
-  /* Hide Clerk development mode banner and footer branding */
+  /* Hide Clerk development mode banner and branding badges */
   .cl-internal-b3fm6y,
   .cl-internal-16vtwdp,
   div[data-testid="development-badge"],
-  .cl-footerAction__signIn .cl-internal-b3fm6y {
+  [class*='cl-internal'],
+  .cl-footer .cl-footerPages,
+  [data-localization-key*='badge'] {
     display: none !important;
   }
 }

@@ -26,10 +26,10 @@ const clerkAppearance = {
     headerTitle: 'text-xl font-bold',
     headerSubtitle: 'text-muted-foreground',
     card: 'shadow-none',
-    footer: 'hidden',
-    // Hide "Development mode" and "Secured by Clerk" badges
-    badge: 'hidden',
-    developerWarning: 'hidden',
+    // Hide branding and dev-mode badges but keep footerAction (sign-in/sign-up toggle)
+    footerPages: { display: 'none' },
+    badge: { display: 'none' },
+    developmentModeNotice: { display: 'none' },
   },
 };
 
