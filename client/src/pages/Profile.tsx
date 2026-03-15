@@ -7,10 +7,49 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2, Save, User, Building2, Mail, Phone, Briefcase } from "lucide-react";
+import { Loader2, Save, User, Building2, Mail, Phone, Briefcase, Search, CheckCircle2, AlertCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { UserTypeSelector } from "@/components/UserTypeSelector";
+
+const UK_POSTCODE_REGEX = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
+
+interface StructuredAddress {
+  line1: string;
+  line2: string;
+  city: string;
+  county: string;
+  postcode: string;
+  verified: boolean;
+}
+
+function parseAddress(raw: string | null | undefined): StructuredAddress {
+  if (!raw) return { line1: "", line2: "", city: "", county: "", postcode: "", verified: false };
+  try {
+    const parsed = JSON.parse(raw);
+    return {
+      line1: parsed.line1 || "",
+      line2: parsed.line2 || "",
+      city: parsed.city || "",
+      county: parsed.county || "",
+      postcode: parsed.postcode || "",
+      verified: !!parsed.verified,
+    };
+  } catch {
+    // Legacy plain-text address — put it in line1
+    return { line1: raw, line2: "", city: "", county: "", postcode: "", verified: false };
+  }
+}
+
+export function formatAddress(raw: string | null | undefined): string {
+  if (!raw) return "";
+  try {
+    const a = JSON.parse(raw) as StructuredAddress;
+    return [a.line1, a.line2, a.city, a.county, a.postcode].filter(Boolean).join(", ");
+  } catch {
+    return raw;
+  }
+}
 
 export default function Profile() {
   const { data: user, isLoading, refetch } = trpc.auth.me.useQuery();
@@ -28,8 +67,22 @@ export default function Profile() {
   const [email, setEmail] = useState("");
   const [company, setCompany] = useState("");
   const [phone, setPhone] = useState("");
-  const [address, setAddress] = useState("");
   const [showUserTypeSelector, setShowUserTypeSelector] = useState(false);
+
+  // Structured address fields
+  const [addressLine1, setAddressLine1] = useState("");
+  const [addressLine2, setAddressLine2] = useState("");
+  const [addressCity, setAddressCity] = useState("");
+  const [addressCounty, setAddressCounty] = useState("");
+  const [addressPostcode, setAddressPostcode] = useState("");
+  const [addressVerified, setAddressVerified] = useState(false);
+  const [postcodeError, setPostcodeError] = useState("");
+
+  // Postcode lookup
+  const [lookupPostcode, setLookupPostcode] = useState("");
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [lookupResults, setLookupResults] = useState<Array<{ line1: string; line2: string; city: string; county: string }>>([]);
+  const [showLookupResults, setShowLookupResults] = useState(false);
 
   // Notification preferences
   const [emailNotifications, setEmailNotifications] = useState(true);
@@ -44,11 +97,108 @@ export default function Profile() {
       setEmail(user.email || "");
       setCompany(user.businessName || "");
       setPhone(user.phone || "");
-      setAddress(user.address || "");
+      const addr = parseAddress(user.address);
+      setAddressLine1(addr.line1);
+      setAddressLine2(addr.line2);
+      setAddressCity(addr.city);
+      setAddressCounty(addr.county);
+      setAddressPostcode(addr.postcode);
+      setAddressVerified(addr.verified);
     }
   }, [user]);
 
+  const validatePostcode = (pc: string): boolean => {
+    if (!pc) return true; // empty is OK (not required until save)
+    return UK_POSTCODE_REGEX.test(pc.trim());
+  };
+
+  const handlePostcodeLookup = async () => {
+    const pc = lookupPostcode.trim();
+    if (!pc) return;
+    if (!UK_POSTCODE_REGEX.test(pc)) {
+      toast.error("Please enter a valid UK postcode");
+      return;
+    }
+    setLookupLoading(true);
+    setLookupResults([]);
+    try {
+      // Validate the postcode first
+      const validateRes = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(pc)}/validate`);
+      const validateData = await validateRes.json();
+      if (!validateData.result) {
+        toast.error("Postcode not found");
+        setLookupLoading(false);
+        return;
+      }
+      // Fetch postcode data
+      const res = await fetch(`https://api.postcodes.io/postcodes/${encodeURIComponent(pc)}`);
+      const data = await res.json();
+      if (data.status === 200 && data.result) {
+        const r = data.result;
+        const result = {
+          line1: "",
+          line2: "",
+          city: r.admin_ward || "",
+          county: r.admin_county || r.region || "",
+        };
+        setLookupResults([result]);
+        setShowLookupResults(true);
+        // Auto-fill postcode and location fields
+        setAddressPostcode(r.postcode);
+        setAddressCity(r.admin_district || r.admin_ward || "");
+        setAddressCounty(r.admin_county || r.region || "");
+        setAddressVerified(true);
+        setPostcodeError("");
+        toast.success("Postcode found — fill in your street address");
+      } else {
+        toast.error("Postcode not found");
+      }
+    } catch {
+      toast.error("Failed to look up postcode");
+    } finally {
+      setLookupLoading(false);
+    }
+  };
+
+  const handleSelectLookupResult = (result: { line1: string; line2: string; city: string; county: string }) => {
+    if (result.city) setAddressCity(result.city);
+    if (result.county) setAddressCounty(result.county);
+    setShowLookupResults(false);
+  };
+
   const handleSaveProfile = () => {
+    // Validate postcode if address fields are partially filled
+    const hasAddressFields = addressLine1 || addressCity || addressPostcode;
+    if (hasAddressFields) {
+      if (!addressLine1.trim()) {
+        toast.error("Address Line 1 is required");
+        return;
+      }
+      if (!addressCity.trim()) {
+        toast.error("City / Town is required");
+        return;
+      }
+      if (!addressPostcode.trim()) {
+        toast.error("Postcode is required");
+        return;
+      }
+      if (!validatePostcode(addressPostcode)) {
+        setPostcodeError("Please enter a valid UK postcode");
+        return;
+      }
+    }
+
+    const address = hasAddressFields
+      ? JSON.stringify({
+          line1: addressLine1.trim(),
+          line2: addressLine2.trim(),
+          city: addressCity.trim(),
+          county: addressCounty.trim(),
+          postcode: addressPostcode.trim().toUpperCase(),
+          verified: addressVerified,
+        })
+      : "";
+
     updateProfileMutation.mutate({
       name,
       businessName: company,
@@ -147,6 +297,17 @@ export default function Profile() {
               <Label htmlFor="email">
                 <Mail className="inline h-4 w-4 mr-2" />
                 Email Address
+                {user?.verified === "yes" ? (
+                  <Badge variant="default" className="ml-2 bg-green-500 text-xs">
+                    <CheckCircle2 className="h-3 w-3 mr-1" />
+                    Verified
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary" className="ml-2 bg-yellow-100 text-yellow-800 text-xs">
+                    <AlertCircle className="h-3 w-3 mr-1" />
+                    Pending Verification
+                  </Badge>
+                )}
               </Label>
               <Input
                 id="email"
@@ -157,7 +318,7 @@ export default function Profile() {
                 disabled
               />
               <p className="text-xs text-muted-foreground">
-                Email cannot be changed
+                Email is managed through Clerk
               </p>
             </div>
 
@@ -189,14 +350,125 @@ export default function Profile() {
             </div>
           </div>
 
+          <Separator />
+
+          {/* Postcode Lookup */}
+          <div className="space-y-2">
+            <Label>Find Address by Postcode</Label>
+            <div className="flex gap-2">
+              <Input
+                value={lookupPostcode}
+                onChange={(e) => setLookupPostcode(e.target.value)}
+                placeholder="e.g. SW1A 1AA"
+                className="max-w-[200px]"
+                onKeyDown={(e) => e.key === "Enter" && handlePostcodeLookup()}
+              />
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handlePostcodeLookup}
+                disabled={lookupLoading || !lookupPostcode.trim()}
+              >
+                {lookupLoading ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <Search className="h-4 w-4 mr-2" />
+                )}
+                Find Address
+              </Button>
+            </div>
+            {showLookupResults && lookupResults.length > 0 && (
+              <div className="border rounded-md p-2 bg-muted/50 space-y-1">
+                {lookupResults.map((result, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    className="w-full text-left px-3 py-2 text-sm rounded hover:bg-primary/10 transition-colors"
+                    onClick={() => handleSelectLookupResult(result)}
+                  >
+                    {[result.city, result.county].filter(Boolean).join(", ")} — Click to fill city/county
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Structured Address Fields */}
           <div className="space-y-2">
             <Label htmlFor="address">Business Address</Label>
-            <Input
-              id="address"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              placeholder="123 Business Street, London, UK"
-            />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="addressLine1" className="text-sm">
+                Address Line 1 <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="addressLine1"
+                value={addressLine1}
+                onChange={(e) => { setAddressLine1(e.target.value); setAddressVerified(false); }}
+                placeholder="123 High Street"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="addressLine2" className="text-sm">
+                Address Line 2
+              </Label>
+              <Input
+                id="addressLine2"
+                value={addressLine2}
+                onChange={(e) => setAddressLine2(e.target.value)}
+                placeholder="Flat 4, Building Name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="addressCity" className="text-sm">
+                City / Town <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="addressCity"
+                value={addressCity}
+                onChange={(e) => setAddressCity(e.target.value)}
+                placeholder="London"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="addressCounty" className="text-sm">
+                County
+              </Label>
+              <Input
+                id="addressCounty"
+                value={addressCounty}
+                onChange={(e) => setAddressCounty(e.target.value)}
+                placeholder="Greater London"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="addressPostcode" className="text-sm">
+                Postcode <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="addressPostcode"
+                value={addressPostcode}
+                onChange={(e) => {
+                  setAddressPostcode(e.target.value);
+                  setPostcodeError("");
+                  setAddressVerified(false);
+                }}
+                placeholder="SW1A 1AA"
+                className={postcodeError ? "border-destructive" : ""}
+              />
+              {postcodeError && (
+                <p className="text-xs text-destructive">{postcodeError}</p>
+              )}
+            </div>
+            {addressVerified && (
+              <div className="flex items-center space-y-2 pt-6">
+                <Badge variant="default" className="bg-green-500 text-xs">
+                  <CheckCircle2 className="h-3 w-3 mr-1" />
+                  Postcode Verified
+                </Badge>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-end">

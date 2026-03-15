@@ -63,6 +63,7 @@ export function useAuth(options?: UseAuthOptions) {
         clerkId: clerkUser.id,
         email: clerkUser.primaryEmailAddress?.emailAddress ?? null,
         name: clerkUser.fullName ?? clerkUser.firstName ?? null,
+        emailVerified: clerkUser.primaryEmailAddress?.verification?.status === 'verified',
       });
     }
   }, [isLoaded, isSignedIn, clerkUser, synced]);
@@ -118,6 +119,7 @@ export function useAuth(options?: UseAuthOptions) {
           email: dbUser.email ?? clerkUser!.primaryEmailAddress?.emailAddress ?? null,
           profilePhoto: clerkUser!.imageUrl,
           role: dbUser.role,
+          verified: dbUser.verified,
         },
         loading: false,
         error: null,
