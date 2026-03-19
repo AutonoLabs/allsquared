@@ -11,91 +11,22 @@ import {
 } from '../../drizzle/schema';
 import { eq, and, inArray } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
+import * as transpact from '../lib/transpact-client';
 
 /**
- * Transpact Escrow Integration
+ * Transpact Escrow Integration (SOAP)
  * FCA Reference: 546279
  *
- * This router handles escrow operations via Transpact's API.
- * In production, you'll need to:
- * 1. Sign a partner agreement with Transpact
- * 2. Obtain API credentials
- * 3. Implement proper webhook handling
- * 4. Set up proper fund segregation
+ * This router handles escrow operations via Transpact's SOAP API.
+ * The SOAP client lives in server/lib/transpact-client.ts and falls
+ * back to mock responses when TRANSPACT_API_KEY is not set.
+ *
+ * Env vars:
+ *   TRANSPACT_API_KEY      — partner API key
+ *   TRANSPACT_PARTNER_ID   — partner ID
+ *   TRANSPACT_WSDL_URL     — WSDL endpoint (optional override)
+ *   TRANSPACT_SOAP_URL     — SOAP service endpoint (optional override)
  */
-
-// Transpact API configuration
-const TRANSPACT_API_URL = process.env.TRANSPACT_API_URL || 'https://api.transpact.com/v1';
-const TRANSPACT_PARTNER_ID = process.env.TRANSPACT_PARTNER_ID;
-
-// Helper to make Transpact API calls
-async function transpactRequest(
-  endpoint: string,
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' = 'POST',
-  body?: Record<string, any>
-) {
-  const apiKey = process.env.TRANSPACT_API_KEY;
-
-  if (!apiKey || !TRANSPACT_PARTNER_ID) {
-    // Return mock response for development
-    console.warn('Transpact API not configured - using mock responses');
-    return mockTranspactResponse(endpoint, method, body);
-  }
-
-  const response = await fetch(`${TRANSPACT_API_URL}${endpoint}`, {
-    method,
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-      'X-Partner-ID': TRANSPACT_PARTNER_ID,
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-
-  const data = await response.json();
-
-  if (!response.ok) {
-    console.error('Transpact API error:', data);
-    throw new Error(data.message || 'Transpact API error');
-  }
-
-  return data;
-}
-
-// Mock responses for development
-function mockTranspactResponse(endpoint: string, method: string, body?: any): any {
-  const mockId = `mock_${nanoid(12)}`;
-
-  if (endpoint.includes('/transactions') && method === 'POST') {
-    return {
-      id: mockId,
-      status: 'created',
-      amount: body?.amount,
-      currency: body?.currency || 'GBP',
-      reference: body?.reference,
-      depositUrl: `https://sandbox.transpact.com/deposit/${mockId}`,
-      createdAt: new Date().toISOString(),
-    };
-  }
-
-  if (endpoint.includes('/release')) {
-    return {
-      id: mockId,
-      status: 'released',
-      releasedAt: new Date().toISOString(),
-    };
-  }
-
-  if (endpoint.includes('/refund')) {
-    return {
-      id: mockId,
-      status: 'refunded',
-      refundedAt: new Date().toISOString(),
-    };
-  }
-
-  return { id: mockId, status: 'success' };
-}
 
 // Calculate escrow fee (Transpact typically charges 1.5-2.5%)
 function calculateEscrowFee(amount: number): number {
@@ -158,19 +89,19 @@ export const escrowRouter = router({
       const escrowFee = calculateEscrowFee(input.amount);
       const reference = `AS-${Date.now()}-${nanoid(8)}`;
 
-      // Create Transpact transaction
-      const transpactTx = await transpactRequest('/transactions', 'POST', {
+      // Create Transpact transaction (SOAP: CreateTranspact)
+      const transpactTx = await transpact.createTransaction({
         amount: input.amount,
         currency: 'GBP',
         reference: reference,
         description: `Escrow for contract: ${contract[0].title}`,
-        clientEmail: ctx.user.email,
+        clientEmail: ctx.user.email || '',
+        callbackUrl: `${process.env.APP_URL}/api/webhooks/transpact`,
         metadata: {
           allsquaredContractId: input.contractId,
-          allsquaredMilestoneId: input.milestoneId,
+          allsquaredMilestoneId: input.milestoneId || '',
           allsquaredEscrowId: escrowId,
         },
-        callbackUrl: `${process.env.APP_URL}/api/webhooks/transpact`,
       });
 
       // Create local escrow record
@@ -263,13 +194,10 @@ export const escrowRouter = router({
         throw new Error('Unauthorized');
       }
 
-      // Get latest status from Transpact
+      // Get latest status from Transpact (SOAP: ViewTranspact)
       if (escrow[0].escrowReference && process.env.TRANSPACT_API_KEY) {
         try {
-          const transpactStatus = await transpactRequest(
-            `/transactions/${escrow[0].escrowReference}`,
-            'GET'
-          );
+          const transpactStatus = await transpact.getTransaction(escrow[0].escrowReference);
 
           // Update local status if changed
           if (transpactStatus.status !== escrow[0].status) {
@@ -368,15 +296,12 @@ export const escrowRouter = router({
 
       const releaseAmount = input.amount || parseInt(escrow[0].amount, 10);
 
-      // Release via Transpact
-      const releaseResult = await transpactRequest(
-        `/transactions/${escrow[0].escrowReference}/release`,
-        'POST',
-        {
-          amount: releaseAmount,
-          recipientAccountId: contract[0].providerId, // Would be provider's bank details
-          notes: input.notes,
-        }
+      // Release via Transpact (SOAP: ReleaseTranspact)
+      const releaseResult = await transpact.releaseFunds(
+        escrow[0].escrowReference!,
+        releaseAmount,
+        contract[0].providerId || undefined,
+        input.notes,
       );
 
       // Update escrow status
@@ -566,15 +491,12 @@ export const escrowRouter = router({
         throw new Error('Escrow transaction not found');
       }
 
-      // Process refund via Transpact
-      const refundResult = await transpactRequest(
-        `/transactions/${escrow[0].escrowReference}/refund`,
-        'POST',
-        {
-          amount: input.amount,
-          recipientUserId: input.recipientId,
-          notes: input.adminNotes,
-        }
+      // Process refund via Transpact (SOAP: VoidTranspact)
+      const refundResult = await transpact.requestRefund(
+        escrow[0].escrowReference!,
+        input.amount,
+        input.recipientId,
+        input.adminNotes,
       );
 
       // Update escrow status

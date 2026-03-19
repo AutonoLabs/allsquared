@@ -1,4 +1,4 @@
-import { pgEnum, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { boolean, integer, pgEnum, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
 // Define enums at the top of the file
 export const roleEnum = pgEnum("role", ["user", "admin"]);
@@ -459,3 +459,60 @@ export const aiGenerations = pgTable("aiGenerations", {
 
 export type AiGeneration = typeof aiGenerations.$inferSelect;
 export type InsertAiGeneration = typeof aiGenerations.$inferInsert;
+
+// ===== SquaredNow Dispute System =====
+
+export const mediationRoleEnum = pgEnum("mediation_role", ["claimant", "respondent"]);
+export const settlementProposerEnum = pgEnum("settlement_proposer", ["ai", "claimant", "respondent"]);
+export const settlementStatusEnum = pgEnum("settlement_status", ["proposed", "accepted", "rejected", "expired"]);
+export const confidenceEnum = pgEnum("confidence", ["high", "medium", "low"]);
+
+// AI dispute analyses
+export const disputeAnalyses = pgTable("disputeAnalyses", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  disputeId: varchar("disputeId", { length: 64 }).notNull(),
+  contractSummary: text("contractSummary"),
+  claimantPosition: text("claimantPosition"),
+  respondentPosition: text("respondentPosition"),
+  strengthAssessment: text("strengthAssessment"), // JSON
+  relevantClauses: text("relevantClauses"), // JSON array
+  recommendedAction: varchar("recommendedAction", { length: 100 }),
+  confidence: confidenceEnum("confidence"),
+  aiModel: varchar("aiModel", { length: 50 }),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type DisputeAnalysis = typeof disputeAnalyses.$inferSelect;
+export type InsertDisputeAnalysis = typeof disputeAnalyses.$inferInsert;
+
+// Mediation responses (back-and-forth between parties)
+export const mediationResponses = pgTable("mediationResponses", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  disputeId: varchar("disputeId", { length: 64 }).notNull(),
+  responderId: varchar("responderId", { length: 64 }).notNull(),
+  role: mediationRoleEnum("role").notNull(),
+  message: text("message").notNull(),
+  aiSuggestion: text("aiSuggestion"),
+  round: integer("round").notNull(),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type MediationResponse = typeof mediationResponses.$inferSelect;
+export type InsertMediationResponse = typeof mediationResponses.$inferInsert;
+
+// Settlement options (proposed by AI or either party)
+export const settlementOptions = pgTable("settlementOptions", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  disputeId: varchar("disputeId", { length: 64 }).notNull(),
+  proposedBy: settlementProposerEnum("proposedBy").notNull(),
+  description: text("description").notNull(),
+  financialTerms: text("financialTerms"), // JSON: {amount, currency, splitPercentage, escrowAction}
+  acceptedByClaimant: boolean("acceptedByClaimant").default(false).notNull(),
+  acceptedByRespondent: boolean("acceptedByRespondent").default(false).notNull(),
+  status: settlementStatusEnum("status").default("proposed").notNull(),
+  expiresAt: timestamp("expiresAt"),
+  createdAt: timestamp("createdAt").defaultNow(),
+});
+
+export type SettlementOption = typeof settlementOptions.$inferSelect;
+export type InsertSettlementOption = typeof settlementOptions.$inferInsert;

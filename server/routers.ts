@@ -12,6 +12,7 @@ import { paymentsRouter } from "./routers/payments";
 import { escrowRouter } from "./routers/escrow";
 import { signaturesRouter } from "./routers/signatures";
 import { adminRouter } from "./routers/admin";
+import { disputesRouter } from "./routers/disputes";
 import { templateBuilderRouter } from "./routers/templateBuilder";
 import { updateUser, getUserByClerkId, upsertUser, getUser, getDb } from "./db";
 import { users } from "../drizzle/schema";
@@ -111,6 +112,9 @@ export const appRouter = router({
   payments: paymentsRouter,
   escrow: escrowRouter,
   signatures: signaturesRouter,
+
+  // Dispute resolution
+  disputes: disputesRouter,
 
   // Admin portal
   admin: adminRouter,
