@@ -21,7 +21,7 @@ import { nanoid } from 'nanoid';
  */
 
 // Provider configuration
-const DOCUSEAL_API_URL = process.env.DOCUSEAL_URL || 'http://100.65.116.80:3030';
+const DOCUSEAL_API_URL = process.env.DOCUSEAL_URL || 'https://sign.allsquared.io';
 const DOCUSEAL_API_KEY = process.env.DOCUSEAL_API_KEY || '';
 const DOCUSIGN_API_URL = process.env.DOCUSIGN_API_URL || 'https://demo.docusign.net/restapi/v2.1';
 const SIGNWELL_API_URL = 'https://www.signwell.com/api/v1';
