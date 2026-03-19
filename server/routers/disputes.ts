@@ -18,8 +18,45 @@ import { nanoid } from 'nanoid';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
-// LexAI RAG — local legal research engine
-const LEXAI_API_URL = process.env.LEXAI_API_URL || 'http://localhost:8400';
+// LexAI RAG — legal research engine (Tailscale → Studio, fallback localhost)
+const LEXAI_API_URL = process.env.LEXAI_API_URL || 'http://100.65.116.80:8400';
+
+// LexAI /review — contract clause assessment
+async function reviewWithLexAI(contractText: string, reviewType: string = 'general'): Promise<{ issues: { category: string; description: string; severity: string }[] }> {
+  try {
+    const response = await fetch(`${LEXAI_API_URL}/review`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ document: contractText, review_type: reviewType }),
+      signal: AbortSignal.timeout(30000),
+    });
+    if (!response.ok) return { issues: [] };
+    const data = await response.json() as { issues?: { category: string; description: string; severity: string }[] };
+    console.log(`[LexAI /review] Found ${data.issues?.length || 0} issues`);
+    return { issues: data.issues || [] };
+  } catch (err) {
+    console.warn('[LexAI /review] Unavailable:', (err as Error).message);
+    return { issues: [] };
+  }
+}
+
+// LexAI /draft — settlement proposal generation
+async function draftWithLexAI(prompt: string, style: string = 'formal'): Promise<string> {
+  try {
+    const response = await fetch(`${LEXAI_API_URL}/draft`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ prompt, style }),
+      signal: AbortSignal.timeout(30000),
+    });
+    if (!response.ok) return '';
+    const data = await response.json() as { draft?: string };
+    return data.draft || '';
+  } catch (err) {
+    console.warn('[LexAI /draft] Unavailable:', (err as Error).message);
+    return '';
+  }
+}
 
 async function queryLexAI(query: string, practiceArea?: string): Promise<{ answer: string; sources: { citation: string; text: string }[] }> {
   try {
@@ -98,12 +135,22 @@ async function analyzeDisputeWithAI(
     };
   }
 
-  // Query LexAI for relevant UK case law and legal principles
-  const lexQuery = `${disputeReason} UK contract law remedies breach`;
-  const lexResult = await queryLexAI(lexQuery, 'contract');
+  // Query LexAI for relevant UK case law and contract review
+  const [lexResult, contractReview] = await Promise.all([
+    queryLexAI(`${disputeReason} UK contract law remedies breach`, 'contract'),
+    reviewWithLexAI(contractText, 'risk'),
+  ]);
 
-  const legalContext = lexResult.sources.length > 0
+  const caseLawSection = lexResult.sources.length > 0
     ? `\n\nRELEVANT UK CASE LAW (from LexAI):\n${lexResult.sources.map((s, i) => `${i + 1}. ${s.citation}: ${s.text.substring(0, 300)}`).join('\n')}\n\n${lexResult.answer ? `LEGAL ANALYSIS:\n${lexResult.answer}` : ''}`
+    : '';
+
+  const contractIssuesSection = contractReview.issues.length > 0
+    ? `\n\nCONTRACT REVIEW ISSUES (from LexAI):\n${contractReview.issues.map((iss, i) => `${i + 1}. [${iss.severity.toUpperCase()}] ${iss.category}: ${iss.description}`).join('\n')}`
+    : '';
+
+  const legalContext = (caseLawSection || contractIssuesSection)
+    ? `${caseLawSection}${contractIssuesSection}`
     : '\n\n[Note: LexAI legal research unavailable — analyse based on general UK contract law principles.]';
 
   const userPrompt = `Analyse this dispute:
