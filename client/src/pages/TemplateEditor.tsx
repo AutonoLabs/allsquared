@@ -309,7 +309,7 @@ End Date: {{end_date}}
                     placeholder="e.g., client_name"
                     value={newVariable}
                     onChange={(e) => setNewVariable(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleAddVariable()}
+                    onKeyDown={(e) => e.key === "Enter" && handleAddVariable()}
                   />
                   <Button size="icon" onClick={handleAddVariable}>
                     <Plus className="h-4 w-4" />

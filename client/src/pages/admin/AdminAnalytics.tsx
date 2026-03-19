@@ -76,10 +76,6 @@ export default function AdminAnalytics() {
   ];
 
   // Calculate some derived metrics
-  const userGrowthRate = analytics?.totalUsers
-    ? ((analytics.recentUsers.length / analytics.totalUsers) * 100).toFixed(1)
-    : "0";
-
   const contractCompletionRate = analytics?.totalContracts
     ? (((analytics.totalContracts - analytics.activeContracts) / analytics.totalContracts) * 100).toFixed(1)
     : "0";

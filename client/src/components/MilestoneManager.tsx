@@ -40,6 +40,9 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
       setSubmissionNotes("");
       refetch();
     },
+    onError: (error) => {
+      toast.error(error.message || "Failed to submit milestone");
+    },
   });
 
   const approveMutation = trpc.milestones.approve.useMutation({
@@ -47,12 +50,18 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
       toast.success("Milestone approved and payment released");
       refetch();
     },
+    onError: (error) => {
+      toast.error(error.message || "Failed to approve milestone");
+    },
   });
 
   const rejectMutation = trpc.milestones.reject.useMutation({
     onSuccess: () => {
       toast.success("Milestone rejected");
       refetch();
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to reject milestone");
     },
   });
 

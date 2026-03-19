@@ -39,17 +39,17 @@ export default function Home() {
 
   return (
     <div className="flex flex-col overflow-hidden">
-      {/* Hero Section — Bold asymmetric layout with gradient mesh */}
+      {/* Hero Section — Navy gradient-mesh with violet accents */}
       <section className="relative overflow-hidden gradient-mesh py-28 md:py-40 lg:py-48">
         {/* Decorative geometric shapes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-[oklch(0.637_0.194_25/0.1)] blur-[100px]" />
-          <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-[oklch(0.78_0.14_175/0.12)] blur-[80px]" />
+          <div className="absolute -top-24 -right-24 h-96 w-96 rounded-full bg-[oklch(0.41_0.249_285.75/0.15)] blur-[100px]" />
+          <div className="absolute bottom-0 left-1/4 h-64 w-64 rounded-full bg-[oklch(0.665_0.156_293/0.12)] blur-[80px]" />
           {/* Rotated squares — brand motif */}
           <div className="absolute top-20 right-[15%] h-20 w-20 rounded-2xl border border-white/[0.06] rotate-12" />
-          <div className="absolute top-32 right-[12%] h-14 w-14 rounded-xl bg-[oklch(0.637_0.194_25/0.12)] rotate-[-8deg]" />
+          <div className="absolute top-32 right-[12%] h-14 w-14 rounded-xl bg-[oklch(0.41_0.249_285.75/0.15)] rotate-[-8deg]" />
           <div className="absolute bottom-24 left-[10%] h-16 w-16 rounded-2xl border border-white/[0.06] rotate-[20deg]" />
-          <div className="absolute bottom-36 left-[8%] h-10 w-10 rounded-lg bg-[oklch(0.81_0.16_85/0.15)] rotate-[-15deg]" />
+          <div className="absolute bottom-36 left-[8%] h-10 w-10 rounded-lg bg-[oklch(0.665_0.156_293/0.15)] rotate-[-15deg]" />
         </div>
 
         <div className="container relative">
@@ -60,7 +60,7 @@ export default function Home() {
           >
             <motion.div variants={fadeInUp} className="mb-8">
               <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.06] px-4 py-1.5 text-sm text-white/80 backdrop-blur-sm">
-                <Sparkles className="h-3.5 w-3.5 text-[oklch(0.637_0.194_25)]" />
+                <Sparkles className="h-3.5 w-3.5 text-[oklch(0.665_0.156_293)]" />
                 Launching Soon in the UK
               </span>
             </motion.div>
@@ -72,7 +72,7 @@ export default function Home() {
               Ship work.
               <br />
               Get paid.{" "}
-              <span className="bg-gradient-to-r from-[oklch(0.637_0.194_25)] via-[oklch(0.78_0.14_175)] to-[oklch(0.81_0.16_85)] bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[oklch(0.665_0.156_293)] via-[oklch(0.41_0.249_285.75)] to-[oklch(0.696_0.17_162.48)] bg-clip-text text-transparent">
                 No drama.
               </span>
             </motion.h1>
@@ -90,14 +90,14 @@ export default function Home() {
               className="mt-10 flex flex-col gap-4 sm:flex-row"
             >
               {isAuthenticated ? (
-                <Button size="lg" className="btn-state-layer text-base px-8 h-13 bg-white text-[oklch(0.216_0.014_58)] hover:bg-white/90 shadow-lg shadow-white/10 rounded-xl font-semibold" asChild>
+                <Button size="lg" className="btn-state-layer text-base px-8 h-13 bg-[#6D28D9] text-white hover:bg-[#5B21B6] shadow-lg shadow-[#6D28D9]/20 rounded-xl font-semibold" asChild>
                   <Link href="/dashboard">
                     Go to Dashboard
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
               ) : (
-                <Button size="lg" className="btn-state-layer text-base px-8 h-13 bg-white text-[oklch(0.216_0.014_58)] hover:bg-white/90 shadow-lg shadow-white/10 rounded-xl font-semibold" asChild>
+                <Button size="lg" className="btn-state-layer text-base px-8 h-13 bg-[#6D28D9] text-white hover:bg-[#5B21B6] shadow-lg shadow-[#6D28D9]/20 rounded-xl font-semibold" asChild>
                   <Link href="/dashboard">
                     Join the Waitlist
                     <ArrowRight className="ml-2 h-5 w-5" />
@@ -119,15 +119,15 @@ export default function Home() {
               className="mt-12 flex flex-wrap items-center gap-6 text-sm text-white/50"
             >
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-[oklch(0.81_0.16_85)]" />
+                <CheckCircle2 className="h-4 w-4 text-[oklch(0.696_0.17_162.48)]" />
                 <span>FCA-Backed Escrow</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-[oklch(0.81_0.16_85)]" />
+                <CheckCircle2 className="h-4 w-4 text-[oklch(0.696_0.17_162.48)]" />
                 <span>AI-Powered Contracts</span>
               </div>
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="h-4 w-4 text-[oklch(0.81_0.16_85)]" />
+                <CheckCircle2 className="h-4 w-4 text-[oklch(0.696_0.17_162.48)]" />
                 <span>Milestone Payments</span>
               </div>
             </motion.div>
@@ -140,19 +140,19 @@ export default function Home() {
         <div className="container">
           <div className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 text-sm text-muted-foreground">
             <div className="flex items-center gap-2">
-              <Shield className="h-4 w-4 text-primary" />
+              <Shield className="h-4 w-4 text-accent" />
               <span className="font-medium">FCA Regulated</span>
             </div>
             <div className="flex items-center gap-2">
-              <Lock className="h-4 w-4 text-primary" />
+              <Lock className="h-4 w-4 text-accent" />
               <span className="font-medium">Bank-Grade Security</span>
             </div>
             <div className="flex items-center gap-2">
-              <Scale className="h-4 w-4 text-primary" />
+              <Scale className="h-4 w-4 text-accent" />
               <span className="font-medium">SRA-Approved Lawyers</span>
             </div>
             <div className="flex items-center gap-2">
-              <Star className="h-4 w-4 text-primary" />
+              <Star className="h-4 w-4 text-accent" />
               <span className="font-medium">UK-Focused Platform</span>
             </div>
           </div>
@@ -166,12 +166,12 @@ export default function Home() {
             variants={fadeInUp}
             className="mx-auto max-w-3xl text-center space-y-6"
           >
-            <span className="font-heading inline-block text-xs font-semibold uppercase tracking-[0.2em] text-primary">
+            <span className="font-heading inline-block text-xs font-semibold uppercase tracking-[0.2em] text-accent">
               The Problem
             </span>
             <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
               A £30 Billion Market{" "}
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#6D28D9] to-[#A78BFA] bg-clip-text text-transparent">
                 Plagued by Payment Disputes
               </span>
             </h2>
@@ -185,14 +185,14 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Key Features — M3 surface tint cards */}
+      {/* Key Features — White cards with violet icon badges */}
       <section className="py-20 md:py-28 bg-muted/40">
         <div className="container">
           <motion.div
             variants={fadeInUp}
             className="mx-auto max-w-2xl text-center mb-16"
           >
-            <span className="font-heading inline-block text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-4">
+            <span className="font-heading inline-block text-xs font-semibold uppercase tracking-[0.2em] text-accent mb-4">
               Features
             </span>
             <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-5">
@@ -213,41 +213,41 @@ export default function Home() {
                 icon: FileText,
                 title: "AI Contract Generation",
                 description: "Generate professional, legally-sound contracts in minutes for freelance services, home improvements, events, and more.",
-                gradient: "from-[oklch(0.78_0.14_175)] to-[oklch(0.637_0.194_25)]",
+                gradient: "from-[#6D28D9] to-[#A78BFA]",
               },
               {
                 icon: Shield,
                 title: "FCA-Backed Escrow",
                 description: "Secure payments with FCA-authorised escrow. Funds released only when milestones are met, protecting both parties.",
-                gradient: "from-[oklch(0.81_0.16_85)] to-[oklch(0.72_0.12_175)]",
+                gradient: "from-[#6D28D9] to-[#10B981]",
               },
               {
                 icon: TrendingUp,
                 title: "Milestone Management",
                 description: "Track project progress with clear milestones. Automatic payment releases keep projects moving forward.",
-                gradient: "from-[oklch(0.637_0.194_25)] to-[oklch(0.81_0.16_85)]",
+                gradient: "from-[#0F172A] to-[#6D28D9]",
               },
               {
                 icon: MessageSquare,
                 title: "AI Dispute Resolution",
                 description: "Resolve conflicts quickly with AI-assisted mediation. Optional lawyer referrals for complex cases.",
-                gradient: "from-[oklch(0.78_0.14_175)] to-[oklch(0.78_0.14_175)]",
+                gradient: "from-[#A78BFA] to-[#6D28D9]",
               },
               {
                 icon: Lock,
                 title: "Bank-Grade Security",
                 description: "Your data and funds are protected with enterprise-level encryption and FCA-regulated escrow partners.",
-                gradient: "from-[oklch(0.72_0.12_175)] to-[oklch(0.637_0.194_25)]",
+                gradient: "from-[#0F172A] to-[#A78BFA]",
               },
               {
                 icon: Scale,
                 title: "Lawyer-in-the-Loop",
                 description: "Need expert advice? Connect with SRA-regulated solicitors for contract review or legal guidance.",
-                gradient: "from-[oklch(0.637_0.194_25)] to-[oklch(0.81_0.16_85)]",
+                gradient: "from-[#6D28D9] to-[#0F172A]",
               },
             ].map((feature) => (
               <motion.div key={feature.title} variants={scaleIn}>
-                <Card className="group h-full border border-border/60 bg-card hover:border-primary/20 shadow-none hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 rounded-2xl">
+                <Card className="group h-full border border-border/60 bg-card hover:border-[#6D28D9]/20 shadow-none hover:shadow-lg hover:shadow-[#6D28D9]/5 transition-all duration-300 rounded-2xl">
                   <CardContent className="pt-7 pb-6">
                     <div className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br ${feature.gradient}`}>
                       <feature.icon className="h-5 w-5 text-white" />
@@ -269,7 +269,7 @@ export default function Home() {
             variants={fadeInUp}
             className="mx-auto max-w-2xl text-center mb-16"
           >
-            <span className="font-heading inline-block text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-4">
+            <span className="font-heading inline-block text-xs font-semibold uppercase tracking-[0.2em] text-accent mb-4">
               How It Works
             </span>
             <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl mb-5">
@@ -305,10 +305,10 @@ export default function Home() {
               },
             ].map((item) => (
               <motion.div key={item.step} variants={fadeInUp} className="relative text-center">
-                <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10">
-                  <item.icon className="h-7 w-7 text-primary" />
+                <div className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-[#F1F0FF]">
+                  <item.icon className="h-7 w-7 text-[#6D28D9]" />
                 </div>
-                <div className="absolute -top-1 right-1/4 md:right-auto md:-left-1 flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-accent text-xs font-bold text-white shadow-md shadow-primary/20">
+                <div className="absolute -top-1 right-1/4 md:right-auto md:-left-1 flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#6D28D9] to-[#A78BFA] text-xs font-bold text-white shadow-md shadow-[#6D28D9]/20">
                   {item.step}
                 </div>
                 <h3 className="font-heading mb-3 text-xl font-semibold">{item.title}</h3>
@@ -319,17 +319,17 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Social Proof / Stats */}
-      <section className="py-20 md:py-28 bg-muted/40 relative overflow-hidden">
+      {/* Social Proof / Stats — Navy background */}
+      <section className="py-20 md:py-28 bg-[#0F172A] text-white relative overflow-hidden">
         <div className="container relative">
           <motion.div
             variants={fadeInUp}
             className="text-center mb-14"
           >
-            <span className="font-heading inline-block text-xs font-semibold uppercase tracking-[0.2em] text-primary mb-4">
+            <span className="font-heading inline-block text-xs font-semibold uppercase tracking-[0.2em] text-[#A78BFA] mb-4">
               Built for Scale
             </span>
-            <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl">
+            <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl text-white">
               Trusted by the UK Freelance Economy
             </h2>
           </motion.div>
@@ -344,10 +344,10 @@ export default function Home() {
               { value: "10M+", label: "UK Freelancers Served", icon: Users },
               { value: "99.9%", label: "Payment Success Rate", icon: CheckCircle2 },
             ].map((stat) => (
-              <motion.div key={stat.label} variants={scaleIn} className="rounded-2xl border border-border/60 bg-card p-8 text-center">
-                <stat.icon className="h-6 w-6 mx-auto mb-4 text-primary" />
-                <div className="font-heading text-4xl font-bold mb-2">{stat.value}</div>
-                <div className="text-muted-foreground text-sm">{stat.label}</div>
+              <motion.div key={stat.label} variants={scaleIn} className="rounded-2xl border border-white/10 bg-white/5 p-8 text-center">
+                <stat.icon className="h-6 w-6 mx-auto mb-4 text-[#A78BFA]" />
+                <div className="font-heading text-4xl font-bold mb-2 text-white">{stat.value}</div>
+                <div className="text-white/60 text-sm">{stat.label}</div>
               </motion.div>
             ))}
           </motion.div>
@@ -363,7 +363,7 @@ export default function Home() {
           >
             <h2 className="font-heading text-3xl font-bold tracking-tight sm:text-4xl md:text-5xl">
               Ready to Protect Your{" "}
-              <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-[#6D28D9] to-[#A78BFA] bg-clip-text text-transparent">
                 Next Project?
               </span>
             </h2>
@@ -373,21 +373,21 @@ export default function Home() {
             </p>
             <div className="flex flex-col gap-4 sm:flex-row sm:justify-center pt-2">
               {isAuthenticated ? (
-                <Button size="lg" className="btn-state-layer text-base px-8 h-13 shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 rounded-xl font-semibold transition-all duration-200" asChild>
+                <Button size="lg" className="btn-state-layer text-base px-8 h-13 bg-[#6D28D9] text-white hover:bg-[#5B21B6] shadow-md shadow-[#6D28D9]/20 hover:shadow-lg hover:shadow-[#6D28D9]/30 rounded-xl font-semibold transition-all duration-200" asChild>
                   <Link href="/dashboard">
                     Go to Dashboard
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
               ) : (
-                <Button size="lg" className="btn-state-layer text-base px-8 h-13 shadow-md shadow-primary/20 hover:shadow-lg hover:shadow-primary/30 rounded-xl font-semibold transition-all duration-200" asChild>
+                <Button size="lg" className="btn-state-layer text-base px-8 h-13 bg-[#6D28D9] text-white hover:bg-[#5B21B6] shadow-md shadow-[#6D28D9]/20 hover:shadow-lg hover:shadow-[#6D28D9]/30 rounded-xl font-semibold transition-all duration-200" asChild>
                   <Link href="/dashboard">
                     Join Waitlist — It's Free
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
               )}
-              <Button size="lg" variant="outline" className="text-base px-8 h-13 rounded-xl border-border hover:border-primary/30 hover:bg-primary/5 transition-all duration-200" asChild>
+              <Button size="lg" variant="outline" className="text-base px-8 h-13 rounded-xl border-border hover:border-[#6D28D9]/30 hover:bg-[#F1F0FF] transition-all duration-200" asChild>
                 <Link href="/pricing">View Pricing</Link>
               </Button>
             </div>

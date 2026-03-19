@@ -132,14 +132,6 @@ export default function NewContractTypeform() {
   );
 
   // Mutations
-  const generateMutation = trpc.templateBuilder.generateContract.useMutation({
-    onSuccess: (data) => {
-      setGeneratedMarkdown(data.generatedMarkdown);
-      setSavedContractId(data.contractId);
-    },
-    onError: (err) => toast.error(err.message),
-  });
-
   const saveMutation = trpc.templateBuilder.saveContractDraft.useMutation({
     onSuccess: (data) => {
       setSavedContractId(data.contractId);

@@ -110,7 +110,7 @@ export const verificationTypeEnum = pgEnum("verification_type", [
   "business",
 ]);
 export const addressVerifiedEnum = pgEnum("address_verified", ["yes", "no"]);
-export const signatureProviderEnum = pgEnum("signature_provider", ["docusign", "signwell", "internal"]);
+export const signatureProviderEnum = pgEnum("signature_provider", ["docuseal", "docusign", "signwell", "internal"]);
 export const signatureStatusEnum = pgEnum("signature_status", [
   "pending",
   "sent",

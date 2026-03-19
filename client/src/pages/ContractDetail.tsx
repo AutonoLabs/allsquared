@@ -5,8 +5,6 @@ import MilestoneManager from "@/components/MilestoneManager";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -15,7 +13,6 @@ import {
   ArrowLeft,
   FileText,
   Calendar,
-  DollarSign,
   Users,
   CheckCircle2,
   AlertCircle,
@@ -228,8 +225,8 @@ export default function ContractDetail() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {signatures.map((sig: any, index: number) => (
-                    <div key={index} className="flex items-center gap-3 p-3 rounded-lg border bg-emerald-50/50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900">
+                  {signatures.map((sig: any) => (
+                    <div key={sig.userId || sig.name} className="flex items-center gap-3 p-3 rounded-lg border bg-emerald-50/50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900">
                       <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
                       <div>
                         <p className="font-medium">{sig.name}</p>

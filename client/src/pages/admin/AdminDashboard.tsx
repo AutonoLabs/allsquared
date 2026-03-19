@@ -111,7 +111,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {analytics?.recentUsers.length === 0 ? (
+              {!analytics?.recentUsers?.length ? (
                 <p className="text-sm text-muted-foreground">No users yet</p>
               ) : (
                 analytics?.recentUsers.map((user) => (
@@ -147,7 +147,7 @@ export default function AdminDashboard() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {analytics?.recentContracts.length === 0 ? (
+              {!analytics?.recentContracts?.length ? (
                 <p className="text-sm text-muted-foreground">No contracts yet</p>
               ) : (
                 analytics?.recentContracts.map((contract) => (

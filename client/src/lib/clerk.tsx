@@ -17,12 +17,12 @@ const clerkAppearance = {
     socialButtonsVariant: 'iconButton' as const,
   },
   variables: {
-    colorPrimary: '#F97066',
+    colorPrimary: '#6D28D9',
     colorBackground: '#ffffff',
     borderRadius: '0.5rem',
   },
   elements: {
-    formButtonPrimary: 'bg-[#F97066] hover:bg-[#e5635a]',
+    formButtonPrimary: 'bg-[#6D28D9] hover:bg-[#5B21B6]',
     headerTitle: 'text-xl font-bold',
     headerSubtitle: 'text-muted-foreground',
     card: 'shadow-none',
