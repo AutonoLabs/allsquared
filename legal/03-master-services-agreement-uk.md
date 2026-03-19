@@ -1,263 +1,368 @@
-# Master Services Agreement
+# ALLSQUARED — MASTER SERVICES AGREEMENT (UK)
 
-**AllSquared — Master Services Agreement**
+**AllSquared Limited**
+**Effective date:** [DATE]
+**Governing law:** England and Wales
+**Jurisdiction:** Courts of England and Wales
 
-This Master Services Agreement ("Agreement") is entered into on {{effectiveDate}} between the following parties.
+---
 
-## Parties
+## PARTIES
 
-1. **Client:** {{clientName}}, whose registered address is {{clientAddress}} and whose email address is {{clientEmail}} ("Client").
+This Agreement is entered into between:
 
-2. **Freelancer:** {{freelancerName}}, whose address is {{freelancerAddress}} and whose email address is {{freelancerEmail}} ("Freelancer").
+**AllSquared Limited** (company number [NUMBER], registered address [ADDRESS]) trading as AllSquared, a marketplace platform for freelance services ("**AllSquared**" or "**Platform**"), and
 
-Each a "Party" and together the "Parties".
+**[CLIENT NAME]**, a business entity registered at [CLIENT ADDRESS] ("**Client**"), and
 
-## Background
+**[FREELANCER NAME]**, trading as [FREELANCER ENTITY/SOLE TRADER], registered at [FREELANCER ADDRESS] ("**Freelancer**").
 
-(a) The Client wishes to engage the Freelancer to provide certain professional services on the terms set out in this Agreement and in one or more Statements of Work.
+Collectively, the "**Parties**" or individually a "**Party**".
 
-(b) The Freelancer wishes to provide those services to the Client as an independent contractor.
+---
 
-(c) The Parties have agreed to use AllSquared (allsquared.io) ("AllSquared" or the "Platform") as the platform through which Statements of Work are managed and payments are processed.
+## RECITALS
 
-## 1. Definitions and Interpretation
+**Whereas:**
 
-1.1 In this Agreement, unless the context requires otherwise, the following terms have the meanings set out below:
+**A.** AllSquared operates a digital platform that connects clients with freelancers for the delivery of services, with integrated dispute resolution and escrow payment facilities.
 
-(a) "Acceptance" means written confirmation by the Client that a Deliverable or Milestone conforms to the acceptance criteria specified in the relevant SOW, or deemed acceptance in accordance with clause 5.5.
+**B.** AllSquared is approved as an Alternative Dispute Resolution (ADR) entity under the Alternative Dispute Resolution for Consumer Disputes (Competent Authorities and Information) Regulations 2015 (SI 2015/542), by the Chartered Trading Standards Institute (CTSI). This ADR approval covers disputes arising from engagements facilitated through the Platform.
 
-(b) "Change Request" means a written request by either Party to vary the scope, timeline, Deliverables, or fees under a SOW, to be agreed in writing by both Parties before taking effect.
+**C.** The Parties wish to establish the terms on which the Freelancer will provide services to the Client through the Platform, including payment mechanics via escrow, intellectual property ownership, and access to AllSquared's integrated dispute resolution process.
 
-(c) "Confidential Information" means all information (whether disclosed in writing, orally, electronically, or by any other means) that is designated as confidential or that a reasonable person would consider confidential given the nature of the information and the circumstances of disclosure, including business plans, financial data, technical specifications, client lists, pricing, trade secrets, and the terms of this Agreement.
+**D.** This Agreement is a business-to-business (B2B) agreement and is not intended to create consumer contracts within the meaning of the Consumer Rights Act 2015. Both Client and Freelancer confirm they are acting in a business capacity or as a business entity.
 
-(d) "Deliverables" means the tangible and intangible outputs, work product, reports, documents, software, designs, and other materials to be produced by the Freelancer as specified in a SOW.
+**Now it is agreed as follows:**
 
-(e) "Escrow" means the payment holding facility operated by AllSquared through which Client funds are held and released to the Freelancer upon Acceptance of Milestones or Deliverables in accordance with the Platform's terms.
+---
 
-(f) "IP Rights" means all intellectual property rights of any kind, including patents, trade marks, rights in designs, copyright, database rights, rights in know-how, trade secrets, and all other intellectual property rights, in each case whether registered or unregistered and including all applications and rights to apply for and be granted renewals or extensions of, and rights to claim priority from, such rights and all similar or equivalent rights or forms of protection in any part of the world.
+## 1. INTERPRETATION AND DEFINITIONS
 
-(g) "Milestone" means a defined stage or phase of the Services as set out in a SOW, the completion of which triggers a payment obligation and Acceptance process.
+1.1 In this Agreement, the following terms have the meanings set out below:
 
-(h) "Services" means the professional services to be provided by the Freelancer to the Client as described in one or more SOWs executed under this Agreement.
+"**ADR Entity**" means AllSquared in its capacity as an approved Alternative Dispute Resolution entity under SI 2015/542.
 
-(i) "SOW" or "Statement of Work" means a document executed by both Parties that describes the scope, Deliverables, timeline, Milestones, fees, and acceptance criteria for a particular engagement under this Agreement, substantially in the form set out in the Platform or as otherwise agreed in writing.
+"**ADR Official**" means the natural person appointed by AllSquared to conduct dispute resolution proceedings at Tier 2 of the ADR process and who meets all requirements under Schedule 3 of SI 2015/542.
 
-(j) "Working Day" means any day other than a Saturday, Sunday, or public holiday in England and Wales.
+"**ADR Tier**" means each tier of the dispute resolution process as defined in clause 13: Tier 1 (AI-Assisted Facilitation), Tier 2 (ADR Official Determination), or Tier 3 (CEDR-Accredited Mediation).
 
-1.2 In this Agreement:
+"**Auto-Release**" means the automatic release of Escrow funds to the Freelancer upon expiry of the Dispute Window without a Dispute being formally raised by the Client.
 
-(a) a reference to a statute or statutory provision includes any subordinate legislation made under it and any modification, re-enactment, or replacement of it from time to time;
+"**Background IP**" means any intellectual property owned by a Party prior to this Agreement, or developed independently of this Agreement, which is used in the performance of the Services.
 
-(b) a reference to writing or written includes email;
+"**Confidential Information**" means any non-public information disclosed by one Party to the other relating to this Agreement, the Services, or the Parties' respective businesses, marked as "Confidential" or reasonably understood to be confidential by nature.
 
-(c) the words "include", "including", and "in particular" do not limit the generality of any preceding words; and
+"**Deliverable**" means any tangible work product, code, document, design, or asset specified in the applicable Statement of Work as due to be delivered by the Freelancer.
 
-(d) headings are for convenience only and do not affect interpretation.
+"**Dispute**" means a formal dispute raised through the Platform's dispute submission portal in accordance with clause 13, relating to a disagreement about performance, quality, payment, or scope under this Agreement.
 
-## 2. Term
+"**Dispute Window**" means 14 Working Days from the date the Freelancer notifies the Client of delivery of a Deliverable or completion of a Milestone, during which the Client may raise a Dispute. After expiry of the Dispute Window, an Auto-Release occurs unless a Dispute has been formally raised.
 
-2.1 This Agreement commences on {{effectiveDate}} and continues for an initial term of {{initialTerm}} ("Initial Term"), unless terminated earlier in accordance with clause 12.
+"**Escrow Account**" means the segregated account held by Transpact on behalf of the Client and Freelancer for the purpose of holding Client payments until release conditions are met.
 
-2.2 After the expiry of the Initial Term, this Agreement automatically renews for successive periods of 12 months ("Renewal Term") unless either Party gives at least 30 days' written notice before the end of the then-current term.
+"**Foreground IP**" means any intellectual property created by the Freelancer in the course of performing the Services under this Agreement, including but not limited to works of authorship, designs, software code, and inventions.
 
-2.3 Termination or expiry of this Agreement does not affect any SOW that has been executed but not yet completed, which must continue to be governed by the terms of this Agreement until that SOW is completed or separately terminated.
+"**Force Majeure Event**" means any event beyond the reasonable control of a Party, including but not limited to: natural disasters, acts of war or terrorism, government actions, pandemic or epidemic, cyber attacks, AI system outages, third-party payment processor failures, telecommunications failure, or government sanctions, provided the affected Party is unable to perform its obligations as a result.
 
-## 3. Services
+"**Intellectual Property**" or "**IP**" means all intellectual property rights including patents, trade marks, service marks, designs, copyright, database rights, moral rights, and similar rights in any jurisdiction.
 
-3.1 The Freelancer must perform the Services described in each SOW with reasonable skill, care, and diligence and in accordance with good industry practice.
+"**Milestone**" means each stage of work as specified in the applicable Statement of Work, with associated Deliverable(s) and acceptance criteria.
 
-3.2 The Freelancer is responsible for determining the manner, method, and means by which the Services are performed, subject to meeting the requirements specified in the relevant SOW.
+"**Platform**" means the AllSquared digital marketplace accessible at [allsquared.io] and all associated systems, tools, and services operated by AllSquared.
 
-3.3 The Freelancer must comply with all applicable laws, regulations, and professional standards in performing the Services.
+"**Platform Fee**" means AllSquared's service commission, calculated as 10% of the total fees payable under each Statement of Work, which is deducted from the Escrow Account upon release of funds to the Freelancer.
 
-3.4 The Freelancer must not subcontract or delegate any part of the Services without the prior written consent of the Client. Any approved subcontractor must be bound by confidentiality obligations no less onerous than those in clause 8.
+"**Services**" means the work to be performed by the Freelancer as described in the applicable Statement of Work.
 
-## 4. Statements of Work
+"**SOW**" or "**Statement of Work**" means the document executed by the Parties pursuant to clause 2, specifying the Services, Deliverables, timeline, fees, and acceptance criteria.
 
-4.1 Each engagement under this Agreement must be documented in a SOW that specifies as a minimum:
+"**Transpact**" means Transpact.com Limited, the third-party escrow payment processor contracted by AllSquared to hold Client payments in trust pending release.
 
-(a) a description of the Services and scope of work;
+"**Working Day**" means Monday to Friday, excluding UK bank holidays and Christmas week (22 December to 2 January).
 
-(b) the Deliverables to be produced;
+1.2 Headings are for convenience only and do not affect interpretation.
 
-(c) the timeline and any Milestones;
+1.3 In this Agreement, "must" indicates a mandatory obligation. References to time are in UK time zone unless otherwise specified.
 
-(d) the fees, rates, or fixed price for the engagement;
+1.4 Any reference to a person's "written consent" or similar means consent in writing signed by an authorised representative of that person, excluding email consent unless otherwise agreed in writing.
 
-(e) the acceptance criteria for each Deliverable or Milestone; and
+---
 
-(f) any additional terms specific to that engagement.
+## 2. STATEMENT OF WORK AND ENGAGEMENT
 
-4.2 Each SOW must be agreed and signed by both Parties (including by electronic signature or acceptance through the Platform) before work commences.
+2.1 The Parties' engagement is governed by this Agreement and the applicable Statement of Work. The SOW must be signed by both Parties before any work begins. The SOW prevails over this Agreement to the extent of any inconsistency; otherwise, this Agreement prevails.
 
-4.3 In the event of any conflict between this Agreement and a SOW, the terms of the SOW prevail to the extent of the inconsistency, unless the SOW expressly states otherwise.
+2.2 Each SOW must specify:
 
-4.4 Either Party may submit a Change Request. No Change Request is effective unless agreed in writing by both Parties. The Freelancer must not perform any additional work arising from a Change Request until the Parties have agreed the impact on scope, timeline, and fees in writing.
+    (a) description of the Services and Deliverables;
+    (b) acceptance criteria for each Deliverable;
+    (c) timeline and Milestone schedule;
+    (d) total fees (exclusive of VAT);
+    (e) payment schedule linked to Milestones;
+    (f) any reimbursable expenses; and
+    (g) key personnel and contact details.
 
-4.5 If the Client does not provide written notice of acceptance or rejection of a Deliverable within 10 Working Days of delivery, the Deliverable is deemed accepted.
+2.3 The Client must confirm the Freelancer's right to perform the Services (e.g., no conflicting obligations, no breach of third-party IP rights in Client materials provided). The Freelancer warrants that no third party's consent is required to perform the Services, except as expressly disclosed in the SOW.
 
-## 5. Payment
+2.4 Changes to the scope of Services (scope changes, additional Deliverables, timeline changes) must be documented in writing via the Platform's change request mechanism or by signed amendment. No scope change is binding unless approved in writing by both Parties.
 
-5.1 The Client must pay the Freelancer at the rate of {{serviceRateOrFee}} in accordance with the payment terms of {{paymentTerms}}, as further specified in each SOW.
+---
 
-5.2 All payments under this Agreement must be processed through AllSquared's Escrow facility. The Client must deposit the relevant fees into Escrow in accordance with the Milestone schedule set out in the SOW. Escrow funds are released to the Freelancer upon Acceptance of the relevant Milestone or Deliverable.
+## 3. TERM AND TERMINATION
 
-5.3 All fees are exclusive of value added tax ("VAT"). If VAT is chargeable on any supply made by the Freelancer under this Agreement, the Client must pay the VAT amount in addition to the fees, subject to receipt of a valid VAT invoice.
+3.1 This Agreement commences on the date of execution and continues for the duration of the Services unless earlier terminated in accordance with this clause.
 
-5.4 The Freelancer is solely responsible for all income tax, National Insurance contributions, and any other taxes, duties, or levies arising from the fees received under this Agreement. The Freelancer must indemnify the Client against any claim by HM Revenue & Customs or any other tax authority for such amounts.
+3.2 **Termination for Convenience:** Either Party may terminate this Agreement without cause by giving 10 Working Days' written notice to the other Party, provided no Dispute is pending. Upon termination for convenience, the Freelancer must stop performing Services and deliver all work completed to date.
 
-5.5 The Client must reimburse the Freelancer for expenses only where the relevant SOW expressly provides for reimbursable expenses and only where such expenses have been pre-approved in writing by the Client and are supported by receipts or other reasonable evidence.
+3.3 **Termination for Cause:** Either Party may terminate this Agreement with immediate effect if the other Party:
 
-## 6. Intellectual Property
+    (a) materially breaches this Agreement and fails to cure the breach within 10 Working Days of written notice;
+    (b) becomes insolvent, enters administration, or liquidation;
+    (c) commits fraud or gross misconduct; or
+    (d) is convicted of an indictable offence.
 
-6.1 All IP Rights in the Deliverables created by the Freelancer in the performance of the Services ("Foreground IP") vest in the Freelancer upon creation and are hereby assigned to the Client with full title guarantee, effective upon receipt of full payment for the relevant Deliverable or Milestone. The Freelancer must execute all documents and do all acts reasonably required to perfect the assignment.
+3.4 **Effect of Termination:** Upon termination:
 
-6.2 To the extent that any pre-existing intellectual property of the Freelancer ("Background IP") is incorporated into the Deliverables, the Freelancer grants the Client a non-exclusive, perpetual, irrevocable, royalty-free, worldwide licence to use, modify, and sublicence that Background IP solely as part of or in connection with the Deliverables.
+    (a) the Freelancer must immediately cease providing Services;
+    (b) all Confidential Information must be returned or certified as destroyed;
+    (c) accrued fees and expenses are immediately due if not already in Escrow;
+    (d) the Client must pay for work completed to the termination date, pro-rated by Milestone;
+    (e) the Freelancer must grant the Client a licence to use any partially completed Deliverables, unless disputed; and
+    (f) payment is subject to escrow release rules in clause 5.
 
-6.3 The Client warrants that any materials, data, or Background IP provided by the Client to the Freelancer for the purposes of the Services do not infringe any third-party IP Rights. The Client grants the Freelancer a non-exclusive, revocable licence to use such materials solely for the purpose of performing the Services.
+3.5 **Survival:** Clauses 1, 6, 7, 8, 9, 10, 11, 12, 14, and 15 survive termination of this Agreement.
 
-6.4 To the fullest extent permitted by law, the Freelancer irrevocably and unconditionally waives all moral rights under Chapter IV of Part I of the Copyright, Designs and Patents Act 1988 in respect of the Deliverables.
+---
 
-## 7. Confidentiality
+## 4. CONDUCT OF SERVICES
 
-7.1 Each Party ("Receiving Party") must keep confidential all Confidential Information received from the other Party ("Disclosing Party") and must not disclose it to any third party without the prior written consent of the Disclosing Party.
+4.1 The Freelancer must perform the Services in a professional and timely manner, in accordance with the SOW and applicable professional standards. The Freelancer must keep the Client reasonably informed of progress via the Platform's communication tools.
 
-7.2 The obligations in clause 7.1 do not apply to information that:
+4.2 The Client must provide all necessary information, materials, and access required for the Freelancer to perform the Services, and must respond to requests for information within 5 Working Days unless otherwise specified in the SOW.
 
-(a) is or becomes publicly available other than through a breach of this Agreement;
+4.3 The Freelancer is responsible for all aspects of Service delivery including quality assurance, testing, and compliance with applicable law. The Client may specify acceptance criteria in the SOW; if acceptance criteria are not met, the Client may reject a Deliverable and request rework within the Dispute Window.
 
-(b) was already known to the Receiving Party before disclosure, as evidenced by written records;
+4.4 **Change Requests:** If the Client requests changes to the scope, Deliverables, or timeline, such requests must be documented via the Platform's change request mechanism. The Freelancer is not obligated to perform out-of-scope work without a signed change request and associated fee adjustment. Requests for rework due to Client-initiated changes are not "rejection of Deliverables" and do not trigger Dispute resolution; instead, they are treated as separate change requests with new timelines and fees.
 
-(c) is independently developed by the Receiving Party without reference to the Disclosing Party's Confidential Information; or
+---
 
-(d) is required to be disclosed by law, regulation, or order of a court or competent authority, provided the Receiving Party gives the Disclosing Party prompt written notice (to the extent legally permitted) and cooperates with any steps to limit the scope of such disclosure.
+## 5. PAYMENT AND ESCROW
 
-7.3 Each Party must use the other Party's Confidential Information only for the purposes of this Agreement.
+5.1 **Escrow Mechanism:** All payments from Client to Freelancer must be made via the Escrow Account held by Transpact. The Client must deposit the full amount due for each Milestone into Escrow before the Freelancer begins work on that Milestone. Payments made outside Escrow are at the Client's sole risk and do not trigger any obligations on AllSquared.
 
-7.4 The obligations under this clause 7 survive termination or expiry of this Agreement for a period of 5 years.
+5.2 **Escrow Release Triggers:** Escrow funds are released to the Freelancer only upon satisfaction of one of the following conditions:
 
-## 8. Warranties
+    (a) Client clicks "Accept" on a Deliverable via the Platform, indicating acceptance of that Milestone;
+    (b) Auto-Release occurs upon expiry of the Dispute Window without a Dispute being raised;
+    (c) Joint written instruction by both Client and Freelancer authorising release; or
+    (d) ADR determination at Tier 2 or Tier 3 specifying release terms.
 
-8.1 The Freelancer warrants and represents that:
+5.3 **Platform Fee Deduction:** Upon release of Escrow funds, AllSquared deducts the Platform Fee (10% of the total fees for that Milestone). The net amount is then remitted to the Freelancer within 5 Working Days. Example: If a Milestone is £1,000, Platform Fee is £100, and the Freelancer receives £900.
 
-(a) the Freelancer has the necessary skills, qualifications, and experience to perform the Services to a professional standard;
+5.4 **Partial Release:** If a SOW specifies partial Milestone acceptance (e.g., 50% of Deliverables accepted, 50% to be revised), Escrow funds may be released pro-rata, with the Platform Fee calculated on the amount released. The remaining Dispute Window applies to outstanding Deliverables.
 
-(b) the Deliverables will materially conform to the acceptance criteria set out in the relevant SOW;
+5.5 **Auto-Release Mechanics:** If no Dispute is formally raised within the Dispute Window, Escrow funds are automatically released to the Freelancer's designated bank account. The Client waives the right to raise a Dispute for that Milestone after Auto-Release, except in cases of fraud or material non-performance discovered post-Auto-Release and reported to AllSquared within 10 Working Days.
 
-(c) the Deliverables will be original and will not infringe the IP Rights of any third party; and
+5.6 **Late Payment:** The Late Payment of Commercial Debts (Interest) Act 1998 applies to any sums due under this Agreement that are not paid through Escrow or are overdue following Escrow release. Interest accrues at 8% per annum plus the Bank of England base rate, calculated daily from the due date until payment.
 
-(d) the Freelancer has full authority and capacity to enter into this Agreement and to grant the rights set out in clause 6.
+5.7 **VAT:** All fees quoted in this Agreement are exclusive of Value Added Tax (VAT). The Freelancer is responsible for VAT registration and collection in accordance with HMRC rules. The Client must pay VAT in addition to fees if the Freelancer is VAT-registered. The Freelancer must provide a valid VAT invoice for each payment.
 
-8.2 The Client warrants and represents that:
+5.8 **Bank Account Fraud Warning:** The Client must verify Transpact's bank account details independently (e.g., by visiting Transpact's website directly or calling Transpact's published phone number) before depositing funds. AllSquared is not liable for funds misdirected as a result of the Client's failure to verify account details or for phishing attacks targeting the Client.
 
-(a) the Client has full authority and capacity to enter into this Agreement;
+5.9 **Tax Responsibility:** The Freelancer is solely responsible for income tax, National Insurance contributions, Corporation Tax (if applicable), VAT accounting, and self-assessment compliance. The Freelancer is not an employee of AllSquared or the Client, and no payroll tax or benefits are provided by AllSquared. The Client does not withhold tax on Freelancer payments.
 
-(b) the Client owns or has the right to licence any Background IP provided to the Freelancer for the purposes of the Services; and
+---
 
-(c) the Client will provide timely access to information, personnel, and resources reasonably required by the Freelancer to perform the Services.
+## 6. INTELLECTUAL PROPERTY
 
-## 9. Limitation of Liability
+6.1 **Assignment of Foreground IP:** Upon full payment of fees and satisfaction of all conditions for Escrow release, all Foreground IP created by the Freelancer in performance of the Services is assigned to the Client with full title guarantee, free of encumbrances. The Freelancer warrants that the Foreground IP is original, does not infringe third-party rights, and is not subject to any lien or security interest. The Freelancer must execute any documents reasonably necessary to perfect the Client's ownership, at the Client's expense.
 
-9.1 Nothing in this Agreement limits or excludes either Party's liability for:
+6.2 **Background IP Licence:** All Background IP retained by the Freelancer is licensed to the Client on a non-exclusive, perpetual, irrevocable, royalty-free, worldwide basis, solely for the Client's use of the Services and Deliverables as provided. The Client may not sublicense, resell, or reverse-engineer Background IP. At termination of this Agreement, the Client's licence to Background IP survives, but the Client may not use Background IP independently of the Foreground IP and Deliverables.
 
-(a) death or personal injury caused by its negligence;
+6.3 **Open-Source Disclosure:** If any Deliverable incorporates open-source software or materials subject to open-source or free licences (e.g., GPL, MIT, Apache), the Freelancer must disclose this in the SOW or in writing before delivery, specifying the licence and any restrictions. The Client accepts responsibility for compliance with open-source licence obligations, which may include making Client modifications publicly available. The Freelancer indemnifies the Client against claims that the open-source licence was misapplied.
 
-(b) fraud or fraudulent misrepresentation; or
+6.4 **AI-Assisted Work:** If Deliverables are generated in whole or in material part using AI tools (e.g., large language models, generative image tools, AI code generators), the Freelancer must disclose this in the SOW or by written notice before delivery. The Client acknowledges that the copyright ownership and IP status of AI-generated outputs remains uncertain under current UK law and that third parties may claim rights to such outputs. The Client accepts this risk and indemnifies the Freelancer against claims that AI-generated content is not validly assigned or that third-party IP rights exist in such content, except to the extent of the Freelancer's negligence.
 
-(c) any other liability that cannot be limited or excluded by applicable law.
+6.5 **Moral Rights Waiver:** To the extent permitted by law, the Freelancer irrevocably waives all moral rights (including the right of paternity and the right of integrity) under Chapter IV of Part I of the Copyright, Designs and Patents Act 1988. The Freelancer consents to the Client modifying, adapting, and republishing the Foreground IP without attribution or notice to the Freelancer.
 
-9.2 Subject to clause 9.1, neither Party is liable to the other for any indirect, consequential, special, or incidental loss or damage, including loss of profit, loss of revenue, loss of business, loss of data, or loss of goodwill, howsoever caused, even if advised of the possibility of such loss.
+6.6 **Reverse IP — Client Materials:** If the Client provides materials, content, or intellectual property to the Freelancer for incorporation into the Services, the Client grants the Freelancer a non-exclusive, royalty-free licence to use such Client materials solely for the purpose of performing the Services. The Freelancer may not use Client materials for any other purpose or for the benefit of other clients without prior written consent.
 
-9.3 Subject to clause 9.1, the total aggregate liability of either Party under or in connection with this Agreement and any SOW, whether in contract, tort (including negligence), breach of statutory duty, or otherwise, must not exceed the total fees paid or payable under the relevant SOW giving rise to the claim.
+6.7 **IP Indemnity:** The Freelancer warrants that the Services and Deliverables do not infringe any third-party IP rights. The Freelancer indemnifies the Client against third-party claims that the Deliverables, as used by the Client, infringe patents, copyrights, trade marks, or other IP rights.
 
-## 10. Indemnity
+---
 
-10.1 The Freelancer must indemnify and hold harmless the Client against all losses, damages, costs, and expenses (including reasonable legal fees) arising from any claim that the Deliverables infringe the IP Rights of a third party, except to the extent that such infringement results from the Client's materials or instructions.
+## 7. CONFIDENTIALITY
 
-10.2 The Client must indemnify and hold harmless the Freelancer against all losses, damages, costs, and expenses (including reasonable legal fees) arising from any claim that the Client's materials or Background IP provided to the Freelancer infringe the IP Rights of a third party.
+7.1 Each Party must keep Confidential Information of the other Party confidential and must not disclose it to third parties without prior written consent, except to its employees, contractors, and professional advisers on a need-to-know basis, who are bound by confidentiality obligations no less stringent than this clause.
 
-10.3 Each Party must indemnify and hold harmless the other against all losses, damages, costs, and expenses arising from the indemnifying Party's wilful misconduct or gross negligence.
+7.2 Confidentiality obligations do not apply to information that is: (a) publicly available through no breach of this Agreement; (b) rightfully received by the receiving Party from a third party without confidentiality restrictions; (c) independently developed without reference to the other Party's Confidential Information; or (d) required to be disclosed by law, provided the receiving Party gives prompt notice and cooperates with any efforts to obtain a protective order.
 
-## 11. Independent Contractor
+7.3 Upon termination of this Agreement, each Party must return or certify as destroyed all Confidential Information of the other Party within 10 Working Days.
 
-11.1 The Freelancer is engaged as an independent contractor and nothing in this Agreement creates a relationship of employment, partnership, joint venture, or agency between the Parties.
+7.4 **Duration:** Confidentiality obligations continue for 3 years after termination of this Agreement, except for trade secrets, which remain confidential indefinitely.
 
-11.2 The Freelancer is not entitled to any employee benefits from the Client, including holiday pay, sick pay, pension contributions, or redundancy payments.
+---
 
-11.3 The Freelancer is solely responsible for assessing and managing compliance with the off-payroll working rules (commonly known as "IR35") under Chapter 10 of Part 2 of the Income Tax (Earnings and Pensions) Act 2003 (as amended). The Freelancer must notify the Client promptly if the Freelancer forms the view that the engagement falls within the off-payroll working rules and must cooperate with any status determination made by the Client.
+## 8. REPRESENTATIONS AND WARRANTIES
 
-11.4 The Freelancer must not hold themselves out as an employee, agent, or representative of the Client.
+8.1 **Mutual Representations:** Each Party represents and warrants that:
 
-## 12. Termination
+    (a) it has full authority to enter into this Agreement;
+    (b) this Agreement constitutes its legal, valid, and binding obligation;
+    (c) it is not in breach of any material contract or law in performing its obligations hereunder;
+    (d) it has obtained all necessary licences, consents, and approvals required.
 
-12.1 Either Party may terminate this Agreement or any SOW for cause by giving written notice to the other Party if:
+8.2 **Freelancer Representations:** The Freelancer additionally represents and warrants that:
 
-(a) the other Party commits a material breach of this Agreement and fails to remedy that breach within 14 days of receiving written notice specifying the breach and requiring its remedy; or
+    (a) it is not engaged in any activity that would prohibit it from providing the Services (e.g., competing work for a direct competitor, without Client consent);
+    (b) it has the necessary skills, experience, and qualifications to perform the Services in a professional manner;
+    (c) it is not subject to any non-compete or exclusivity obligation that would be breached by this engagement;
+    (d) any subcontractors will be approved by the Client in writing in advance.
 
-(b) the other Party becomes insolvent, enters administration, liquidation, or makes any arrangement with its creditors.
+8.3 **Client Representations:** The Client additionally represents and warrants that:
 
-12.2 Either Party may terminate this Agreement or any SOW for convenience by giving at least 30 days' written notice to the other Party.
+    (a) all Client-provided materials do not infringe third-party IP rights;
+    (b) the Client has all necessary rights to provide such materials to the Freelancer.
 
-12.3 Upon termination or expiry:
+---
 
-(a) the Freelancer must deliver to the Client all completed and partially completed Deliverables;
+## 9. LIMITATION OF LIABILITY
 
-(b) the Client must pay for all Services performed and Deliverables accepted up to the date of termination, and Escrow funds for accepted Milestones must be released to the Freelancer;
+9.1 **Exclusion of Consequential Damages:** Except for breaches of confidentiality, IP infringement indemnities, or gross negligence, neither Party is liable for indirect, incidental, special, or consequential damages, including loss of profits, loss of revenue, loss of data, or reputational harm, even if advised of the possibility of such damages.
 
-(c) any Escrow funds held for Milestones not yet accepted must be returned to the Client, unless the Parties agree otherwise;
+9.2 **Liability Cap:** Except for breaches of confidentiality, IP indemnities, or gross negligence, the total aggregate liability of either Party for breach of this Agreement is limited to the total fees paid or payable under the applicable SOW in the 12 months preceding the claim.
 
-(d) each Party must return or destroy all Confidential Information of the other Party, subject to reasonable record-keeping requirements; and
+9.3 **Service Performance:** AllSquared's liability is limited to the Platform providing access to dispute resolution. AllSquared is not liable for the quality of the Services, disputes between parties, or the solvency of either Party. Escrow is held by Transpact, not AllSquared.
 
-(e) clauses 6, 7, 8, 9, 10, and 14 survive termination.
+---
 
-## 13. Dispute Resolution
+## 10. INSURANCE
 
-13.1 The Parties must attempt to resolve any dispute arising out of or in connection with this Agreement through good-faith negotiation within 30 days of written notice of the dispute.
+10.1 Each Party must maintain professional indemnity insurance (or equivalent coverage) of at least £[AMOUNT] for the term of this Agreement. Upon request, each Party must provide evidence of insurance coverage to the other Party.
 
-13.2 If the dispute is not resolved within the period specified in clause 13.1, either Party may refer the dispute to arbitration under the rules of the London Court of International Arbitration ("LCIA"). The arbitration must be conducted in London by a single arbitrator appointed in accordance with the LCIA Rules. The language of the arbitration must be English.
+10.2 Professional indemnity insurance does not limit liability under this Agreement but is maintained in addition to this Agreement's liability limitations.
 
-13.3 Nothing in this clause 13 prevents either Party from applying to the courts of England and Wales for interim or injunctive relief.
+---
 
-## 14. General
+## 11. COMPLIANCE WITH LAW
 
-14.1 **Entire agreement.** This Agreement and any SOWs executed under it constitute the entire agreement between the Parties in relation to its subject matter and supersede all previous agreements, understandings, and representations between the Parties, whether written or oral.
+11.1 **General Compliance:** Each Party must comply with all applicable laws and regulations in performing its obligations under this Agreement, including health and safety laws, data protection laws, employment laws, and tax laws.
 
-14.2 **Variation.** No variation of this Agreement is effective unless it is in writing and signed by or on behalf of both Parties.
+11.2 **Anti-Bribery Act 2010:** Both Parties must comply with the Bribery Act 2010. The Freelancer must have in place adequate procedures to prevent bribery and corruption, as required under section 7 of the Bribery Act 2010, and must warrant compliance upon request.
 
-14.3 **Severability.** If any provision of this Agreement is held by a court or competent authority to be invalid, illegal, or unenforceable, that provision must be deemed modified to the minimum extent necessary to make it valid, legal, and enforceable. If such modification is not possible, the relevant provision must be deemed deleted. The validity and enforceability of the remaining provisions of this Agreement are not affected.
+11.3 **Modern Slavery Act 2015:** The Freelancer warrants compliance with the Modern Slavery Act 2015. If the Freelancer's annual turnover exceeds £36 million, the Freelancer must produce a slavery and human trafficking statement in accordance with section 54 of the Modern Slavery Act 2015. Smaller entities are not subject to this reporting obligation but must still comply with the substantive obligations of the Act.
 
-14.4 **Waiver.** A waiver of any right or remedy under this Agreement or by law is only effective if given in writing and is not to be taken as a waiver of any subsequent right or remedy. A failure or delay by a Party to exercise any right or remedy does not constitute a waiver of that or any other right or remedy.
+11.4 **Sanctions:** Neither Party is subject to trade sanctions, export controls, or government restrictions that would prohibit engagement under this Agreement.
 
-14.5 **Assignment.** The Freelancer must not assign, transfer, subcontract, or deal in any other manner with all or any of its rights or obligations under this Agreement without the prior written consent of the Client. The Client may assign its rights under this Agreement to any successor in title to all or substantially all of the Client's business.
+---
 
-14.6 **Notices.** Any notice or other communication given under this Agreement must be in writing and must be delivered by email (with read receipt or delivery confirmation) to the addresses specified in this Agreement or such other address as the relevant Party may notify in writing. A notice is deemed received on the Working Day after it is sent.
+## 12. DATA PROTECTION
 
-14.7 **Force majeure.** Neither Party is liable for any failure or delay in performing its obligations under this Agreement to the extent that such failure or delay results from circumstances beyond the reasonable control of that Party, including acts of God, natural disaster, pandemic, war, terrorism, riot, government action, fire, flood, or industrial action not involving the affected Party's employees. The affected Party must notify the other Party promptly and use reasonable endeavours to mitigate the effect. If the force majeure event continues for more than 60 days, either Party may terminate this Agreement by written notice.
+12.1 If either Party processes personal data (data relating to an identified or identifiable natural person) in connection with this Agreement, the Party must enter into AllSquared's Data Processing Agreement (DPA) before any personal data is processed.
 
-14.8 **Third-party rights.** No person other than the Parties has any rights under the Contracts (Rights of Third Parties) Act 1999 to enforce any term of this Agreement.
+12.2 Each Party is responsible for its own compliance with the UK General Data Protection Regulation (GDPR) and the Data Protection Act 2018. Neither Party is the data controller of the other Party's personal data.
 
-## 15. Governing Law and Jurisdiction
+12.3 If a personal data breach occurs, the Party discovering the breach must notify the other Party and AllSquared within 24 hours.
 
-15.1 This Agreement and any dispute or claim arising out of or in connection with it or its subject matter or formation (including non-contractual disputes or claims) is governed by and construed in accordance with the laws of England and Wales.
+---
 
-15.2 Subject to clause 13, the courts of England and Wales have exclusive jurisdiction to settle any dispute or claim arising out of or in connection with this Agreement.
+## 13. DISPUTE RESOLUTION
 
-## Execution
+13.1 **Good Faith Negotiation:** If a dispute arises relating to this Agreement, the Parties must attempt to resolve it in good faith through negotiation within 10 Working Days of the dispute being notified to the other Party. During this period, either Party may not escalate to formal ADR.
 
-This Agreement has been entered into on the date stated at the beginning of this Agreement.
+13.2 **Tier 1 — AI-Assisted Facilitation:** If negotiation fails, either Party may initiate Tier 1 dispute resolution through the Platform. AllSquared's AI system analyzes the dispute, the Services delivery evidence, and contract terms, and proposes a recommended resolution to both Parties. Tier 1 is facilitated negotiation, not formal ADR, and either Party may reject the AI proposal and proceed to Tier 2 without restriction. Tier 1 is free of charge.
 
-**Signed by {{clientName}}:**
+13.3 **Tier 2 — ADR Official Determination:** If both Parties agree to proceed to Tier 2, or if one Party rejects Tier 1 and demands escalation, a dispute is submitted to AllSquared's ADR Official for a binding determination (if parties agreed in writing before submission) or non-binding opinion (if no prior agreement). The ADR Official reviews the AI analysis, all party submissions, and evidence, and issues a determination within 90 calendar days of receipt of a complete file from both parties. The determination explains the ADR Official's reasoning and the legal basis for the outcome. The 90-day clock is measured from the date both parties have submitted all required evidence to AllSquared's dispute team; AllSquared will confirm the "complete file" date to both parties.
 
-Signature: ____________________________
+13.4 **Tier 2 — Legal Effect:** A Tier 2 determination is binding only if both parties have agreed in writing (before submission) that the ADR Official's determination is binding. Otherwise, the determination is a non-binding expert opinion, and either Party may choose not to accept it and proceed to court or arbitration. A binding determination is enforceable as a contract term; non-binding determinations are not enforceable by AllSquared but may be relied upon in subsequent litigation.
 
-Name: ____________________________
+13.5 **Tier 3 — CEDR Escalation:** If both Parties agree, the dispute may be escalated to a CEDR-accredited mediator, with costs borne equally or as agreed. Tier 3 is consensual mediation, not mandatory ADR. CEDR fees are charged in accordance with CEDR's published fee schedule.
 
-Date: ____________________________
+13.6 **Court and Arbitration:** At any stage, either Party may seek injunctive or interim relief from the courts of England and Wales without waiting for ADR to complete. If neither Party wishes to use ADR, disputes may be referred to arbitration under the London Court of International Arbitration (LCIA) Rules, with one arbitrator, seat of arbitration in London, and English law as the governing law.
 
-**Signed by {{freelancerName}}:**
+13.7 **ADR Official Independence:** The ADR Official conducting Tier 2 proceedings has declared independence under clause 12 of AllSquared's ADR Official Independence Declaration, including that the ADR Official has no personal, financial, or professional relationship with either party that would affect impartiality. If either party objects to the ADR Official's impartiality, the objection must be raised in writing within 10 Working Days of being notified of the ADR Official's appointment. AllSquared will investigate the objection and, if valid, replace the ADR Official.
 
-Signature: ____________________________
+13.8 **Confidentiality of ADR:** All submissions, communications, and determinations in Tier 1, Tier 2, and Tier 3 are confidential and without prejudice, and may not be used in subsequent litigation except by agreement of the Parties.
 
-Name: ____________________________
+---
 
-Date: ____________________________
+## 14. FORCE MAJEURE
+
+14.1 Neither Party is liable for failure to perform its obligations if the failure is due to a Force Majeure Event, provided the affected Party:
+
+    (a) gives prompt notice to the other Party (within 5 Working Days of discovering the Force Majeure Event);
+    (b) uses reasonable efforts to mitigate the effect and resume performance; and
+    (c) resumes performance as soon as the Force Majeure Event has ceased.
+
+14.2 If a Force Majeure Event prevents performance for more than 30 consecutive calendar days, either Party may terminate this Agreement without liability by giving written notice to the other Party.
+
+14.3 Force Majeure includes: natural disasters, war, terrorism, government actions, pandemic or epidemic, cyber attacks, AI system outages (including failures of the Platform's dispute resolution system), telecommunications failures, third-party payment processor failures (including Transpact insolvency or suspension), government sanctions, or regulatory prohibition.
+
+14.4 Force Majeure does not include: general economic downturns, inability to obtain financing, increase in costs, or changes in market conditions (unless due to government action).
+
+---
+
+## 15. GENERAL PROVISIONS
+
+15.1 **Entire Agreement:** This Agreement and the applicable SOW constitute the entire agreement between the Parties relating to the subject matter and supersede all prior negotiations, understandings, and agreements. This Agreement excludes all pre-contractual representations and warranties except for fraudulent misrepresentation, which is not excluded.
+
+15.2 **Amendment:** This Agreement may be amended only by written agreement signed by both Parties or by AllSquared's publication of updated Terms of Service (with 30 days' notice to existing users).
+
+15.3 **Waiver:** Waiver of any breach or right must be in writing signed by the Party waiving the right. Waiver of one breach does not waive any other breach or any other right.
+
+15.4 **Severability:** If any provision of this Agreement is found to be invalid or unenforceable, that provision is severed, and the remainder of this Agreement continues in force. If a provision is severable but would substantially undermine the Agreement's purpose, the Parties must negotiate a replacement provision.
+
+15.5 **Assignment:** Neither Party may assign this Agreement or its rights/obligations to a third party without prior written consent of the other Party, except AllSquared may assign its rights to a successor or related entity on 30 days' notice. Any attempted assignment without consent is void.
+
+15.6 **Notices:** Notices must be in writing and delivered by email to the contact address specified on the Platform, or by registered post to the Party's registered address. Notices by email are effective upon sending; notices by post are effective 3 Working Days after posting.
+
+15.7 **Governing Law and Jurisdiction:** This Agreement is governed by the laws of England and Wales, without regard to conflict of laws principles. Both Parties irrevocably submit to the exclusive jurisdiction of the courts of England and Wales for any legal proceedings, subject to the dispute resolution process in clause 13.
+
+15.8 **Counterparts:** This Agreement may be executed in counterparts (e.g., by electronic signature), each of which is an original and all of which together constitute one agreement.
+
+15.9 **Third-Party Rights:** No third party has any rights under this Agreement except as expressly stated herein (e.g., AllSquared's rights as ADR Entity are third-party beneficiary rights).
+
+15.10 **Relationship of Parties:** This Agreement does not create a partnership, joint venture, or employment relationship. The Freelancer is an independent contractor. AllSquared is a platform facilitator and escrow agent (via Transpact) but is not a party to the Client-Freelancer Services relationship.
+
+15.11 **Subcontracting:** The Freelancer may not engage subcontractors without prior written approval from the Client. Any approved subcontractor must agree to be bound by confidentiality and IP obligations equivalent to the Freelancer's obligations under this Agreement. The Freelancer remains liable to the Client for subcontractor performance.
+
+---
+
+## EXECUTION
+
+**For the Client:**
+
+Signature: ________________________
+
+Name (print): ________________________
+
+Title: ________________________
+
+Date: ________________________
+
+
+**For the Freelancer:**
+
+Signature: ________________________
+
+Name (print): ________________________
+
+Business name (if applicable): ________________________
+
+Date: ________________________
+
+
+**For AllSquared Limited (witness):**
+
+Signature: ________________________
+
+Name (print): ________________________
+
+Title: ________________________
+
+Date: ________________________
+
+---
+
+**END OF MASTER SERVICES AGREEMENT**

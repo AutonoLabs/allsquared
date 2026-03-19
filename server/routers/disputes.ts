@@ -18,6 +18,35 @@ import { nanoid } from 'nanoid';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
+// LexAI RAG — local legal research engine
+const LEXAI_API_URL = process.env.LEXAI_API_URL || 'http://localhost:8400';
+
+async function queryLexAI(query: string, practiceArea?: string): Promise<{ answer: string; sources: { citation: string; text: string }[] }> {
+  try {
+    const body: Record<string, unknown> = { query, top_k: 5 };
+    if (practiceArea) body.practice_area = practiceArea;
+
+    const response = await fetch(`${LEXAI_API_URL}/query`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(30000),
+    });
+
+    if (!response.ok) {
+      console.warn('[LexAI] Query failed:', response.status);
+      return { answer: '', sources: [] };
+    }
+
+    const data = await response.json() as { answer?: string; sources?: { citation: string; text: string }[] };
+    console.log(`[LexAI] Returned ${data.sources?.length || 0} sources for: "${query.substring(0, 50)}..."`);
+    return { answer: data.answer || '', sources: data.sources || [] };
+  } catch (err) {
+    console.warn('[LexAI] Unavailable:', (err as Error).message);
+    return { answer: '', sources: [] };
+  }
+}
+
 const DISPUTE_ANALYSIS_PROMPT = `You are an expert dispute analyst for AllSquared, a UK-based freelance contracts platform. You analyze disputes between clients and service providers.
 
 Given a contract and a dispute reason, produce a structured analysis. Be fair, balanced, and reference specific contract terms. Follow UK contract law principles.
@@ -69,6 +98,14 @@ async function analyzeDisputeWithAI(
     };
   }
 
+  // Query LexAI for relevant UK case law and legal principles
+  const lexQuery = `${disputeReason} UK contract law remedies breach`;
+  const lexResult = await queryLexAI(lexQuery, 'contract');
+
+  const legalContext = lexResult.sources.length > 0
+    ? `\n\nRELEVANT UK CASE LAW (from LexAI):\n${lexResult.sources.map((s, i) => `${i + 1}. ${s.citation}: ${s.text.substring(0, 300)}`).join('\n')}\n\n${lexResult.answer ? `LEGAL ANALYSIS:\n${lexResult.answer}` : ''}`
+    : '\n\n[Note: LexAI legal research unavailable — analyse based on general UK contract law principles.]';
+
   const userPrompt = `Analyse this dispute:
 
 CONTRACT TEXT:
@@ -79,7 +116,8 @@ ${disputeReason}
 
 ${evidence ? `EVIDENCE PROVIDED:\n${evidence}` : 'No evidence submitted.'}
 
-RESPONDENT: ${respondentName}`;
+RESPONDENT: ${respondentName}
+${legalContext}`;
 
   try {
     const response = await fetch(OPENAI_API_URL, {
@@ -145,6 +183,16 @@ async function getMediationSuggestion(
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return null;
 
+  // Query LexAI for relevant mediation guidance
+  const lexMediationResult = await queryLexAI(
+    `${disputeReason} mediation resolution UK contract dispute`,
+    'contract'
+  );
+
+  const legalGuidance = lexMediationResult.sources.length > 0
+    ? `\n\nRelevant legal context (LexAI):\n${lexMediationResult.sources.slice(0, 3).map(s => `- ${s.citation}: ${s.text.substring(0, 200)}`).join('\n')}`
+    : '';
+
   const userPrompt = `Contract summary: ${contractSummary}
 
 Dispute reason: ${disputeReason}
@@ -154,6 +202,7 @@ ${mediationHistory}
 
 Latest message from the other party:
 ${latestMessage}
+${legalGuidance}
 
 Suggest a constructive response for the ${targetRole}:`;
 
