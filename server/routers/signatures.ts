@@ -21,11 +21,33 @@ import { nanoid } from 'nanoid';
  */
 
 // Provider configuration
+const DOCUSEAL_API_URL = process.env.DOCUSEAL_URL || 'http://100.65.116.80:3030';
+const DOCUSEAL_API_KEY = process.env.DOCUSEAL_API_KEY || '';
 const DOCUSIGN_API_URL = process.env.DOCUSIGN_API_URL || 'https://demo.docusign.net/restapi/v2.1';
 const SIGNWELL_API_URL = 'https://www.signwell.com/api/v1';
 
-// Get active signature provider
-function getActiveProvider(): 'docusign' | 'signwell' | 'internal' {
+// DocuSeal API helper
+async function docusealRequest(path: string, method = 'GET', body?: unknown) {
+  const res = await fetch(`${DOCUSEAL_API_URL}/api${path}`, {
+    method,
+    headers: {
+      'X-Auth-Token': DOCUSEAL_API_KEY,
+      'Content-Type': 'application/json',
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`DocuSeal ${method} ${path} failed: ${res.status} ${err}`);
+  }
+  return res.json();
+}
+
+// Get active signature provider (DocuSeal is now primary)
+function getActiveProvider(): 'docuseal' | 'docusign' | 'signwell' | 'internal' {
+  if (DOCUSEAL_API_KEY) {
+    return 'docuseal';
+  }
   if (process.env.DOCUSIGN_INTEGRATION_KEY && process.env.DOCUSIGN_ACCOUNT_ID) {
     return 'docusign';
   }
@@ -221,7 +243,7 @@ export const signaturesRouter = router({
         id: string;
         contractId: string;
         userId: string;
-        provider: 'docusign' | 'signwell' | 'internal';
+        provider: 'docuseal' | 'docusign' | 'signwell' | 'internal';
         providerEnvelopeId?: string;
         status: 'sent' | 'pending';
         signatureName: string;
@@ -231,7 +253,54 @@ export const signaturesRouter = router({
         updatedAt: Date;
       }> = [];
 
-      if (provider === 'docusign') {
+      if (provider === 'docuseal') {
+        // Create DocuSeal submission — upload contract as HTML document
+        const contractHtml = `<!DOCTYPE html><html><body>
+          <h1>${contract.title}</h1>
+          <div style="white-space:pre-wrap">${contract.generatedMarkdown || contract.description || 'Contract content'}</div>
+        </body></html>`;
+
+        // First create template from HTML
+        const template = await docusealRequest('/templates/html', 'POST', {
+          html: contractHtml,
+          name: contract.title,
+          submitters: input.signers.map((s: { email: string; name: string; role?: string }, i: number) => ({
+            name: s.role || (i === 0 ? 'Client' : 'Provider'),
+          })),
+        });
+
+        // Then create submission (send for signing)
+        const submission = await docusealRequest('/submissions', 'POST', {
+          template_id: template.id,
+          send_email: true,
+          submitters: input.signers.map((s: { email: string; name: string; role?: string }, i: number) => ({
+            email: s.email,
+            name: s.name,
+            role: s.role || (i === 0 ? 'Client' : 'Provider'),
+            message: input.message || `Please sign: ${contract.title}`,
+          })),
+        });
+
+        // Create signature records for each submitter
+        for (const submitter of submission.submitters || []) {
+          const sigId = `sig_${nanoid()}`;
+          signatureRecords.push({
+            id: sigId,
+            contractId: contract.id,
+            userId: ctx.user.id,
+            provider: 'docuseal',
+            providerEnvelopeId: String(submission.id),
+            status: 'sent',
+            signatureName: submitter.name,
+            expiresAt,
+            sentAt: new Date(),
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+        }
+
+        console.log(`[DocuSeal] Created submission ${submission.id} for contract ${contract.id}`);
+      } else if (provider === 'docusign') {
         // Create DocuSign envelope
         const pdfBase64 = generateContractPDF(contract);
 
