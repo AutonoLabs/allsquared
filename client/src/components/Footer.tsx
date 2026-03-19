@@ -23,15 +23,15 @@ export default function Footer() {
               <span>FCA-Regulated Escrow</span>
             </div>
             <div className="flex items-center gap-1 pt-1">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-xl hover:bg-primary/5">
+              <a href="https://x.com/allsquared_io" target="_blank" rel="noopener" className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-xl hover:bg-primary/5">
                 <Twitter className="h-4 w-4" />
                 <span className="sr-only">Twitter</span>
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-xl hover:bg-primary/5">
+              <a href="https://linkedin.com/company/allsquared" target="_blank" rel="noopener" className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-xl hover:bg-primary/5">
                 <Linkedin className="h-4 w-4" />
                 <span className="sr-only">LinkedIn</span>
               </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-xl hover:bg-primary/5">
+              <a href="https://github.com/AutonoLabs/allsquared" target="_blank" rel="noopener" className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-xl hover:bg-primary/5">
                 <Github className="h-4 w-4" />
                 <span className="sr-only">GitHub</span>
               </a>

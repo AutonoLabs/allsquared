@@ -208,7 +208,7 @@ export default function HowItWorks() {
                   <Card className={`${isEven ? "lg:col-start-2" : ""} border-0 shadow-sm`}>
                     <CardContent className="p-8">
                       <div className={`aspect-video rounded-xl flex items-center justify-center ${step.bgColor}`}>
-                        <Icon className={`h-24 w-24 ${step.iconColor} opacity-30`} />
+                        <Icon className={`h-24 w-24 ${step.iconColor} opacity-70`} />
                       </div>
                     </CardContent>
                   </Card>

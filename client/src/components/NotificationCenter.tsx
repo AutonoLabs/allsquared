@@ -11,9 +11,13 @@ import { Bell, Check, FileText, AlertCircle, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDistanceToNow } from "date-fns";
+import { useUser } from "@clerk/clerk-react";
 
 export default function NotificationCenter() {
-  const { data, refetch } = trpc.notifications.list.useQuery();
+  const { isSignedIn } = useUser();
+  const { data, refetch } = trpc.notifications.list.useQuery(undefined, {
+    enabled: !!isSignedIn, // Only query when authenticated
+  });
   const notifications = data?.notifications || [];
   const unreadCount = data?.unreadCount || 0;
   
