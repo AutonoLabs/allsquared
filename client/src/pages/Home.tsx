@@ -54,6 +54,7 @@ export default function Home() {
 
         <div className="container relative">
           <motion.div
+            initial="hidden"
             animate="visible"
             variants={staggerContainer}
             className="max-w-4xl"

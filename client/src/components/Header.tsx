@@ -3,12 +3,14 @@ import { APP_LOGO, APP_TITLE } from "@/const";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
+import { useUser } from "@clerk/clerk-react";
 import NotificationCenter from "./NotificationCenter";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [location] = useLocation();
+  const { isSignedIn } = useUser();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -57,7 +59,7 @@ export default function Header() {
 
         {/* CTA Buttons */}
         <div className="hidden md:flex md:items-center md:gap-3">
-          <NotificationCenter />
+          {isSignedIn && <NotificationCenter />}
           <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground" asChild>
             <Link href="/dashboard">Sign In</Link>
           </Button>
