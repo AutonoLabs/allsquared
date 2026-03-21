@@ -194,6 +194,8 @@ export const contracts = pgTable("contracts", {
   selectedClauses: text("selectedClauses"), // JSON - which clauses were selected
   filledVariables: text("filledVariables"), // JSON - filled variable values
   generatedMarkdown: text("generatedMarkdown"), // final generated markdown
+  partyAId: varchar("partyAId", { length: 64 }),
+  partyBId: varchar("partyBId", { length: 64 }),
   clientSignedAt: timestamp("clientSignedAt"),
   providerSignedAt: timestamp("providerSignedAt"),
   startDate: timestamp("startDate"),
@@ -461,6 +463,27 @@ export const aiGenerations = pgTable("aiGenerations", {
 
 export type AiGeneration = typeof aiGenerations.$inferSelect;
 export type InsertAiGeneration = typeof aiGenerations.$inferInsert;
+
+// ===== Party Profiles (for Contract Builder) =====
+
+export const partyTypeEnum = pgEnum("party_type", ["client", "contractor", "individual", "company"]);
+
+export const partyProfiles = pgTable("partyProfiles", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  userId: varchar("userId", { length: 64 }).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  companyNumber: varchar("companyNumber", { length: 20 }),
+  address: text("address"),
+  email: varchar("email", { length: 320 }),
+  phone: varchar("phone", { length: 20 }),
+  type: partyTypeEnum("type").default("company").notNull(),
+  companiesHouseData: text("companiesHouseData"), // JSON cache of CH response
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
+
+export type PartyProfile = typeof partyProfiles.$inferSelect;
+export type InsertPartyProfile = typeof partyProfiles.$inferInsert;
 
 // ===== SquaredNow Dispute System =====
 

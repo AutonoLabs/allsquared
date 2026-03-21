@@ -43,6 +43,7 @@ const LegalServices = lazyRetry(() => import("./pages/LegalServices"));
 const Dashboard = lazyRetry(() => import("./pages/Dashboard"));
 const Contracts = lazyRetry(() => import("./pages/Contracts"));
 const NewContractTypeform = lazyRetry(() => import("./pages/NewContractTypeform"));
+const NewContractBuilder = lazyRetry(() => import("./pages/NewContractBuilder"));
 const ContractDetail = lazyRetry(() => import("./pages/ContractDetail"));
 const Templates = lazyRetry(() => import("./pages/Templates"));
 const TemplateEditor = lazyRetry(() => import("./pages/TemplateEditor"));
@@ -126,6 +127,11 @@ function Router() {
           </DashboardLayout>
         </Route>
         <Route path="/dashboard/contracts/new">
+          <DashboardLayout>
+            <NewContractBuilder />
+          </DashboardLayout>
+        </Route>
+        <Route path="/dashboard/contracts/new/classic">
           <DashboardLayout>
             <NewContractTypeform />
           </DashboardLayout>
