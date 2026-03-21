@@ -471,7 +471,21 @@ export default function Profile() {
             )}
           </div>
 
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-3">
+            <Button
+              variant="outline"
+              onClick={() => {
+                handleSaveProfile();
+                // Navigate back after save
+                if (!updateProfileMutation.isPending) {
+                  window.history.back();
+                }
+              }}
+              disabled={updateProfileMutation.isPending}
+            >
+              <Save className="mr-2 h-4 w-4" />
+              Save & Exit
+            </Button>
             <Button onClick={handleSaveProfile} disabled={updateProfileMutation.isPending}>
               {updateProfileMutation.isPending ? (
                 <>

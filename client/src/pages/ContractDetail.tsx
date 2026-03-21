@@ -113,7 +113,16 @@ export default function ContractDetail() {
     );
   }
 
-  const contractContent = contract.contractContent ? JSON.parse(contract.contractContent as string) : {};
+  const contractContent = (() => {
+    if (!contract.contractContent) return {};
+    const raw = contract.contractContent as string;
+    try {
+      return JSON.parse(raw);
+    } catch {
+      // Content is markdown/plain text, not JSON
+      return { content: raw, variables: [] };
+    }
+  })();
   const signatures = contractContent.signatures || [];
 
   return (

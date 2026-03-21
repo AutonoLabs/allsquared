@@ -14,6 +14,7 @@ import { signaturesRouter } from "./routers/signatures";
 import { adminRouter } from "./routers/admin";
 import { disputesRouter } from "./routers/disputes";
 import { templateBuilderRouter } from "./routers/templateBuilder";
+import { companiesHouseRouter } from "./routers/companiesHouse";
 import { updateUser, getUserByClerkId, upsertUser, getUser, getDb } from "./db";
 import { users } from "../drizzle/schema";
 import { z } from "zod";
@@ -115,6 +116,7 @@ export const appRouter = router({
 
   // Dispute resolution
   disputes: disputesRouter,
+  companiesHouse: companiesHouseRouter,
 
   // Admin portal
   admin: adminRouter,

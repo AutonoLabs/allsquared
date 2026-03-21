@@ -847,10 +847,37 @@ export default function NewContractTypeform() {
       {/* Bottom nav */}
       {showNavButtons && (
         <div className="sticky bottom-0 bg-background/80 backdrop-blur-sm border-t">
-          <div className="max-w-2xl mx-auto px-4 py-4 flex justify-between">
+          <div className="max-w-2xl mx-auto px-4 py-4 flex items-center justify-between">
             <Button variant="ghost" onClick={handleBack}>
               <ArrowLeft className="h-4 w-4 mr-2" />
               Back
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={saveMutation.isPending || !selectedTemplateId}
+              onClick={() => {
+                saveMutation.mutate({
+                  contractId: savedContractId || undefined,
+                  templateId: selectedTemplateId!,
+                  variables,
+                  selectedClauses,
+                  generatedMarkdown: generatedMarkdown || "",
+                  status: "draft",
+                }, {
+                  onSuccess: () => {
+                    toast.success("Draft saved! You can resume anytime from your dashboard.");
+                    setLocation("/dashboard/contracts");
+                  },
+                });
+              }}
+            >
+              {saveMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              Save & Exit
             </Button>
             <Button onClick={handleNext}>
               {step === 3 ? "Continue" : "Next"}
