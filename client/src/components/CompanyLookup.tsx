@@ -38,7 +38,7 @@ export default function CompanyLookup({
   const [query, setQuery] = useState(initialValue);
   const [showDropdown, setShowDropdown] = useState(false);
   const [selected, setSelected] = useState<CompanyData | null>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -124,7 +124,7 @@ export default function CompanyLookup({
         {/* Dropdown */}
         {showDropdown && data?.items && data.items.length > 0 && (
           <div className="absolute z-50 w-full mt-1 bg-background border border-border rounded-lg shadow-lg max-h-64 overflow-y-auto">
-            {data.items.map((company) => (
+            {data.items.map((company: CompanyData) => (
               <button
                 key={company.companyNumber}
                 type="button"
