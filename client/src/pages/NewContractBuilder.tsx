@@ -163,6 +163,25 @@ const DEFAULT_MODULES: ContractModule[] = [
       { id: "term_breach", question: "Cure period for breach", type: "select", options: ["7 days", "14 days", "30 days"], default: "14 days", answer: "14 days" },
     ],
   },
+  {
+    id: "debt_acknowledgement",
+    name: "Debt Acknowledgement & Payment Arrangement",
+    description: "Acknowledge an existing debt and agree a repayment plan",
+    icon: "Banknote",
+    enabled: false,
+    questions: [
+      { id: "debt_amount", question: "Total debt acknowledged (£)", type: "number", answer: "" },
+      { id: "debt_description", question: "Description of the debt (what it's for)", type: "text", answer: "" },
+      { id: "debt_date", question: "Date the debt was incurred", type: "date", answer: "" },
+      { id: "debt_repayment_type", question: "Repayment structure", type: "select", options: ["Lump sum", "Instalments", "Milestone-based", "Upon completion of work"], answer: "" },
+      { id: "debt_instalment_amount", question: "Instalment amount per payment (£)", type: "number", answer: "" },
+      { id: "debt_instalment_frequency", question: "Payment frequency", type: "select", options: ["Weekly", "Fortnightly", "Monthly", "Quarterly"], answer: "" },
+      { id: "debt_first_payment", question: "First payment due date", type: "date", answer: "" },
+      { id: "debt_interest", question: "Interest on outstanding balance", type: "select", options: ["None", "Bank of England base rate + 8%", "Fixed 4%", "Fixed 8%", "Custom"], default: "None", answer: "None" },
+      { id: "debt_default_action", question: "What happens if a payment is missed?", type: "select", options: ["7-day grace period then full balance due", "14-day grace period then full balance due", "Escalate to ADR", "Automatic debt recovery"], answer: "" },
+      { id: "debt_security", question: "Is the debt secured against any asset?", type: "select", options: ["Unsecured", "Personal guarantee", "Property charge", "Equipment lien"], answer: "" },
+    ],
+  },
 ];
 
 // ── Component ──────────────────────────────────────────────────────
