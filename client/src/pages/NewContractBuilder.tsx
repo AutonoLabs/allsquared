@@ -166,7 +166,7 @@ const DEFAULT_MODULES: ContractModule[] = [
   {
     id: "debt_acknowledgement",
     name: "Debt Acknowledgement & Payment Arrangement",
-    description: "Acknowledge an existing debt and agree a repayment plan",
+    description: "Formalise an existing agreed debt between businesses (B2B only — not consumer credit)",
     icon: "Banknote",
     enabled: false,
     questions: [
