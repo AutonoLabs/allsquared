@@ -81,6 +81,8 @@ export default function Profile() {
   // Postcode lookup
   const [lookupPostcode, setLookupPostcode] = useState("");
   const [lookupLoading, setLookupLoading] = useState(false);
+  const [companyNumber, setCompanyNumber] = useState("");
+  const [vatNumber, setVatNumber] = useState("");
   const [lookupResults, setLookupResults] = useState<Array<{ line1: string; line2: string; city: string; county: string }>>([]);
   const [showLookupResults, setShowLookupResults] = useState(false);
 
@@ -97,6 +99,8 @@ export default function Profile() {
       setEmail(user.email || "");
       setCompany(user.businessName || "");
       setPhone(user.phone || "");
+      setCompanyNumber((user as any).companyNumber || "");
+      setVatNumber((user as any).vatNumber || "");
       const addr = parseAddress(user.address);
       setAddressLine1(addr.line1);
       setAddressLine2(addr.line2);
@@ -333,6 +337,35 @@ export default function Profile() {
                 onChange={(e) => setCompany(e.target.value)}
                 placeholder="Your Company Ltd"
               />
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="companyNumber">
+                  Company Number
+                </Label>
+                <Input
+                  id="companyNumber"
+                  value={companyNumber}
+                  onChange={(e) => setCompanyNumber(e.target.value)}
+                  placeholder="12345678"
+                  maxLength={8}
+                />
+                {companyNumber && !/^[0-9]{8}$|^(SC|NI|OC)[0-9]{6}$/i.test(companyNumber) && (
+                  <p className="text-xs text-destructive">Invalid format (8 digits or SC/NI + 6 digits)</p>
+                )}
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="vatNumber">
+                  VAT Number
+                </Label>
+                <Input
+                  id="vatNumber"
+                  value={vatNumber}
+                  onChange={(e) => setVatNumber(e.target.value)}
+                  placeholder="GB 123 4567 89"
+                />
+              </div>
             </div>
 
             <div className="space-y-2">

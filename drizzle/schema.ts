@@ -148,6 +148,8 @@ export const users = pgTable("users", {
   profilePhoto: varchar("profilePhoto", { length: 500 }),
   verified: verifiedEnum("verified").default("no").notNull(),
   verificationToken: varchar("verificationToken", { length: 255 }),
+  companyNumber: varchar("companyNumber", { length: 20 }),
+  vatNumber: varchar("vatNumber", { length: 20 }),
   stripeCustomerId: varchar("stripeCustomerId", { length: 255 }),
   stripeConnectedAccountId: varchar("stripeConnectedAccountId", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow(),
