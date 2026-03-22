@@ -138,7 +138,6 @@ export default function Home() {
 
         <div className="container relative">
           <motion.div
-            initial="hidden"
             animate="visible"
             variants={stagger}
             className="max-w-4xl"
@@ -243,9 +242,6 @@ export default function Home() {
       <section className="py-20 md:py-28">
         <div className="container">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-80px" }}
             variants={fadeUp}
             className="mx-auto max-w-3xl space-y-6 text-center"
           >
@@ -271,9 +267,6 @@ export default function Home() {
       <section className="bg-muted/30 py-20 md:py-28">
         <div className="container">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
             className="mx-auto mb-14 max-w-2xl text-center"
           >
@@ -290,9 +283,6 @@ export default function Home() {
           </motion.div>
 
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
             variants={stagger}
             className="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
           >
@@ -323,9 +313,6 @@ export default function Home() {
       <section className="py-20 md:py-28">
         <div className="container">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
             className="mx-auto mb-14 max-w-2xl text-center"
           >
@@ -341,9 +328,6 @@ export default function Home() {
           </motion.div>
 
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
             variants={stagger}
             className="mx-auto grid max-w-5xl gap-10 md:grid-cols-3"
           >
@@ -373,9 +357,6 @@ export default function Home() {
         </div>
         <div className="container relative">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
             className="mb-12 text-center"
           >
@@ -388,9 +369,6 @@ export default function Home() {
           </motion.div>
 
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-40px" }}
             variants={stagger}
             className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4"
           >
@@ -413,9 +391,6 @@ export default function Home() {
       <section className="py-24 md:py-32">
         <div className="container">
           <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
             variants={fadeUp}
             className="mx-auto max-w-3xl space-y-8 text-center"
           >
