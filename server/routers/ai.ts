@@ -4,6 +4,7 @@ import { getDb } from '../db';
 import { aiGenerations, contractTemplates } from '../../drizzle/schema';
 import { eq, desc } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
+import { CHATBOT_MODELS, DEFAULT_CHATBOT_MODEL, type ChatbotModelId } from '../../shared/chatbot-config';
 
 // OpenAI API configuration - will be set via environment variable
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
@@ -487,7 +488,127 @@ Format each clause with a title and the clause text.`;
         };
       }
     }),
+
+  // ── Chatbot — multi-model contract assistant ────────────────────
+  chatMessage: protectedProcedure
+    .input(
+      z.object({
+        message: z.string().min(1),
+        contractContext: z.string().optional(),
+        modelId: z.enum(['gpt-4o', 'lexai-rag', 'codex']).default(DEFAULT_CHATBOT_MODEL),
+        history: z.array(z.object({
+          role: z.enum(['user', 'assistant']),
+          content: z.string(),
+        })).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const modelCfg = CHATBOT_MODELS[input.modelId];
+      const apiKey = process.env.OPENAI_API_KEY;
+
+      // ── LexAI RAG path ──────────────────────────────────────────
+      if (modelCfg.provider === 'lexai') {
+        // LexAI RAG endpoint (local). Falls back to heuristic.
+        try {
+          const ragResp = await fetch('http://localhost:3100/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              query: input.message,
+              context: input.contractContext?.slice(0, 4000) || '',
+              history: input.history?.slice(-6) || [],
+            }),
+            signal: AbortSignal.timeout(15_000),
+          });
+          if (ragResp.ok) {
+            const data = await ragResp.json();
+            return { reply: data.answer || data.response || data.text || 'No response from LexAI.', model: 'lexai-rag' };
+          }
+        } catch { /* fall through to heuristic */ }
+
+        return {
+          reply: chatFallback(input.message, input.contractContext || ''),
+          model: 'lexai-rag-fallback',
+        };
+      }
+
+      // ── OpenAI path (GPT-4o / Codex) ────────────────────────────
+      if (!apiKey) {
+        return {
+          reply: chatFallback(input.message, input.contractContext || ''),
+          model: `${modelCfg.id}-fallback`,
+        };
+      }
+
+      const systemContent = `You are a helpful contract assistant for AllSquared, a UK contract platform.
+You help users understand and build their contracts. Be concise and practical.
+Never provide legal advice — suggest seeking a solicitor for complex matters.
+${input.contractContext ? `\nCurrent contract context:\n${input.contractContext.slice(0, 4000)}` : ''}`;
+
+      const messages: { role: string; content: string }[] = [
+        { role: 'system', content: systemContent },
+        ...(input.history?.slice(-8) || []),
+        { role: 'user', content: input.message },
+      ];
+
+      try {
+        const resp = await fetch(OPENAI_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model: modelCfg.apiModel,
+            messages,
+            max_tokens: 800,
+            temperature: 0.5,
+          }),
+        });
+
+        if (!resp.ok) {
+          const errText = await resp.text();
+          console.error(`[chatbot] ${modelCfg.apiModel} error:`, errText);
+          throw new Error('API error');
+        }
+
+        const data = await resp.json();
+        return {
+          reply: data.choices?.[0]?.message?.content || 'Unable to generate response.',
+          model: modelCfg.apiModel,
+        };
+      } catch {
+        return {
+          reply: chatFallback(input.message, input.contractContext || ''),
+          model: `${modelCfg.id}-fallback`,
+        };
+      }
+    }),
 });
+
+// ── Chatbot heuristic fallback ─────────────────────────────────────
+function chatFallback(question: string, context: string): string {
+  const q = question.toLowerCase();
+  if (q.includes('payment') || q.includes('pay') || q.includes('invoice')) {
+    return 'Payment terms define when and how the client pays. Milestone-based payments held in escrow are recommended for security. You can configure this in the Payment Terms module.';
+  }
+  if (q.includes('terminat') || q.includes('cancel')) {
+    return 'Termination clauses define how either party can end the agreement. Typically 14–30 days written notice is required. Upon termination, the client pays for completed work.';
+  }
+  if (q.includes('ip') || q.includes('intellectual property') || q.includes('copyright')) {
+    return 'IP ownership typically transfers to the client upon full payment. You can configure this in the Intellectual Property module.';
+  }
+  if (q.includes('dispute') || q.includes('disagree')) {
+    return 'AllSquared offers AI-assisted mediation as the first step for disputes. If unresolved, parties can escalate to formal mediation or the courts of England and Wales.';
+  }
+  if (q.includes('escrow') || q.includes('protect')) {
+    return 'Escrow protection holds funds securely until milestones are completed and approved. It\'s recommended for contracts over £10,000.';
+  }
+  if (q.includes('scope') || q.includes('deliverable')) {
+    return 'The Scope of Work module lets you define deliverables, exclusions, and expectations. Be as specific as possible to avoid disputes.';
+  }
+  return 'I can help with payment terms, termination, IP rights, escrow, disputes, scope of work, and more. Ask about any contract topic!';
+}
 
 // Default clauses for common scenarios
 function getDefaultClauses(scenario: string, category: string): string {
