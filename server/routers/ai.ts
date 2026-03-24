@@ -10,7 +10,7 @@ import { CHATBOT_MODELS, DEFAULT_CHATBOT_MODEL, type ChatbotModelId } from '../.
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
 // LexAI RAG — legal research engine (env var with localhost fallback)
-const LEXAI_API_URL = process.env.LEXAI_API_URL || 'http://localhost:8400';
+const LEXAI_API_URL = process.env.LEXAI_API_URL || 'http://localhost:8002';
 
 // ── Jurisdiction Guard ─────────────────────────────────────────────
 const LEXAI_JURISDICTION = "England and Wales";
@@ -535,10 +535,10 @@ Format each clause with a title and the clause text.`;
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               query: input.message,
-              collection: 'contracts',
-              jurisdiction: LEXAI_JURISDICTION,
-              legal_system: LEXAI_LEGAL_SYSTEM,
-              n_results: 5,
+              collection: 'public_legal',
+              jurisdiction_filter: LEXAI_JURISDICTION,
+              limit: 5,
+              mode: 'chat',
             }),
             signal: AbortSignal.timeout(15_000),
           });
