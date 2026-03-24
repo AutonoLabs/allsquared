@@ -211,17 +211,11 @@ const TEMPLATES: TemplateConfig[] = [
   },
 ];
 
-async function seed() {
-  const dbUrl = process.env.DATABASE_URL;
-  if (!dbUrl) {
-    console.error("DATABASE_URL is required");
-    process.exit(1);
-  }
-
-  const db = drizzle(dbUrl);
+/** Seed templates into the given drizzle db instance. Exported for auto-seed on boot. */
+export async function seedTemplates(db: ReturnType<typeof drizzle>) {
   const legalDir = path.resolve(__dirname, "../legal");
 
-  console.log("Seeding legal templates...\n");
+  console.log("[seed] Seeding legal templates...\n");
 
   for (const config of TEMPLATES) {
     const filePath = path.join(legalDir, config.file);
@@ -254,14 +248,12 @@ async function seed() {
     };
 
     if (existing.length > 0) {
-      // Update
       await db
         .update(contractTemplates)
         .set(templateData)
         .where(eq(contractTemplates.id, existing[0].id));
       console.log(`  ✓ Updated: ${config.name} (${config.slug})`);
     } else {
-      // Insert
       await db.insert(contractTemplates).values({
         id: `tmpl_${nanoid(16)}`,
         ...templateData,
@@ -271,11 +263,25 @@ async function seed() {
     }
   }
 
-  console.log("\nDone! Seeded", TEMPLATES.length, "legal templates.");
-  process.exit(0);
+  console.log("[seed] Done! Seeded", TEMPLATES.length, "legal templates.");
 }
 
-seed().catch((err) => {
-  console.error("Seed failed:", err);
-  process.exit(1);
-});
+// CLI entrypoint: npx tsx server/seed-templates.ts
+const isCLI = process.argv[1] && (
+  process.argv[1].endsWith('seed-templates.ts') ||
+  process.argv[1].endsWith('seed-templates.js')
+);
+
+if (isCLI) {
+  const dbUrl = process.env.DATABASE_URL;
+  if (!dbUrl) {
+    console.error("DATABASE_URL is required");
+    process.exit(1);
+  }
+  seedTemplates(drizzle(dbUrl))
+    .then(() => process.exit(0))
+    .catch((err) => {
+      console.error("Seed failed:", err);
+      process.exit(1);
+    });
+}

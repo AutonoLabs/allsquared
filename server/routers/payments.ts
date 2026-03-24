@@ -676,6 +676,50 @@ export const paymentsRouter = router({
               .where(eq(payments.stripePaymentIntentId, paymentIntent.id));
             break;
           }
+
+          case 'invoice.payment_succeeded': {
+            const invoice = input.data.object;
+            if (invoice.subscription) {
+              // Update subscription status to active on successful payment
+              await db
+                .update(subscriptions)
+                .set({
+                  status: 'active',
+                  updatedAt: new Date(),
+                })
+                .where(eq(subscriptions.stripeSubscriptionId, invoice.subscription));
+            }
+            // Record the payment
+            const invoicePaymentId = `pay_${nanoid(16)}`;
+            await db.insert(payments).values({
+              id: invoicePaymentId,
+              userId: invoice.metadata?.userId || 'unknown',
+              type: 'subscription',
+              amount: String(invoice.amount_paid),
+              currency: (invoice.currency || 'gbp').toUpperCase(),
+              status: 'succeeded',
+              stripePaymentIntentId: invoice.payment_intent,
+              description: `Invoice ${invoice.number || invoice.id}`,
+              processedAt: new Date(),
+              createdAt: new Date(),
+              updatedAt: new Date(),
+            });
+            break;
+          }
+
+          case 'invoice.payment_failed': {
+            const invoice = input.data.object;
+            if (invoice.subscription) {
+              await db
+                .update(subscriptions)
+                .set({
+                  status: 'past_due',
+                  updatedAt: new Date(),
+                })
+                .where(eq(subscriptions.stripeSubscriptionId, invoice.subscription));
+            }
+            break;
+          }
         }
 
         // Mark webhook as processed

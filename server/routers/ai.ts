@@ -6,8 +6,11 @@ import { eq, desc } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { CHATBOT_MODELS, DEFAULT_CHATBOT_MODEL, type ChatbotModelId } from '../../shared/chatbot-config';
 
-// OpenAI API configuration - will be set via environment variable
+// OpenAI API configuration
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+
+// LexAI RAG — legal research engine (env var with localhost fallback)
+const LEXAI_API_URL = process.env.LEXAI_API_URL || 'http://localhost:8400';
 
 // Contract generation system prompt
 const SYSTEM_PROMPT = `You are a legal contract drafting assistant for AllSquared, a UK-based platform for secure service contracts. Your role is to generate clear, professional contract clauses based on user requirements.
@@ -508,23 +511,59 @@ Format each clause with a title and the clause text.`;
 
       // ── LexAI RAG path ──────────────────────────────────────────
       if (modelCfg.provider === 'lexai') {
-        // LexAI RAG endpoint (local). Falls back to heuristic.
         try {
-          const ragResp = await fetch('http://localhost:3100/api/chat', {
+          const ragResp = await fetch(`${LEXAI_API_URL}/query`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
               query: input.message,
-              context: input.contractContext?.slice(0, 4000) || '',
-              history: input.history?.slice(-6) || [],
+              collection: 'contracts',
+              n_results: 5,
             }),
             signal: AbortSignal.timeout(15_000),
           });
           if (ragResp.ok) {
-            const data = await ragResp.json();
+            const data = await ragResp.json() as { answer?: string; response?: string; text?: string };
             return { reply: data.answer || data.response || data.text || 'No response from LexAI.', model: 'lexai-rag' };
           }
-        } catch { /* fall through to heuristic */ }
+        } catch (err) {
+          console.warn('[LexAI /query] Unavailable, falling back to OpenAI:', (err as Error).message);
+        }
+
+        // Fallback to OpenAI if available, otherwise heuristic
+        if (apiKey) {
+          const systemContent = `You are a helpful contract assistant for AllSquared, a UK contract platform.
+You help users understand and build their contracts. Be concise and practical.
+Never provide legal advice — suggest seeking a solicitor for complex matters.
+${input.contractContext ? `\nCurrent contract context:\n${input.contractContext.slice(0, 4000)}` : ''}`;
+
+          try {
+            const resp = await fetch(OPENAI_API_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${apiKey}`,
+              },
+              body: JSON.stringify({
+                model: 'gpt-4o',
+                messages: [
+                  { role: 'system', content: systemContent },
+                  ...(input.history?.slice(-8) || []),
+                  { role: 'user', content: input.message },
+                ],
+                max_tokens: 800,
+                temperature: 0.5,
+              }),
+            });
+            if (resp.ok) {
+              const data = await resp.json();
+              return {
+                reply: data.choices?.[0]?.message?.content || 'Unable to generate response.',
+                model: 'lexai-rag-openai-fallback',
+              };
+            }
+          } catch { /* fall through to heuristic */ }
+        }
 
         return {
           reply: chatFallback(input.message, input.contractContext || ''),

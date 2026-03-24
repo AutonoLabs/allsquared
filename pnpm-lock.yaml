@@ -20,6 +20,9 @@ importers:
       '@clerk/express':
         specifier: ^1.0.0
         version: 1.7.67(express@4.21.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+      '@material/material-color-utilities':
+        specifier: ^0.3.0
+        version: 0.3.0
       '@radix-ui/react-accordion':
         specifier: ^1.2.12
         version: 1.2.12(@types/react-dom@19.2.1(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -1168,6 +1171,9 @@ packages:
     resolution: {integrity: sha512-uwPAhccfFJlsfCxMYTwOdVfOz3xqyj8xYL3zJj8f0pb30tLohnnFPhLuqp4/qoEz8sNxe4SESZedcBojRefIzg==}
     engines: {node: '>=18'}
     hasBin: true
+
+  '@material/material-color-utilities@0.3.0':
+    resolution: {integrity: sha512-ztmtTd6xwnuh2/xu+Vb01btgV8SQWYCaK56CkRK8gEkWe5TuDyBcYJ0wgkMRn+2VcE9KUmhvkz+N9GHrqw/C0g==}
 
   '@neondatabase/serverless@0.9.5':
     resolution: {integrity: sha512-siFas6gItqv6wD/pZnvdu34wEqgG3nSE6zWZdq5j2DEsa+VvX8i/5HXJOo06qrw5axPXn+lGCxeR+NLaSPIXug==}
@@ -5122,6 +5128,8 @@ snapshots:
     transitivePeerDependencies:
       - encoding
       - supports-color
+
+  '@material/material-color-utilities@0.3.0': {}
 
   '@neondatabase/serverless@0.9.5':
     dependencies:

@@ -170,7 +170,7 @@ export function PartySearch({ label, role, value, onChange, savedProfiles = [] }
               {!searchResult.isLoading && searchResult.data?.items?.length === 0 && (
                 <div className="p-3 text-sm text-muted-foreground text-center">No companies found</div>
               )}
-              {searchResult.data?.items?.map((item) => (
+              {searchResult.data?.items?.map((item: any) => (
                 <button
                   key={item.companyNumber}
                   type="button"
