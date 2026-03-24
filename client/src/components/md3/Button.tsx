@@ -42,6 +42,19 @@ export function MD3Button({
 }: MD3ButtonProps) {
   const Comp = asChild ? Slot : "button";
 
+  // When asChild=true, Slot requires exactly ONE React element child.
+  // The icon span + children would be two children, crashing React.Children.only.
+  // Solution: when asChild, ignore icon prop (callers using asChild should put
+  // icon inside their child element instead).
+  const content = asChild ? (
+    children
+  ) : (
+    <>
+      {icon && <span className="shrink-0 [&_svg]:size-[18px]">{icon}</span>}
+      {children}
+    </>
+  );
+
   return (
     <Comp
       className={cn(
@@ -61,8 +74,7 @@ export function MD3Button({
       )}
       {...props}
     >
-      {icon && <span className="shrink-0 [&_svg]:size-[18px]">{icon}</span>}
-      {children}
+      {content}
     </Comp>
   );
 }
