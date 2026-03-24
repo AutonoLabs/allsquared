@@ -18,21 +18,32 @@ import { nanoid } from 'nanoid';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
+// ── UK Jurisdiction Guard ──────────────────────────────────────────────
+const LEXAI_JURISDICTION = "England and Wales";
+const LEXAI_LEGAL_SYSTEM = "common law";
+const LEXAI_SYSTEM_PROMPT = `You are a UK legal AI specialising in English and Welsh common law contract drafting and review. Only advise on English and Welsh law. Do not advise on Scots law, Northern Irish law, Australian law, US law, or any other jurisdiction.`;
+// ────────────────────────────────────────────────────────────────────────
+
 // LexAI RAG — legal research engine (Tailscale → Studio, fallback localhost)
 const LEXAI_API_URL = process.env.LEXAI_API_URL || 'http://100.65.116.80:8400';
 
-// LexAI /review — contract clause assessment
+// LexAI /review — contract clause assessment (UK common law only)
 async function reviewWithLexAI(contractText: string, reviewType: string = 'general'): Promise<{ issues: { category: string; description: string; severity: string }[] }> {
   try {
     const response = await fetch(`${LEXAI_API_URL}/review`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ document: contractText, review_type: reviewType }),
+      body: JSON.stringify({
+        document: contractText,
+        review_type: reviewType,
+        jurisdiction: LEXAI_JURISDICTION,
+        legal_system: LEXAI_LEGAL_SYSTEM,
+      }),
       signal: AbortSignal.timeout(30000),
     });
     if (!response.ok) return { issues: [] };
     const data = await response.json() as { issues?: { category: string; description: string; severity: string }[] };
-    console.log(`[LexAI /review] Found ${data.issues?.length || 0} issues`);
+    console.log(`[LexAI /review] Found ${data.issues?.length || 0} issues (${LEXAI_JURISDICTION})`);
     return { issues: data.issues || [] };
   } catch (err) {
     console.warn('[LexAI /review] Unavailable:', (err as Error).message);
@@ -40,27 +51,20 @@ async function reviewWithLexAI(contractText: string, reviewType: string = 'gener
   }
 }
 
-// LexAI /draft — settlement proposal generation
-async function draftWithLexAI(prompt: string, style: string = 'formal'): Promise<string> {
-  try {
-    const response = await fetch(`${LEXAI_API_URL}/draft`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, style }),
-      signal: AbortSignal.timeout(30000),
-    });
-    if (!response.ok) return '';
-    const data = await response.json() as { draft?: string };
-    return data.draft || '';
-  } catch (err) {
-    console.warn('[LexAI /draft] Unavailable:', (err as Error).message);
-    return '';
-  }
+// LexAI /draft — REMOVED: settlement drafting is no longer supported.
+// For dispute resolution, users should contact hello@allsquared.io
+async function draftWithLexAI(_prompt: string, _style: string = 'formal'): Promise<string> {
+  return 'For dispute resolution, please contact support at hello@allsquared.io';
 }
 
+// LexAI /query — UK common law research only
 async function queryLexAI(query: string, practiceArea?: string): Promise<{ answer: string; sources: { citation: string; text: string }[] }> {
   try {
-    const body: Record<string, unknown> = { query, top_k: 5 };
+    const body: Record<string, unknown> = {
+      query: `${LEXAI_SYSTEM_PROMPT}\n\n${query}`,
+      top_k: 5,
+      jurisdiction: LEXAI_JURISDICTION,
+    };
     if (practiceArea) body.practice_area = practiceArea;
 
     const response = await fetch(`${LEXAI_API_URL}/query`, {
@@ -76,7 +80,7 @@ async function queryLexAI(query: string, practiceArea?: string): Promise<{ answe
     }
 
     const data = await response.json() as { answer?: string; sources?: { citation: string; text: string }[] };
-    console.log(`[LexAI] Returned ${data.sources?.length || 0} sources for: "${query.substring(0, 50)}..."`);
+    console.log(`[LexAI] Returned ${data.sources?.length || 0} sources (${LEXAI_JURISDICTION}) for: "${query.substring(0, 50)}..."`);
     return { answer: data.answer || '', sources: data.sources || [] };
   } catch (err) {
     console.warn('[LexAI] Unavailable:', (err as Error).message);
@@ -84,9 +88,12 @@ async function queryLexAI(query: string, practiceArea?: string): Promise<{ answe
   }
 }
 
-const DISPUTE_ANALYSIS_PROMPT = `You are an expert dispute analyst for AllSquared, a UK-based freelance contracts platform. You analyze disputes between clients and service providers.
+const DISPUTE_ANALYSIS_PROMPT = `${LEXAI_SYSTEM_PROMPT}
 
-Given a contract and a dispute reason, produce a structured analysis. Be fair, balanced, and reference specific contract terms. Follow UK contract law principles.
+You are an expert dispute analyst for AllSquared, a UK-based freelance contracts platform. You analyze disputes between clients and service providers.
+Jurisdiction: ${LEXAI_JURISDICTION}. Legal system: ${LEXAI_LEGAL_SYSTEM}.
+
+Given a contract and a dispute reason, produce a structured analysis. Be fair, balanced, and reference specific contract terms. Apply English and Welsh common law principles ONLY.
 
 Respond ONLY with valid JSON in this exact format:
 {
@@ -99,7 +106,14 @@ Respond ONLY with valid JSON in this exact format:
   "confidence": "high or medium or low"
 }`;
 
-const MEDIATION_SUGGESTION_PROMPT = `You are a mediation assistant for AllSquared, a UK-based freelance contracts platform. Given the dispute context and the latest message from one party, suggest a constructive response for the other party that moves toward resolution.
+const MEDIATION_SUGGESTION_PROMPT = `${LEXAI_SYSTEM_PROMPT}
+
+You are a mediation assistant for AllSquared, a UK-based freelance contracts platform operating under English and Welsh common law.
+Jurisdiction: ${LEXAI_JURISDICTION}. Legal system: ${LEXAI_LEGAL_SYSTEM}.
+
+For dispute resolution beyond AI-assisted mediation, users should contact support at hello@allsquared.io.
+
+Given the dispute context and the latest message from one party, suggest a constructive response for the other party that moves toward resolution.
 
 Be concise, professional, and solution-oriented. Focus on finding common ground. Respond with just the suggested message text, no JSON wrapper.`;
 

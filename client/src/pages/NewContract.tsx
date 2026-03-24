@@ -267,6 +267,9 @@ export default function NewContract() {
                             {template.description || templateContent.content?.substring(0, 80) + "..."}
                           </p>
                           <div className="flex items-center gap-2 mt-2">
+                            <Badge className="bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                              🇬🇧 UK Law
+                            </Badge>
                             <Badge className={getCategoryColor(template.category)}>
                               {getCategoryLabel(template.category)}
                             </Badge>

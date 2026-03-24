@@ -3,13 +3,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { MessageCircle, Send, X, Bot, User, Loader2 } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { MessageCircle, Send, X, Bot, User, Loader2, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { trpc } from "@/lib/trpc";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
   timestamp: Date;
+  model?: string;
+  sources?: Array<{ citation: string; text: string }>;
 }
 
 interface Props {
@@ -18,76 +22,27 @@ interface Props {
   onOpenChange: (open: boolean) => void;
 }
 
-async function askContractAI(question: string, context: string): Promise<string> {
-  const apiKey = (window as any).__openai_key || "";
-
-  // Fallback to heuristic response if no key
-  if (!apiKey) {
-    return generateFallbackResponse(question, context);
-  }
-
-  try {
-    const resp = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: `You are a helpful contract assistant for AllSquared, a UK contract platform.
-You help users understand and improve their contract. Be concise and practical.
-Never provide legal advice — instead suggest seeking a solicitor for complex matters.
-
-Current contract context:
-${context.slice(0, 3000)}`,
-          },
-          { role: "user", content: question },
-        ],
-        max_tokens: 600,
-        temperature: 0.5,
-      }),
-    });
-
-    if (!resp.ok) throw new Error("API error");
-    const data = await resp.json();
-    return data.choices[0]?.message?.content || "Unable to generate response.";
-  } catch {
-    return generateFallbackResponse(question, context);
-  }
-}
-
-function generateFallbackResponse(question: string, context: string): string {
-  const q = question.toLowerCase();
-  if (q.includes("payment") || q.includes("pay")) {
-    return "Payment terms define when and how the client pays. The contract uses milestone-based payments held in escrow for security. You can edit the payment milestones and amounts in the contract fields.";
-  }
-  if (q.includes("terminat") || q.includes("cancel")) {
-    return "Termination clauses define how either party can end the agreement. Typically 14 days written notice is required. Upon termination, the client pays for completed work and the provider delivers all work to date.";
-  }
-  if (q.includes("ip") || q.includes("intellectual property") || q.includes("copyright")) {
-    return "IP ownership transfers to the client upon full payment. Until payment is complete, the provider retains ownership. You may want to specify this explicitly if your work involves sensitive IP.";
-  }
-  if (q.includes("dispute") || q.includes("problem") || q.includes("disagree")) {
-    return "The contract includes AllSquared's AI-assisted mediation service as the first step for disputes. This is faster and cheaper than court. If unresolved, parties can escalate to formal mediation or the courts of England and Wales.";
-  }
-  return "I can help you understand specific clauses in your contract. Ask about payment terms, termination, IP rights, confidentiality, dispute resolution, or any other section you'd like explained.";
-}
-
 export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hi! I'm your contract assistant. Ask me anything about this contract — payment terms, clauses, obligations, or what any section means.",
+      content:
+        "Hi! I'm your contract assistant. Ask me anything about this contract — payment terms, clauses, obligations, or what any section means.",
       timestamp: new Date(),
     },
   ]);
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [selectedModel, setSelectedModel] = useState("gpt-4o-mini");
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Fetch available models
+  const { data: modelsData } = trpc.contractChat.models.useQuery(undefined, {
+    staleTime: 60_000,
+  });
+
+  const sendMutation = trpc.contractChat.send.useMutation();
+
+  const availableModels = (modelsData?.models || []).filter((m) => m.available);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -95,20 +50,46 @@ export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props)
 
   const send = async () => {
     const text = input.trim();
-    if (!text || loading) return;
+    if (!text || sendMutation.isPending) return;
 
     setInput("");
-    setMessages((prev) => [...prev, { role: "user", content: text, timestamp: new Date() }]);
-    setLoading(true);
+    setMessages((prev) => [
+      ...prev,
+      { role: "user", content: text, timestamp: new Date() },
+    ]);
 
     try {
-      const reply = await askContractAI(text, contractMarkdown);
+      const history = messages
+        .filter((m) => m.role === "user" || m.role === "assistant")
+        .slice(-10)
+        .map((m) => ({ role: m.role, content: m.content }));
+
+      const result = await sendMutation.mutateAsync({
+        message: text,
+        contractContext: contractMarkdown,
+        model: selectedModel,
+        history,
+      });
+
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: reply, timestamp: new Date() },
+        {
+          role: "assistant",
+          content: result.reply,
+          timestamp: new Date(),
+          model: result.model,
+          sources: result.sources?.length ? result.sources : undefined,
+        },
       ]);
-    } finally {
-      setLoading(false);
+    } catch (err: any) {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: `Error: ${err.message || "Failed to get response. Please try again."}`,
+          timestamp: new Date(),
+        },
+      ]);
     }
   };
 
@@ -123,44 +104,96 @@ export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props)
             <Bot className="w-4 h-4" />
             Contract Assistant
           </SheetTitle>
-          <p className="text-xs text-violet-200 mt-0.5">Ask anything about your contract</p>
+          <div className="flex items-center gap-2 mt-1">
+            <Select value={selectedModel} onValueChange={setSelectedModel}>
+              <SelectTrigger className="h-7 text-xs bg-white/10 border-white/20 text-white w-[160px]">
+                <SelectValue placeholder="Model" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableModels.map((m) => (
+                  <SelectItem key={m.id} value={m.id}>
+                    {m.label}
+                  </SelectItem>
+                ))}
+                {availableModels.length === 0 && (
+                  <SelectItem value="gpt-4o-mini" disabled>
+                    No models available
+                  </SelectItem>
+                )}
+              </SelectContent>
+            </Select>
+            <p className="text-[10px] text-violet-200 flex-1">
+              {selectedModel === "lexai-rag"
+                ? "Legal research + RAG"
+                : "AI assistant"}
+            </p>
+          </div>
         </SheetHeader>
 
         <ScrollArea className="flex-1 px-4 py-3">
           <div className="space-y-3">
             {messages.map((msg, i) => (
-              <div
-                key={i}
-                className={cn("flex gap-2", msg.role === "user" ? "flex-row-reverse" : "flex-row")}
-              >
+              <div key={i}>
                 <div
                   className={cn(
-                    "w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5",
-                    msg.role === "user"
-                      ? "bg-violet-600 text-white"
-                      : "bg-navy-100 text-navy-700 border border-navy-200"
+                    "flex gap-2",
+                    msg.role === "user" ? "flex-row-reverse" : "flex-row"
                   )}
                 >
-                  {msg.role === "user" ? (
-                    <User className="w-3.5 h-3.5" />
-                  ) : (
-                    <Bot className="w-3.5 h-3.5" />
-                  )}
+                  <div
+                    className={cn(
+                      "w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5",
+                      msg.role === "user"
+                        ? "bg-violet-600 text-white"
+                        : "bg-navy-100 text-navy-700 border border-navy-200"
+                    )}
+                  >
+                    {msg.role === "user" ? (
+                      <User className="w-3.5 h-3.5" />
+                    ) : (
+                      <Bot className="w-3.5 h-3.5" />
+                    )}
+                  </div>
+                  <div
+                    className={cn(
+                      "max-w-[80%] rounded-xl px-3 py-2 text-sm leading-relaxed",
+                      msg.role === "user"
+                        ? "bg-violet-600 text-white rounded-tr-sm"
+                        : "bg-muted text-foreground rounded-tl-sm"
+                    )}
+                  >
+                    {msg.content}
+                    {msg.model && msg.role === "assistant" && (
+                      <span className="block text-[10px] mt-1 opacity-50">
+                        via {msg.model}
+                      </span>
+                    )}
+                  </div>
                 </div>
-                <div
-                  className={cn(
-                    "max-w-[80%] rounded-xl px-3 py-2 text-sm leading-relaxed",
-                    msg.role === "user"
-                      ? "bg-violet-600 text-white rounded-tr-sm"
-                      : "bg-muted text-foreground rounded-tl-sm"
-                  )}
-                >
-                  {msg.content}
-                </div>
+
+                {/* LexAI RAG sources */}
+                {msg.sources && msg.sources.length > 0 && (
+                  <div className="ml-9 mt-1 space-y-1">
+                    {msg.sources.map((src, si) => (
+                      <div
+                        key={si}
+                        className="flex items-start gap-1.5 text-[11px] text-muted-foreground bg-muted/50 rounded px-2 py-1"
+                      >
+                        <BookOpen className="w-3 h-3 mt-0.5 shrink-0" />
+                        <div>
+                          {src.citation && (
+                            <span className="font-medium">{src.citation}: </span>
+                          )}
+                          <span className="line-clamp-2">{src.text}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             ))}
 
-            {loading && (
+            {sendMutation.isPending && (
               <div className="flex gap-2">
                 <div className="w-7 h-7 rounded-full bg-navy-100 border border-navy-200 flex items-center justify-center shrink-0">
                   <Bot className="w-3.5 h-3.5 text-navy-700" />
@@ -180,12 +213,12 @@ export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props)
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask about this contract..."
             onKeyDown={(e) => e.key === "Enter" && send()}
-            disabled={loading}
+            disabled={sendMutation.isPending}
             className="flex-1"
           />
           <Button
             onClick={send}
-            disabled={!input.trim() || loading}
+            disabled={!input.trim() || sendMutation.isPending}
             size="icon"
             className="bg-violet-600 hover:bg-violet-700 text-white shrink-0"
           >

@@ -66,13 +66,13 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="m3-headline-md font-bold tracking-tight">Dashboard</h1>
+          <p className="m3-body-md text-muted-foreground mt-1">
             Manage your contracts and milestones
           </p>
         </div>
         <Link href="/dashboard/contracts/new">
-          <Button size="lg" className="shadow-sm">
+          <Button size="lg" className="m3-state-layer rounded-[var(--radius-xl)] shadow-[var(--shadow-elevation-1)] hover:shadow-[var(--shadow-elevation-2)]">
             <Plus className="mr-2 h-5 w-5" />
             New Contract
           </Button>
@@ -81,9 +81,9 @@ export default function Dashboard() {
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="m3-card-elevated">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Active Contracts</CardTitle>
+            <CardTitle className="m3-label-lg text-muted-foreground">Active Contracts</CardTitle>
             <div className="h-9 w-9 rounded-lg bg-blue-500/10 flex items-center justify-center">
               <FileText className="h-5 w-5 text-blue-600" />
             </div>
@@ -97,9 +97,9 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="m3-card-elevated">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Completed</CardTitle>
+            <CardTitle className="m3-label-lg text-muted-foreground">Completed</CardTitle>
             <div className="h-9 w-9 rounded-lg bg-emerald-500/10 flex items-center justify-center">
               <CheckCircle2 className="h-5 w-5 text-emerald-600" />
             </div>
@@ -113,9 +113,9 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="m3-card-elevated">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Draft Contracts</CardTitle>
+            <CardTitle className="m3-label-lg text-muted-foreground">Draft Contracts</CardTitle>
             <div className="h-9 w-9 rounded-lg bg-amber-500/10 flex items-center justify-center">
               <Clock className="h-5 w-5 text-amber-600" />
             </div>
@@ -128,9 +128,9 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-sm hover:shadow-md transition-shadow">
+        <Card className="m3-card-elevated">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Value</CardTitle>
+            <CardTitle className="m3-label-lg text-muted-foreground">Total Value</CardTitle>
             <div className="h-9 w-9 rounded-lg bg-purple-500/10 flex items-center justify-center">
               <Banknote className="h-5 w-5 text-purple-600" />
             </div>
@@ -149,7 +149,7 @@ export default function Dashboard() {
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Recent Contracts */}
-        <Card className="lg:col-span-2 border-0 shadow-sm">
+        <Card className="lg:col-span-2 m3-card-outlined">
           <CardHeader>
             <div className="flex items-center justify-between">
               <div>
@@ -215,8 +215,8 @@ export default function Dashboard() {
 
         {/* Quick Actions */}
         <div className="space-y-4">
-          <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Quick Actions</h3>
-          <Card className="border-0 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 cursor-pointer group">
+          <h3 className="m3-label-lg text-muted-foreground uppercase tracking-wider">Quick Actions</h3>
+          <Card className="m3-card-elevated cursor-pointer group">
             <Link href="/dashboard/contracts/new">
               <CardContent className="p-5">
                 <div className="flex items-start gap-4">
@@ -234,7 +234,7 @@ export default function Dashboard() {
             </Link>
           </Card>
 
-          <Card className="border-0 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 cursor-pointer group">
+          <Card className="m3-card-elevated cursor-pointer group">
             <Link href="/dashboard/contracts">
               <CardContent className="p-5">
                 <div className="flex items-start gap-4">
@@ -252,7 +252,7 @@ export default function Dashboard() {
             </Link>
           </Card>
 
-          <Card className="border-0 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 cursor-pointer group">
+          <Card className="m3-card-elevated cursor-pointer group">
             <Link href="/dashboard/templates">
               <CardContent className="p-5">
                 <div className="flex items-start gap-4">
@@ -270,7 +270,7 @@ export default function Dashboard() {
             </Link>
           </Card>
 
-          <Card className="border-0 shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 cursor-pointer group">
+          <Card className="m3-card-elevated cursor-pointer group">
             <Link href="/dashboard/profile">
               <CardContent className="p-5">
                 <div className="flex items-start gap-4">
@@ -306,7 +306,7 @@ function StatusBadge({ status }: { status: string }) {
   const config = statusConfig[status] || statusConfig.draft;
 
   return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium ${config.className}`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-[var(--radius-sm)] m3-label-sm font-medium ${config.className}`}>
       {config.label}
     </span>
   );

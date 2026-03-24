@@ -8,8 +8,17 @@ import { nanoid } from 'nanoid';
 // OpenAI API configuration - will be set via environment variable
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
+// ── UK Jurisdiction Guard ──────────────────────────────────────────────
+const LEXAI_JURISDICTION = "England and Wales";
+const LEXAI_LEGAL_SYSTEM = "common law";
+const LEXAI_SYSTEM_PROMPT = `You are a UK legal AI specialising in English and Welsh common law contract drafting and review. Only advise on English and Welsh law. Do not advise on Scots law, Northern Irish law, Australian law, US law, or any other jurisdiction.`;
+// ────────────────────────────────────────────────────────────────────────
+
 // Contract generation system prompt
-const SYSTEM_PROMPT = `You are a legal contract drafting assistant for AllSquared, a UK-based platform for secure service contracts. Your role is to generate clear, professional contract clauses based on user requirements.
+const SYSTEM_PROMPT = `You are a legal contract drafting assistant for AllSquared, a UK-based platform for secure service contracts.
+${LEXAI_SYSTEM_PROMPT}
+Jurisdiction: ${LEXAI_JURISDICTION}. Legal system: ${LEXAI_LEGAL_SYSTEM}.
+Your role is to generate clear, professional contract clauses based on user requirements under English and Welsh common law ONLY.
 
 IMPORTANT LEGAL DISCLAIMER: You generate contract templates for unreserved legal activities only. These contracts are starting points and users should seek independent legal advice for complex matters.
 
@@ -18,16 +27,18 @@ When generating contracts:
 2. Include all essential terms for the service type
 3. Incorporate milestone-based payment structures
 4. Include dispute resolution clauses referencing AllSquared's mediation service
-5. Follow UK contract law principles
+5. Follow English and Welsh contract law principles (common law)
 6. Be specific about deliverables, timelines, and payment terms
 7. Include appropriate limitation of liability clauses
 8. Reference escrow payment protection where relevant
+9. State governing law as England and Wales in every contract
 
 DO NOT:
 - Provide legal advice
 - Generate contracts for reserved legal activities
 - Include terms that would be unfair under the Consumer Rights Act 2015
-- Make guarantees about legal enforceability`;
+- Make guarantees about legal enforceability
+- Advise on Scots law, Northern Irish law, or any non-English jurisdiction`;
 
 // Category-specific prompts
 const CATEGORY_PROMPTS: Record<string, string> = {
@@ -442,14 +453,17 @@ export const aiRouter = router({
         };
       }
 
-      const prompt = `Suggest 3-5 relevant contract clauses for the following scenario in a ${input.category} contract:
+      const prompt = `${LEXAI_SYSTEM_PROMPT}
+
+Suggest 3-5 relevant contract clauses for the following scenario in a ${input.category} contract under English and Welsh common law:
 
 Scenario: ${input.scenario}
 
 Provide clauses that are:
-1. Clear and enforceable under English law
+1. Clear and enforceable under English and Welsh law only
 2. Fair to both parties
 3. Appropriate for the service category
+4. Governed by the laws of England and Wales
 
 Format each clause with a title and the clause text.`;
 
