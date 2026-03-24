@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "buildCommand": "pnpm build",
+  "buildCommand": "pnpm build && npx tsx server/seed-templates.ts",
   "outputDirectory": "dist/public",
   "installCommand": "pnpm install --prod=false",
   "build": {
     "env": {
-      "NODE_VERSION": "20"
+      "NODE_VERSION": "22"
     }
   },
   "headers": [

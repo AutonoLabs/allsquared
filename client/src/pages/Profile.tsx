@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2, Save, User, Building2, Mail, Phone, Briefcase, Search, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, Save, User, Building2, Mail, Phone, Briefcase, Search, CheckCircle2, AlertCircle, ShieldCheck, Clock, XCircle, ArrowRight } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { UserTypeSelector } from "@/components/UserTypeSelector";
@@ -536,6 +536,9 @@ export default function Profile() {
         </CardContent>
       </Card>
 
+      {/* KYC Identity Verification */}
+      <KycStatusCard userId={user?.id} />
+
       {/* Notification Preferences */}
       <Card>
         <CardHeader>
@@ -667,6 +670,136 @@ export default function Profile() {
         onComplete={() => refetch()}
       />
     </div>
+  );
+}
+
+// ─── KYC Status Card ────────────────────────────────────────
+
+type KycStatus = "pending" | "processing" | "verified" | "failed" | "expired" | "requires_input" | "none";
+
+function KycStatusCard({ userId }: { userId?: string }) {
+  const [kycStatus, setKycStatus] = useState<KycStatus>("none");
+  const [loading, setLoading] = useState(false);
+
+  // In production this would come from a tRPC query. For now, use local state.
+  // The DB schema already has kycVerifications table.
+
+  const statusConfig: Record<KycStatus, { label: string; color: string; icon: React.ReactNode; description: string }> = {
+    none: {
+      label: "Not Started",
+      color: "bg-gray-100 text-gray-700",
+      icon: <ShieldCheck className="h-5 w-5 text-gray-400" />,
+      description: "Verify your identity to unlock higher transaction limits and build trust with clients.",
+    },
+    pending: {
+      label: "Pending Review",
+      color: "bg-yellow-100 text-yellow-800",
+      icon: <Clock className="h-5 w-5 text-yellow-600" />,
+      description: "Your verification is being reviewed. This usually takes 1-2 business days.",
+    },
+    processing: {
+      label: "Processing",
+      color: "bg-blue-100 text-blue-800",
+      icon: <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />,
+      description: "Your documents are being processed. Please wait.",
+    },
+    verified: {
+      label: "Verified",
+      color: "bg-green-100 text-green-800",
+      icon: <CheckCircle2 className="h-5 w-5 text-green-600" />,
+      description: "Your identity has been verified. You have full platform access.",
+    },
+    failed: {
+      label: "Verification Failed",
+      color: "bg-red-100 text-red-800",
+      icon: <XCircle className="h-5 w-5 text-red-600" />,
+      description: "Verification failed. Please try again or contact support.",
+    },
+    expired: {
+      label: "Expired",
+      color: "bg-orange-100 text-orange-800",
+      icon: <AlertCircle className="h-5 w-5 text-orange-600" />,
+      description: "Your verification has expired. Please re-verify your identity.",
+    },
+    requires_input: {
+      label: "Additional Info Required",
+      color: "bg-purple-100 text-purple-800",
+      icon: <AlertCircle className="h-5 w-5 text-purple-600" />,
+      description: "We need additional information to complete your verification.",
+    },
+  };
+
+  const config = statusConfig[kycStatus];
+
+  const handleStartVerification = () => {
+    setLoading(true);
+    // Simulate starting verification — in production this would call a tRPC mutation
+    // that creates a kycVerifications row and (later) initiates Stripe Identity
+    setTimeout(() => {
+      setKycStatus("pending");
+      setLoading(false);
+      toast.success("Verification submitted. We'll review your identity.");
+    }, 1500);
+  };
+
+  const handleRetryVerification = () => {
+    setKycStatus("none");
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <ShieldCheck className="h-5 w-5" />
+          Identity Verification (KYC)
+        </CardTitle>
+        <CardDescription>
+          Verify your identity for enhanced trust and higher limits
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-start gap-4 p-4 rounded-lg border">
+          {config.icon}
+          <div className="flex-1 space-y-1">
+            <div className="flex items-center gap-2">
+              <Badge className={config.color}>{config.label}</Badge>
+            </div>
+            <p className="text-sm text-muted-foreground">{config.description}</p>
+          </div>
+        </div>
+
+        {(kycStatus === "none" || kycStatus === "expired") && (
+          <Button onClick={handleStartVerification} disabled={loading} className="w-full sm:w-auto">
+            {loading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Starting Verification...
+              </>
+            ) : (
+              <>
+                <ShieldCheck className="mr-2 h-4 w-4" />
+                Verify Identity
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </>
+            )}
+          </Button>
+        )}
+
+        {(kycStatus === "failed" || kycStatus === "requires_input") && (
+          <Button onClick={handleRetryVerification} variant="outline">
+            <ArrowRight className="mr-2 h-4 w-4" />
+            Try Again
+          </Button>
+        )}
+
+        {kycStatus === "verified" && (
+          <div className="flex items-center gap-2 text-sm text-green-700 bg-green-50 px-3 py-2 rounded-md">
+            <CheckCircle2 className="h-4 w-4" />
+            Your identity is verified. No further action needed.
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }
 

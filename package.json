@@ -13,6 +13,8 @@
     "db:push": "drizzle-kit generate && drizzle-kit migrate"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1015.0",
+    "@aws-sdk/s3-request-presigner": "^3.1015.0",
     "@clerk/backend": "^1.0.0",
     "@clerk/clerk-react": "^5.0.0",
     "@clerk/express": "^1.0.0",
@@ -112,7 +114,7 @@
   },
   "packageManager": "pnpm@9.0.0",
   "engines": {
-    "node": "20.x"
+    "node": ">=20"
   },
   "pnpm": {
     "overrides": {
