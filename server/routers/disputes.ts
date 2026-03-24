@@ -18,71 +18,10 @@ import { nanoid } from 'nanoid';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
-// LexAI RAG — legal research engine (Tailscale → Studio, fallback localhost)
-const LEXAI_API_URL = process.env.LEXAI_API_URL || 'http://100.65.116.80:8400';
-
-// LexAI /review — contract clause assessment
-async function reviewWithLexAI(contractText: string, reviewType: string = 'general'): Promise<{ issues: { category: string; description: string; severity: string }[] }> {
-  try {
-    const response = await fetch(`${LEXAI_API_URL}/review`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ document: contractText, review_type: reviewType }),
-      signal: AbortSignal.timeout(30000),
-    });
-    if (!response.ok) return { issues: [] };
-    const data = await response.json() as { issues?: { category: string; description: string; severity: string }[] };
-    console.log(`[LexAI /review] Found ${data.issues?.length || 0} issues`);
-    return { issues: data.issues || [] };
-  } catch (err) {
-    console.warn('[LexAI /review] Unavailable:', (err as Error).message);
-    return { issues: [] };
-  }
-}
-
-// LexAI /draft — settlement proposal generation
-async function draftWithLexAI(prompt: string, style: string = 'formal'): Promise<string> {
-  try {
-    const response = await fetch(`${LEXAI_API_URL}/draft`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt, style }),
-      signal: AbortSignal.timeout(30000),
-    });
-    if (!response.ok) return '';
-    const data = await response.json() as { draft?: string };
-    return data.draft || '';
-  } catch (err) {
-    console.warn('[LexAI /draft] Unavailable:', (err as Error).message);
-    return '';
-  }
-}
-
-async function queryLexAI(query: string, practiceArea?: string): Promise<{ answer: string; sources: { citation: string; text: string }[] }> {
-  try {
-    const body: Record<string, unknown> = { query, top_k: 5 };
-    if (practiceArea) body.practice_area = practiceArea;
-
-    const response = await fetch(`${LEXAI_API_URL}/query`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-      signal: AbortSignal.timeout(30000),
-    });
-
-    if (!response.ok) {
-      console.warn('[LexAI] Query failed:', response.status);
-      return { answer: '', sources: [] };
-    }
-
-    const data = await response.json() as { answer?: string; sources?: { citation: string; text: string }[] };
-    console.log(`[LexAI] Returned ${data.sources?.length || 0} sources for: "${query.substring(0, 50)}..."`);
-    return { answer: data.answer || '', sources: data.sources || [] };
-  } catch (err) {
-    console.warn('[LexAI] Unavailable:', (err as Error).message);
-    return { answer: '', sources: [] };
-  }
-}
+// ── LexAI DISABLED in disputes ─────────────────────────────────────
+// LexAI is restricted to contract_draft and contract_review only (ai.ts).
+// Settlement drafting and legal research removed from dispute flow.
+// Disputes use OpenAI for analysis only; escalation routes to human support.
 
 const DISPUTE_ANALYSIS_PROMPT = `You are an expert dispute analyst for AllSquared, a UK-based freelance contracts platform. You analyze disputes between clients and service providers.
 
@@ -135,23 +74,8 @@ async function analyzeDisputeWithAI(
     };
   }
 
-  // Query LexAI for relevant UK case law and contract review
-  const [lexResult, contractReview] = await Promise.all([
-    queryLexAI(`${disputeReason} UK contract law remedies breach`, 'contract'),
-    reviewWithLexAI(contractText, 'risk'),
-  ]);
-
-  const caseLawSection = lexResult.sources.length > 0
-    ? `\n\nRELEVANT UK CASE LAW (from LexAI):\n${lexResult.sources.map((s, i) => `${i + 1}. ${s.citation}: ${s.text.substring(0, 300)}`).join('\n')}\n\n${lexResult.answer ? `LEGAL ANALYSIS:\n${lexResult.answer}` : ''}`
-    : '';
-
-  const contractIssuesSection = contractReview.issues.length > 0
-    ? `\n\nCONTRACT REVIEW ISSUES (from LexAI):\n${contractReview.issues.map((iss, i) => `${i + 1}. [${iss.severity.toUpperCase()}] ${iss.category}: ${iss.description}`).join('\n')}`
-    : '';
-
-  const legalContext = (caseLawSection || contractIssuesSection)
-    ? `${caseLawSection}${contractIssuesSection}`
-    : '\n\n[Note: LexAI legal research unavailable — analyse based on general UK contract law principles.]';
+  // LexAI disabled in disputes — analyse based on general UK contract law principles only
+  const legalContext = '\n\n[Apply English and Welsh common law principles. Governing law: England and Wales.]';
 
   const userPrompt = `Analyse this dispute:
 
@@ -230,16 +154,6 @@ async function getMediationSuggestion(
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return null;
 
-  // Query LexAI for relevant mediation guidance
-  const lexMediationResult = await queryLexAI(
-    `${disputeReason} mediation resolution UK contract dispute`,
-    'contract'
-  );
-
-  const legalGuidance = lexMediationResult.sources.length > 0
-    ? `\n\nRelevant legal context (LexAI):\n${lexMediationResult.sources.slice(0, 3).map(s => `- ${s.citation}: ${s.text.substring(0, 200)}`).join('\n')}`
-    : '';
-
   const userPrompt = `Contract summary: ${contractSummary}
 
 Dispute reason: ${disputeReason}
@@ -249,7 +163,8 @@ ${mediationHistory}
 
 Latest message from the other party:
 ${latestMessage}
-${legalGuidance}
+
+Apply English and Welsh common law principles only. Governing law: England and Wales.
 
 Suggest a constructive response for the ${targetRole}:`;
 

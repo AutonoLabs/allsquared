@@ -161,9 +161,12 @@ export default function Templates() {
                     </div>
                     <FileText className="h-5 w-5 text-muted-foreground" />
                   </div>
-                  <div className="flex items-center gap-2 mt-3">
+                  <div className="flex items-center gap-2 mt-3 flex-wrap">
                     <Badge className={getCategoryColor(template.category)}>
                       {getCategoryLabel(template.category)}
+                    </Badge>
+                    <Badge variant="outline" className="text-[11px] border-blue-300 text-blue-700 bg-blue-50">
+                      🇬🇧 UK Law
                     </Badge>
                     {templateContent.variables && templateContent.variables.length > 0 && (
                       <Badge variant="outline">

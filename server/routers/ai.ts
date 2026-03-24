@@ -12,8 +12,23 @@ const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 // LexAI RAG — legal research engine (env var with localhost fallback)
 const LEXAI_API_URL = process.env.LEXAI_API_URL || 'http://localhost:8400';
 
+// ── Jurisdiction Guard ─────────────────────────────────────────────
+const LEXAI_JURISDICTION = "England and Wales";
+const LEXAI_LEGAL_SYSTEM = "common law";
+
+const JURISDICTION_PREAMBLE = `You are a UK legal AI. Apply English and Welsh common law only.
+Governing law: England and Wales. Do not advise on other jurisdictions.
+If a user asks about law outside England and Wales, respond: "AllSquared only supports English and Welsh common law. For other jurisdictions, please consult a qualified legal professional."`;
+
+// LexAI is restricted to two functions:
+// 1. contract_draft — draft UK common law contract from template + variables
+// 2. contract_review — review a draft contract and flag issues under English law
+// All other LexAI capabilities are disabled.
+
 // Contract generation system prompt
-const SYSTEM_PROMPT = `You are a legal contract drafting assistant for AllSquared, a UK-based platform for secure service contracts. Your role is to generate clear, professional contract clauses based on user requirements.
+const SYSTEM_PROMPT = `${JURISDICTION_PREAMBLE}
+
+You are a legal contract drafting assistant for AllSquared, a UK-based platform for secure service contracts. Your role is to generate clear, professional contract clauses based on user requirements under English and Welsh common law.
 
 IMPORTANT LEGAL DISCLAIMER: You generate contract templates for unreserved legal activities only. These contracts are starting points and users should seek independent legal advice for complex matters.
 
@@ -22,16 +37,19 @@ When generating contracts:
 2. Include all essential terms for the service type
 3. Incorporate milestone-based payment structures
 4. Include dispute resolution clauses referencing AllSquared's mediation service
-5. Follow UK contract law principles
+5. Follow English and Welsh contract law principles exclusively
 6. Be specific about deliverables, timelines, and payment terms
 7. Include appropriate limitation of liability clauses
 8. Reference escrow payment protection where relevant
+9. Always include "Governing Law: England and Wales" clause
 
 DO NOT:
 - Provide legal advice
 - Generate contracts for reserved legal activities
 - Include terms that would be unfair under the Consumer Rights Act 2015
-- Make guarantees about legal enforceability`;
+- Make guarantees about legal enforceability
+- Apply or reference any law outside of England and Wales
+- Advise on Australian, US, EU, Scottish, or other jurisdictions`;
 
 // Category-specific prompts
 const CATEGORY_PROMPTS: Record<string, string> = {
@@ -509,7 +527,7 @@ Format each clause with a title and the clause text.`;
       const modelCfg = CHATBOT_MODELS[input.modelId];
       const apiKey = process.env.OPENAI_API_KEY;
 
-      // ── LexAI RAG path ──────────────────────────────────────────
+      // ── LexAI RAG path (restricted to contract_draft + contract_review) ──
       if (modelCfg.provider === 'lexai') {
         try {
           const ragResp = await fetch(`${LEXAI_API_URL}/query`, {
@@ -518,6 +536,8 @@ Format each clause with a title and the clause text.`;
             body: JSON.stringify({
               query: input.message,
               collection: 'contracts',
+              jurisdiction: LEXAI_JURISDICTION,
+              legal_system: LEXAI_LEGAL_SYSTEM,
               n_results: 5,
             }),
             signal: AbortSignal.timeout(15_000),
@@ -532,9 +552,11 @@ Format each clause with a title and the clause text.`;
 
         // Fallback to OpenAI if available, otherwise heuristic
         if (apiKey) {
-          const systemContent = `You are a helpful contract assistant for AllSquared, a UK contract platform.
-You help users understand and build their contracts. Be concise and practical.
-Never provide legal advice — suggest seeking a solicitor for complex matters.
+          const systemContent = `${JURISDICTION_PREAMBLE}
+
+You are a helpful contract assistant for AllSquared, a UK contract platform.
+You help users understand and build their contracts under English and Welsh common law only.
+Be concise and practical. Never provide legal advice — suggest seeking a solicitor for complex matters.
 ${input.contractContext ? `\nCurrent contract context:\n${input.contractContext.slice(0, 4000)}` : ''}`;
 
           try {
@@ -579,9 +601,11 @@ ${input.contractContext ? `\nCurrent contract context:\n${input.contractContext.
         };
       }
 
-      const systemContent = `You are a helpful contract assistant for AllSquared, a UK contract platform.
-You help users understand and build their contracts. Be concise and practical.
-Never provide legal advice — suggest seeking a solicitor for complex matters.
+      const systemContent = `${JURISDICTION_PREAMBLE}
+
+You are a helpful contract assistant for AllSquared, a UK contract platform.
+You help users understand and build their contracts under English and Welsh common law only.
+Be concise and practical. Never provide legal advice — suggest seeking a solicitor for complex matters.
 ${input.contractContext ? `\nCurrent contract context:\n${input.contractContext.slice(0, 4000)}` : ''}`;
 
       const messages: { role: string; content: string }[] = [

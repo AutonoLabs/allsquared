@@ -121,9 +121,9 @@ export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props)
         <SheetHeader className="px-4 py-3 border-b bg-gradient-to-r from-navy-900 to-violet-700 text-white">
           <SheetTitle className="flex items-center gap-2 text-white">
             <Bot className="w-4 h-4" />
-            Contract Assistant
+            UK Contract Assistant (English Law)
           </SheetTitle>
-          <p className="text-xs text-violet-200 mt-0.5">Ask anything about your contract</p>
+          <p className="text-xs text-violet-200 mt-0.5">AI-assisted contract drafting under English and Welsh common law only.</p>
         </SheetHeader>
 
         <ScrollArea className="flex-1 px-4 py-3">
@@ -174,6 +174,11 @@ export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props)
           </div>
         </ScrollArea>
 
+        <div className="border-t border-border/50 px-4 py-1.5 bg-muted/30">
+          <p className="text-[10px] text-muted-foreground text-center leading-tight">
+            🇬🇧 English &amp; Welsh common law only. Not legal advice. Consult a solicitor for complex matters.
+          </p>
+        </div>
         <div className="border-t p-3 flex gap-2">
           <Input
             value={input}
