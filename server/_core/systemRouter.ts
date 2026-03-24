@@ -11,4 +11,11 @@ export const systemRouter = router({
     .query(() => ({
       ok: true,
     })),
+
+  // Service health check — reports which env vars / integrations are configured
+  serviceHealth: publicProcedure.query(() => ({
+    openai: !!process.env.OPENAI_API_KEY,
+    lexai: !!process.env.LEXAI_API_URL,
+    companiesHouse: !!process.env.COMPANIES_HOUSE_API_KEY,
+  })),
 });

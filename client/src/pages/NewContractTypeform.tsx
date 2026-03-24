@@ -71,7 +71,7 @@ const variants = {
   exit: (dir: number) => ({ x: dir < 0 ? 500 : -500, opacity: 0 }),
 };
 
-const transition = { type: "spring", stiffness: 300, damping: 35 };
+const transition = { type: "spring" as const, stiffness: 300, damping: 35 };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 

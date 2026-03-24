@@ -4,21 +4,31 @@ import { getDb } from '../db';
 import { aiGenerations, contractTemplates } from '../../drizzle/schema';
 import { eq, desc } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
+import { CHATBOT_MODELS, DEFAULT_CHATBOT_MODEL, type ChatbotModelId } from '../../shared/chatbot-config';
 
-// OpenAI API configuration - will be set via environment variable
+// OpenAI API configuration
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
-// ── UK Jurisdiction Guard ──────────────────────────────────────────────
+// LexAI RAG — legal research engine (env var with localhost fallback)
+const LEXAI_API_URL = process.env.LEXAI_API_URL || 'http://localhost:8400';
+
+// ── Jurisdiction Guard ─────────────────────────────────────────────
 const LEXAI_JURISDICTION = "England and Wales";
 const LEXAI_LEGAL_SYSTEM = "common law";
-const LEXAI_SYSTEM_PROMPT = `You are a UK legal AI specialising in English and Welsh common law contract drafting and review. Only advise on English and Welsh law. Do not advise on Scots law, Northern Irish law, Australian law, US law, or any other jurisdiction.`;
-// ────────────────────────────────────────────────────────────────────────
+
+const JURISDICTION_PREAMBLE = `You are a UK legal AI. Apply English and Welsh common law only.
+Governing law: England and Wales. Do not advise on other jurisdictions.
+If a user asks about law outside England and Wales, respond: "AllSquared only supports English and Welsh common law. For other jurisdictions, please consult a qualified legal professional."`;
+
+// LexAI is restricted to two functions:
+// 1. contract_draft — draft UK common law contract from template + variables
+// 2. contract_review — review a draft contract and flag issues under English law
+// All other LexAI capabilities are disabled.
 
 // Contract generation system prompt
-const SYSTEM_PROMPT = `You are a legal contract drafting assistant for AllSquared, a UK-based platform for secure service contracts.
-${LEXAI_SYSTEM_PROMPT}
-Jurisdiction: ${LEXAI_JURISDICTION}. Legal system: ${LEXAI_LEGAL_SYSTEM}.
-Your role is to generate clear, professional contract clauses based on user requirements under English and Welsh common law ONLY.
+const SYSTEM_PROMPT = `${JURISDICTION_PREAMBLE}
+
+You are a legal contract drafting assistant for AllSquared, a UK-based platform for secure service contracts. Your role is to generate clear, professional contract clauses based on user requirements under English and Welsh common law.
 
 IMPORTANT LEGAL DISCLAIMER: You generate contract templates for unreserved legal activities only. These contracts are starting points and users should seek independent legal advice for complex matters.
 
@@ -27,18 +37,19 @@ When generating contracts:
 2. Include all essential terms for the service type
 3. Incorporate milestone-based payment structures
 4. Include dispute resolution clauses referencing AllSquared's mediation service
-5. Follow English and Welsh contract law principles (common law)
+5. Follow English and Welsh contract law principles exclusively
 6. Be specific about deliverables, timelines, and payment terms
 7. Include appropriate limitation of liability clauses
 8. Reference escrow payment protection where relevant
-9. State governing law as England and Wales in every contract
+9. Always include "Governing Law: England and Wales" clause
 
 DO NOT:
 - Provide legal advice
 - Generate contracts for reserved legal activities
 - Include terms that would be unfair under the Consumer Rights Act 2015
 - Make guarantees about legal enforceability
-- Advise on Scots law, Northern Irish law, or any non-English jurisdiction`;
+- Apply or reference any law outside of England and Wales
+- Advise on Australian, US, EU, Scottish, or other jurisdictions`;
 
 // Category-specific prompts
 const CATEGORY_PROMPTS: Record<string, string> = {
@@ -453,17 +464,14 @@ export const aiRouter = router({
         };
       }
 
-      const prompt = `${LEXAI_SYSTEM_PROMPT}
-
-Suggest 3-5 relevant contract clauses for the following scenario in a ${input.category} contract under English and Welsh common law:
+      const prompt = `Suggest 3-5 relevant contract clauses for the following scenario in a ${input.category} contract:
 
 Scenario: ${input.scenario}
 
 Provide clauses that are:
-1. Clear and enforceable under English and Welsh law only
+1. Clear and enforceable under English law
 2. Fair to both parties
 3. Appropriate for the service category
-4. Governed by the laws of England and Wales
 
 Format each clause with a title and the clause text.`;
 
@@ -501,7 +509,169 @@ Format each clause with a title and the clause text.`;
         };
       }
     }),
+
+  // ── Chatbot — multi-model contract assistant ────────────────────
+  chatMessage: protectedProcedure
+    .input(
+      z.object({
+        message: z.string().min(1),
+        contractContext: z.string().optional(),
+        modelId: z.enum(['gpt-4o', 'lexai-rag', 'codex']).default(DEFAULT_CHATBOT_MODEL),
+        history: z.array(z.object({
+          role: z.enum(['user', 'assistant']),
+          content: z.string(),
+        })).optional(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const modelCfg = CHATBOT_MODELS[input.modelId];
+      const apiKey = process.env.OPENAI_API_KEY;
+
+      // ── LexAI RAG path (restricted to contract_draft + contract_review) ──
+      if (modelCfg.provider === 'lexai') {
+        try {
+          const ragResp = await fetch(`${LEXAI_API_URL}/query`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              query: input.message,
+              collection: 'contracts',
+              jurisdiction: LEXAI_JURISDICTION,
+              legal_system: LEXAI_LEGAL_SYSTEM,
+              n_results: 5,
+            }),
+            signal: AbortSignal.timeout(15_000),
+          });
+          if (ragResp.ok) {
+            const data = await ragResp.json() as { answer?: string; response?: string; text?: string };
+            return { reply: data.answer || data.response || data.text || 'No response from LexAI.', model: 'lexai-rag' };
+          }
+        } catch (err) {
+          console.warn('[LexAI /query] Unavailable, falling back to OpenAI:', (err as Error).message);
+        }
+
+        // Fallback to OpenAI if available, otherwise heuristic
+        if (apiKey) {
+          const systemContent = `${JURISDICTION_PREAMBLE}
+
+You are a helpful contract assistant for AllSquared, a UK contract platform.
+You help users understand and build their contracts under English and Welsh common law only.
+Be concise and practical. Never provide legal advice — suggest seeking a solicitor for complex matters.
+${input.contractContext ? `\nCurrent contract context:\n${input.contractContext.slice(0, 4000)}` : ''}`;
+
+          try {
+            const resp = await fetch(OPENAI_API_URL, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${apiKey}`,
+              },
+              body: JSON.stringify({
+                model: 'gpt-4o',
+                messages: [
+                  { role: 'system', content: systemContent },
+                  ...(input.history?.slice(-8) || []),
+                  { role: 'user', content: input.message },
+                ],
+                max_tokens: 800,
+                temperature: 0.5,
+              }),
+            });
+            if (resp.ok) {
+              const data = await resp.json();
+              return {
+                reply: data.choices?.[0]?.message?.content || 'Unable to generate response.',
+                model: 'lexai-rag-openai-fallback',
+              };
+            }
+          } catch { /* fall through to heuristic */ }
+        }
+
+        return {
+          reply: chatFallback(input.message, input.contractContext || ''),
+          model: 'lexai-rag-fallback',
+        };
+      }
+
+      // ── OpenAI path (GPT-4o / Codex) ────────────────────────────
+      if (!apiKey) {
+        return {
+          reply: chatFallback(input.message, input.contractContext || ''),
+          model: `${modelCfg.id}-fallback`,
+        };
+      }
+
+      const systemContent = `${JURISDICTION_PREAMBLE}
+
+You are a helpful contract assistant for AllSquared, a UK contract platform.
+You help users understand and build their contracts under English and Welsh common law only.
+Be concise and practical. Never provide legal advice — suggest seeking a solicitor for complex matters.
+${input.contractContext ? `\nCurrent contract context:\n${input.contractContext.slice(0, 4000)}` : ''}`;
+
+      const messages: { role: string; content: string }[] = [
+        { role: 'system', content: systemContent },
+        ...(input.history?.slice(-8) || []),
+        { role: 'user', content: input.message },
+      ];
+
+      try {
+        const resp = await fetch(OPENAI_API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`,
+          },
+          body: JSON.stringify({
+            model: modelCfg.apiModel,
+            messages,
+            max_tokens: 800,
+            temperature: 0.5,
+          }),
+        });
+
+        if (!resp.ok) {
+          const errText = await resp.text();
+          console.error(`[chatbot] ${modelCfg.apiModel} error:`, errText);
+          throw new Error('API error');
+        }
+
+        const data = await resp.json();
+        return {
+          reply: data.choices?.[0]?.message?.content || 'Unable to generate response.',
+          model: modelCfg.apiModel,
+        };
+      } catch {
+        return {
+          reply: chatFallback(input.message, input.contractContext || ''),
+          model: `${modelCfg.id}-fallback`,
+        };
+      }
+    }),
 });
+
+// ── Chatbot heuristic fallback ─────────────────────────────────────
+function chatFallback(question: string, context: string): string {
+  const q = question.toLowerCase();
+  if (q.includes('payment') || q.includes('pay') || q.includes('invoice')) {
+    return 'Payment terms define when and how the client pays. Milestone-based payments held in escrow are recommended for security. You can configure this in the Payment Terms module.';
+  }
+  if (q.includes('terminat') || q.includes('cancel')) {
+    return 'Termination clauses define how either party can end the agreement. Typically 14–30 days written notice is required. Upon termination, the client pays for completed work.';
+  }
+  if (q.includes('ip') || q.includes('intellectual property') || q.includes('copyright')) {
+    return 'IP ownership typically transfers to the client upon full payment. You can configure this in the Intellectual Property module.';
+  }
+  if (q.includes('dispute') || q.includes('disagree')) {
+    return 'AllSquared offers AI-assisted mediation as the first step for disputes. If unresolved, parties can escalate to formal mediation or the courts of England and Wales.';
+  }
+  if (q.includes('escrow') || q.includes('protect')) {
+    return 'Escrow protection holds funds securely until milestones are completed and approved. It\'s recommended for contracts over £10,000.';
+  }
+  if (q.includes('scope') || q.includes('deliverable')) {
+    return 'The Scope of Work module lets you define deliverables, exclusions, and expectations. Be as specific as possible to avoid disputes.';
+  }
+  return 'I can help with payment terms, termination, IP rights, escrow, disputes, scope of work, and more. Ask about any contract topic!';
+}
 
 // Default clauses for common scenarios
 function getDefaultClauses(scenario: string, category: string): string {

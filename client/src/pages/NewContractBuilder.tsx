@@ -23,9 +23,10 @@ import { toast } from "sonner";
 import {
   ArrowLeft, ArrowRight, Building2, User, FileText, Plus, Check,
   MessageSquare, Send, Loader2, Save, Search, X, ChevronDown,
-  Shield, Scale, Clock, Banknote,
+  Shield, Scale, Clock, Banknote, Bot, Sparkles,
 } from "lucide-react";
 import CompanyLookup from "@/components/CompanyLookup";
+import { CHATBOT_MODEL_LIST, DEFAULT_CHATBOT_MODEL, type ChatbotModelId } from "@shared/chatbot-config";
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -215,7 +216,11 @@ export default function NewContractBuilder() {
   ]);
   const [chatInput, setChatInput] = useState("");
   const [showChat, setShowChat] = useState(true);
+  const [chatLoading, setChatLoading] = useState(false);
+  const [chatModel, setChatModel] = useState<ChatbotModelId>(DEFAULT_CHATBOT_MODEL);
+  const [showModelPicker, setShowModelPicker] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatMutation = trpc.ai.chatMessage.useMutation();
   
   // Save
   const saveMutation = trpc.templateBuilder.saveContractDraft.useMutation({
@@ -246,27 +251,45 @@ export default function NewContractBuilder() {
     ));
   }
 
-  function sendChat() {
-    if (!chatInput.trim()) return;
-    setChatMessages([...chatMessages, 
-      { role: "user", content: chatInput },
-      { role: "assistant", content: getChatResponse(chatInput, step) },
-    ]);
-    setChatInput("");
-  }
+  async function sendChat() {
+    const text = chatInput.trim();
+    if (!text || chatLoading) return;
 
-  function getChatResponse(input: string, currentStep: number): string {
-    // Simple contextual responses — in production, wire to LexAI
-    if (currentStep === 0) {
-      return "Great. Once you've entered both parties' details, click 'Next' to choose which modules to include in your contract.";
+    const userMsg: ChatMessage = { role: "user", content: text };
+    setChatMessages((prev) => [...prev, userMsg]);
+    setChatInput("");
+    setChatLoading(true);
+
+    // Build lightweight contract context from current form state
+    const contextParts: string[] = [];
+    if (contractTitle) contextParts.push(`Title: ${contractTitle}`);
+    if (partyA.name) contextParts.push(`Party A: ${partyA.name}`);
+    if (partyB.name) contextParts.push(`Party B: ${partyB.name}`);
+    enabledModules.forEach((m) => {
+      const answered = m.questions.filter((q) => q.answer).map((q) => `${q.question}: ${q.answer}`);
+      if (answered.length) contextParts.push(`[${m.name}] ${answered.join('; ')}`);
+    });
+
+    try {
+      const result = await chatMutation.mutateAsync({
+        message: text,
+        contractContext: contextParts.join('\n') || undefined,
+        modelId: chatModel,
+        history: chatMessages.slice(-8).map((m) => ({ role: m.role, content: m.content })),
+      });
+
+      setChatMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: result.reply },
+      ]);
+    } catch {
+      setChatMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "Sorry, I couldn't process that. Please try again." },
+      ]);
+    } finally {
+      setChatLoading(false);
     }
-    if (currentStep === 1) {
-      return "Toggle on the modules you need. At minimum, you'll want Scope of Work, Payment Terms, and Timeline. Escrow protection is recommended for contracts over £10,000.";
-    }
-    if (currentStep === 2) {
-      return "Fill in the details for each module. If you're unsure about anything, I can explain what each option means. Just ask!";
-    }
-    return "Your contract is ready for review. Check the summary and click 'Save & Send for Signature' when you're happy.";
   }
 
   // ── Render Functions ────────────────────────────────────────────
@@ -676,6 +699,8 @@ export default function NewContractBuilder() {
   // ── Chat Panel — M3 side panel ───────────────────────────────────
 
   function renderChatPanel() {
+    const activeModel = CHATBOT_MODEL_LIST.find((m) => m.id === chatModel) || CHATBOT_MODEL_LIST[0];
+
     return (
       <div
         className={`fixed right-0 top-0 z-40 flex h-full w-80 flex-col border-l border-border bg-background shadow-[var(--shadow-elevation-3)] transition-transform duration-300 ${
@@ -686,9 +711,11 @@ export default function NewContractBuilder() {
         <div className="flex items-center justify-between border-b px-4 py-3.5">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#6D28D9]">
-              <MessageSquare className="h-4 w-4 text-white" />
+              <Bot className="h-4 w-4 text-white" />
             </div>
-            <span className="m3-title-sm font-semibold">Contract Assistant</span>
+            <div>
+              <span className="m3-title-sm font-semibold block leading-tight">Contract Assistant</span>
+            </div>
           </div>
           <button
             type="button"
@@ -697,6 +724,45 @@ export default function NewContractBuilder() {
           >
             <X className="h-4 w-4" />
           </button>
+        </div>
+
+        {/* Model selector bar */}
+        <div className="relative border-b px-3 py-2">
+          <button
+            type="button"
+            onClick={() => setShowModelPicker(!showModelPicker)}
+            className="flex w-full items-center justify-between rounded-lg bg-muted/60 px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted"
+          >
+            <span className="flex items-center gap-1.5">
+              <Sparkles className="h-3 w-3" />
+              {activeModel.label}
+              <span className="text-[10px] font-normal opacity-60">— {activeModel.description}</span>
+            </span>
+            <ChevronDown className={`h-3 w-3 transition-transform ${showModelPicker ? "rotate-180" : ""}`} />
+          </button>
+
+          {showModelPicker && (
+            <div className="absolute left-3 right-3 top-full z-50 mt-1 rounded-xl border bg-background p-1.5 shadow-lg">
+              {CHATBOT_MODEL_LIST.map((m) => (
+                <button
+                  key={m.id}
+                  type="button"
+                  onClick={() => { setChatModel(m.id as ChatbotModelId); setShowModelPicker(false); }}
+                  className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs transition-colors ${
+                    chatModel === m.id
+                      ? "bg-[#F1F0FF] text-[#4C1D95] font-semibold"
+                      : "text-foreground hover:bg-muted/60"
+                  }`}
+                >
+                  <div className="flex-1">
+                    <span className="font-medium">{m.label}</span>
+                    <span className="ml-1.5 text-[10px] opacity-60">{m.description}</span>
+                  </div>
+                  {chatModel === m.id && <Check className="h-3 w-3 flex-shrink-0" />}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Messages */}
@@ -717,6 +783,14 @@ export default function NewContractBuilder() {
               </div>
             </div>
           ))}
+
+          {chatLoading && (
+            <div className="flex justify-start">
+              <div className="rounded-2xl rounded-bl-sm bg-muted px-3.5 py-2.5">
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+              </div>
+            </div>
+          )}
           <div ref={chatEndRef} />
         </div>
 
@@ -728,12 +802,14 @@ export default function NewContractBuilder() {
               onChange={(e) => setChatInput(e.target.value)}
               placeholder="Ask me anything..."
               onKeyDown={(e) => e.key === "Enter" && sendChat()}
+              disabled={chatLoading}
               className="rounded-full text-sm"
             />
             <Button
               size="sm"
               className="h-9 w-9 flex-shrink-0 rounded-full bg-[#6D28D9] p-0 text-white hover:bg-[#5B21B6]"
               onClick={sendChat}
+              disabled={!chatInput.trim() || chatLoading}
             >
               <Send className="h-4 w-4" />
             </Button>
