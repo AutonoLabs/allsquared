@@ -7,7 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2, Save, User, Building2, Mail, Phone, Briefcase, Search, CheckCircle2, AlertCircle } from "lucide-react";
+import { Loader2, Save, User, Building2, Mail, Phone, Briefcase, Search, CheckCircle2, AlertCircle, ShieldCheck, Clock, XCircle } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { UserTypeSelector } from "@/components/UserTypeSelector";
@@ -49,6 +49,129 @@ export function formatAddress(raw: string | null | undefined): string {
   } catch {
     return raw;
   }
+}
+
+function KycSection() {
+  const { data: kycStatus, isLoading: kycLoading } = trpc.kyc.status.useQuery();
+  const initiateMutation = trpc.kyc.initiate.useMutation({
+    onSuccess: () => {
+      toast.success("Identity verification initiated. You will be reviewed shortly.");
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+  const utils = trpc.useUtils();
+
+  const handleInitiate = () => {
+    initiateMutation.mutate(undefined, {
+      onSuccess: () => utils.kyc.status.invalidate(),
+    });
+  };
+
+  const statusConfig: Record<string, { icon: typeof ShieldCheck; color: string; label: string; description: string }> = {
+    verified: {
+      icon: ShieldCheck,
+      color: "text-green-600",
+      label: "Verified",
+      description: "Your identity has been verified.",
+    },
+    pending: {
+      icon: Clock,
+      color: "text-amber-500",
+      label: "Pending Review",
+      description: "Your verification is awaiting review.",
+    },
+    processing: {
+      icon: Clock,
+      color: "text-blue-500",
+      label: "Processing",
+      description: "Your verification is being processed.",
+    },
+    failed: {
+      icon: XCircle,
+      color: "text-destructive",
+      label: "Rejected",
+      description: kycStatus?.failureReason || "Verification was not successful. You may try again.",
+    },
+    expired: {
+      icon: XCircle,
+      color: "text-muted-foreground",
+      label: "Expired",
+      description: "Your verification has expired. Please verify again.",
+    },
+    requires_input: {
+      icon: AlertCircle,
+      color: "text-amber-500",
+      label: "Action Required",
+      description: "Additional information is needed to complete verification.",
+    },
+  };
+
+  const status = kycStatus?.status ?? null;
+  const config = status ? statusConfig[status] : null;
+  const canInitiate = !status || status === "failed" || status === "expired";
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Identity Verification</CardTitle>
+        <CardDescription>
+          Verify your identity to unlock full platform features and build trust with counterparties.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {kycLoading ? (
+          <div className="flex items-center gap-2">
+            <Loader2 className="h-4 w-4 animate-spin" />
+            <span className="text-sm text-muted-foreground">Loading verification status…</span>
+          </div>
+        ) : config && status ? (
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <config.icon className={`h-5 w-5 ${config.color}`} />
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium">{config.label}</span>
+                  <Badge variant={status === "verified" ? "default" : "secondary"} className={status === "verified" ? "bg-green-500" : ""}>
+                    {status}
+                  </Badge>
+                </div>
+                <p className="text-sm text-muted-foreground">{config.description}</p>
+              </div>
+            </div>
+            {canInitiate && (
+              <Button onClick={handleInitiate} disabled={initiateMutation.isPending}>
+                {initiateMutation.isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                ) : (
+                  <ShieldCheck className="h-4 w-4 mr-2" />
+                )}
+                Verify Again
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center justify-between">
+            <div>
+              <h4 className="font-medium">Not Yet Verified</h4>
+              <p className="text-sm text-muted-foreground">
+                Complete identity verification to access escrow, sign contracts, and build trust.
+              </p>
+            </div>
+            <Button onClick={handleInitiate} disabled={initiateMutation.isPending}>
+              {initiateMutation.isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : (
+                <ShieldCheck className="h-4 w-4 mr-2" />
+              )}
+              Verify Identity
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 }
 
 export default function Profile() {
@@ -617,6 +740,9 @@ export default function Profile() {
           </div>
         </CardContent>
       </Card>
+
+      {/* Identity Verification (KYC) */}
+      <KycSection />
 
       {/* Account Security */}
       <Card>

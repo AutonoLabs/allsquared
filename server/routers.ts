@@ -17,6 +17,7 @@ import { templateBuilderRouter } from "./routers/templateBuilder";
 import { companiesHouseRouter } from "./routers/companiesHouse";
 import { partyProfilesRouter } from "./routers/partyProfiles";
 import { contractChatRouter } from "./routers/contractChat";
+import { kycRouter } from "./routers/kyc";
 import { updateUser, getUserByClerkId, upsertUser, getUser, getDb } from "./db";
 import { users } from "../drizzle/schema";
 import { z } from "zod";
@@ -129,6 +130,7 @@ export const appRouter = router({
 
   // Contract chatbot (multi-model)
   contractChat: contractChatRouter,
+  kyc: kycRouter,
 });
 
 export type AppRouter = typeof appRouter;
