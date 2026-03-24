@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "pnpm build",
+  "buildCommand": "pnpm drizzle-kit push && pnpm tsx server/seed-templates.ts && pnpm build",
   "outputDirectory": "dist/public",
   "installCommand": "pnpm install --prod=false",
   "build": {
