@@ -19,11 +19,12 @@ export default function Header() {
   }, []);
 
   const navigation = [
+    { name: "For Freelancers", href: "/freelancers" },
+    { name: "For Clients", href: "/clients" },
     { name: "How It Works", href: "/how-it-works" },
     { name: "Features", href: "/features" },
     { name: "Pricing", href: "/pricing" },
     { name: "About", href: "/about" },
-    { name: "Contact", href: "/contact" },
   ];
 
   return (
