@@ -18,14 +18,7 @@ export async function authenticateClerkRequest(req: Request): Promise<User | nul
     // Use Clerk's authenticateRequest — handles both Bearer tokens and session cookies correctly
     const requestState = await clerkClient.authenticateRequest(req as any, {
       secretKey,
-      publishableKey: process.env.VITE_CLERK_PUBLISHABLE_KEY || process.env.CLERK_PUBLISHABLE_KEY,
-      authorizedParties: [
-        'https://allsquared.io',
-        'https://allsquared.uk',
-        'https://www.allsquared.uk',
-        'http://localhost:3000',
-        'http://localhost:5173',
-      ],
+      publishableKey: process.env.CLERK_PUBLISHABLE_KEY || process.env.VITE_CLERK_PUBLISHABLE_KEY,
     });
 
     if (!requestState.isSignedIn) {
