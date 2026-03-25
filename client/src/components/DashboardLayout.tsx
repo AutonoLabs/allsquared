@@ -89,10 +89,8 @@ export default function DashboardLayout({
     return <DashboardLayoutSkeleton />;
   }
 
-  // Authenticated but user data still loading — show skeleton briefly
-  if (!user) {
-    return <DashboardLayoutSkeleton />;
-  }
+  // Authenticated but user data still syncing — don't block, render with Clerk data
+  // (useAuth has a 5s timeout fallback, but we shouldn't wait at all if isAuthenticated)
 
   return (
     <SidebarProvider
