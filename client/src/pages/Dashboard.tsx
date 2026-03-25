@@ -1,4 +1,5 @@
 import { trpc } from "@/lib/trpc";
+import { useUser } from "@clerk/clerk-react";
 import { MD3Button } from "@/components/md3/Button";
 import { MD3Card, MD3CardContent, MD3CardHeader } from "@/components/md3/Card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -16,11 +17,17 @@ import {
 } from "lucide-react";
 
 export default function Dashboard() {
-  const { data: stats, isLoading: statsLoading } = trpc.contracts.stats.useQuery();
-  const { data: contractsData, isLoading: contractsLoading } = trpc.contracts.list.useQuery({
-    page: 1,
-    limit: 5,
-  });
+  const { isLoaded, isSignedIn } = useUser();
+  const ready = isLoaded && isSignedIn;
+
+  const { data: stats, isLoading: statsLoading } = trpc.contracts.stats.useQuery(
+    undefined,
+    { enabled: ready }
+  );
+  const { data: contractsData, isLoading: contractsLoading } = trpc.contracts.list.useQuery(
+    { page: 1, limit: 5 },
+    { enabled: ready }
+  );
 
   if (statsLoading || contractsLoading) {
     return (
