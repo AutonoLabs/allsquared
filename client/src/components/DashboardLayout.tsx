@@ -31,6 +31,7 @@ import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, FileCode, UserCirc
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
+import { OnboardingTour } from './OnboardingTour';
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", path: "/dashboard" },
@@ -100,6 +101,7 @@ export default function DashboardLayout({
         } as CSSProperties
       }
     >
+      <OnboardingTour />
       <DashboardLayoutContent setSidebarWidth={setSidebarWidth}>
         {children}
       </DashboardLayoutContent>
