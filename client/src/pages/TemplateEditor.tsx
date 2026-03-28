@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { safeJsonParse } from "@/lib/utils";
 import { useLocation, useParams } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -87,7 +88,7 @@ export default function TemplateEditor() {
       setCategory(template.category);
       
       const templateContent = template.templateContent 
-        ? JSON.parse(template.templateContent as string)
+        ? safeJsonParse(template.templateContent, { content: "", variables: [] })
         : { content: "", variables: [] };
       
       setContent(templateContent.content || "");

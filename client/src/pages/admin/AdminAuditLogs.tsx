@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { safeJsonParse } from "@/lib/utils";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -271,7 +272,7 @@ export default function AdminAuditLogs() {
                 <div>
                   <p className="text-sm text-muted-foreground">Previous Value</p>
                   <pre className="text-sm bg-muted p-2 rounded-md overflow-auto max-h-32">
-                    {JSON.stringify(JSON.parse(selectedLog.previousValue), null, 2)}
+                    {JSON.stringify(safeJsonParse(selectedLog.previousValue, selectedLog.previousValue), null, 2)}
                   </pre>
                 </div>
               )}
@@ -280,7 +281,7 @@ export default function AdminAuditLogs() {
                 <div>
                   <p className="text-sm text-muted-foreground">New Value</p>
                   <pre className="text-sm bg-muted p-2 rounded-md overflow-auto max-h-32">
-                    {JSON.stringify(JSON.parse(selectedLog.newValue), null, 2)}
+                    {JSON.stringify(safeJsonParse(selectedLog.newValue, selectedLog.newValue), null, 2)}
                   </pre>
                 </div>
               )}
@@ -289,7 +290,7 @@ export default function AdminAuditLogs() {
                 <div>
                   <p className="text-sm text-muted-foreground">Metadata</p>
                   <pre className="text-sm bg-muted p-2 rounded-md overflow-auto max-h-32">
-                    {JSON.stringify(JSON.parse(selectedLog.metadata), null, 2)}
+                    {JSON.stringify(safeJsonParse(selectedLog.metadata, selectedLog.metadata), null, 2)}
                   </pre>
                 </div>
               )}

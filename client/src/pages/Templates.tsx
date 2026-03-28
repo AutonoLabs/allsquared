@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { safeJsonParse } from "@/lib/utils";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -146,7 +147,7 @@ export default function Templates() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredTemplates.map((template) => {
             const templateContent = template.templateContent 
-              ? JSON.parse(template.templateContent as string)
+              ? safeJsonParse(template.templateContent, { content: "", variables: [] })
               : { content: "", variables: [] };
             
             return (

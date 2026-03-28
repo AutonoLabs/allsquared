@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { safeJsonParse } from "@/lib/utils";
 import { useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
@@ -64,7 +65,7 @@ export default function NewContract() {
     setSelectedTemplate(template);
 
     const templateContent = template.templateContent
-      ? JSON.parse(template.templateContent)
+      ? safeJsonParse(template.templateContent, { content: "", variables: [] })
       : { content: "", variables: [] };
 
     setFormData({
@@ -249,7 +250,7 @@ export default function NewContract() {
                 <div className="grid gap-3 max-h-[400px] overflow-y-auto">
                   {templates.map((template) => {
                     const templateContent = template.templateContent
-                      ? JSON.parse(template.templateContent as string)
+                      ? safeJsonParse(template.templateContent, { content: "", variables: [] })
                       : { content: "", variables: [] };
 
                     return (
