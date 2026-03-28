@@ -1,3 +1,4 @@
+import { useState, useEffect } from "react";
 import { trpc } from "@/lib/trpc";
 import { useUser } from "@clerk/clerk-react";
 import { MD3Button } from "@/components/md3/Button";
@@ -14,7 +15,11 @@ import {
   Banknote,
   Activity,
   Target,
+  X,
+  Sparkles,
 } from "lucide-react";
+
+const ONBOARDING_DISMISSED_KEY = "allsquared_onboarding_dismissed";
 
 export default function Dashboard() {
   const { isLoaded, isSignedIn } = useUser();
@@ -28,6 +33,15 @@ export default function Dashboard() {
     { page: 1, limit: 5 },
     { enabled: ready }
   );
+
+  const [onboardingDismissed, setOnboardingDismissed] = useState(() => {
+    try { return localStorage.getItem(ONBOARDING_DISMISSED_KEY) === "true"; } catch { return false; }
+  });
+
+  function dismissOnboarding() {
+    setOnboardingDismissed(true);
+    try { localStorage.setItem(ONBOARDING_DISMISSED_KEY, "true"); } catch {}
+  }
 
   if (statsLoading || contractsLoading) {
     return (
@@ -84,6 +98,37 @@ export default function Dashboard() {
           </MD3Button>
         </Link>
       </div>
+
+      {/* Onboarding Banner */}
+      {!onboardingDismissed && !statsLoading && (stats?.activeContracts || 0) + (stats?.completedContracts || 0) + (stats?.draftContracts || 0) === 0 && (
+        <MD3Card variant="filled" className="relative overflow-hidden border-[var(--md-sys-color-primary)]/20">
+          <MD3CardContent className="p-6">
+            <button
+              onClick={dismissOnboarding}
+              className="absolute top-3 right-3 rounded-full p-1.5 text-[var(--md-sys-color-on-surface-variant)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors"
+              aria-label="Dismiss"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <div className="flex items-start gap-4">
+              <div className="h-12 w-12 rounded-[var(--md-sys-shape-large)] bg-[var(--md-sys-color-primary-container)] flex items-center justify-center shrink-0">
+                <Sparkles className="h-6 w-6 text-[var(--md-sys-color-on-primary-container)]" />
+              </div>
+              <div className="flex-1">
+                <h2 className="md3-title-large text-[var(--md-sys-color-on-surface)] mb-1">Welcome to AllSquared 👋</h2>
+                <p className="md3-body-medium text-[var(--md-sys-color-on-surface-variant)] mb-4">
+                  Create your first contract in minutes with our AI-powered builder. Protect your work, get paid on time.
+                </p>
+                <Link href="/dashboard/contracts/new">
+                  <MD3Button variant="filled" icon={<Plus />}>
+                    Create Your First Contract
+                  </MD3Button>
+                </Link>
+              </div>
+            </div>
+          </MD3CardContent>
+        </MD3Card>
+      )}
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">

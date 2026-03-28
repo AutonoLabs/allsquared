@@ -222,14 +222,55 @@ export default function NewContractBuilder() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatMutation = trpc.ai.chatMessage.useMutation();
   
-  // Save
-  const saveMutation = trpc.templateBuilder.saveContractDraft.useMutation({
+  // Save — use contracts.create for new drafts from the builder
+  const [saving, setSaving] = useState(false);
+  const createMutation = trpc.contracts.create.useMutation({
     onSuccess: (data) => {
       toast.success("Contract saved!");
       setLocation(`/dashboard/contracts/${data.contractId}`);
     },
-    onError: (err) => toast.error(err.message),
+    onError: (err) => toast.error(err.message || "Failed to save contract"),
   });
+
+  function handleSaveDraft() {
+    if (saving) return;
+    setSaving(true);
+
+    // Build content from modules
+    const content = {
+      partyA: { ...partyA },
+      partyB: { ...partyB },
+      modules: enabledModules.map((m) => ({
+        id: m.id,
+        name: m.name,
+        answers: Object.fromEntries(m.questions.map((q) => [q.id, q.answer])),
+      })),
+    };
+
+    // Extract total amount from payment module
+    const payModule = enabledModules.find((m) => m.id === "payment");
+    const totalAmount = parseFloat(
+      payModule?.questions.find((q) => q.id === "pay_total")?.answer || "0"
+    ) || 0.01; // minimum to pass validation
+
+    // Extract dates from timeline module
+    const timeModule = enabledModules.find((m) => m.id === "timeline");
+    const startDate = timeModule?.questions.find((q) => q.id === "time_start")?.answer || undefined;
+    const endDate = timeModule?.questions.find((q) => q.id === "time_end")?.answer || undefined;
+
+    createMutation.mutate(
+      {
+        title: contractTitle || "Untitled Contract",
+        description: `Contract between ${partyA.name || "Party A"} and ${partyB.name || "Party B"}`,
+        category: "service_agreement",
+        totalAmount,
+        startDate: startDate || undefined,
+        endDate: endDate || undefined,
+        content,
+      },
+      { onSettled: () => setSaving(false) }
+    );
+  }
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -676,12 +717,10 @@ export default function NewContractBuilder() {
             variant="outline"
             size="lg"
             className="rounded-[1.75rem]"
-            onClick={() => {
-              toast.success("Draft saved!");
-              setLocation("/dashboard/contracts");
-            }}
+            onClick={handleSaveDraft}
+            disabled={saving}
           >
-            <Save className="mr-2 h-4 w-4" />
+            {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
             Save as Draft
           </Button>
           <Button
@@ -892,12 +931,10 @@ export default function NewContractBuilder() {
               variant="outline"
               size="sm"
               className="rounded-full"
-              onClick={() => {
-                toast.success("Draft saved!");
-                setLocation("/dashboard/contracts");
-              }}
+              onClick={handleSaveDraft}
+              disabled={saving}
             >
-              <Save className="mr-2 h-4 w-4" />
+              {saving ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Save className="mr-2 h-4 w-4" />}
               Save & Exit
             </Button>
 
