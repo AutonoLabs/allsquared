@@ -62,7 +62,7 @@ export function useAuth(options?: UseAuthOptions) {
       syncUserMutation.mutate({
         clerkId: clerkUser.id,
         email: clerkUser.primaryEmailAddress?.emailAddress ?? null,
-        name: clerkUser.fullName ?? clerkUser.firstName ?? null,
+        name: clerkUser.fullName ?? clerkUser.firstName ?? clerkUser.username ?? null,
         emailVerified: clerkUser.primaryEmailAddress?.verification?.status === 'verified',
       });
     }
