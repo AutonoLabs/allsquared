@@ -1,4 +1,4 @@
-import { boolean, integer, pgEnum, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { boolean, index, integer, pgEnum, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
 
 // Define enums at the top of the file
 export const roleEnum = pgEnum("role", ["user", "admin"]);
@@ -207,6 +207,10 @@ export const contracts = pgTable("contracts", {
 export type Contract = typeof contracts.$inferSelect;
 export type InsertContract = typeof contracts.$inferInsert;
 
+// Indexes for contracts table
+export const contractsClientIdx = index("contracts_client_status_idx").on(contracts.clientId, contracts.status);
+export const contractsProviderIdx = index("contracts_provider_status_idx").on(contracts.providerId, contracts.status);
+
 // Milestones for each contract
 export const milestones = pgTable("milestones", {
   id: varchar("id", { length: 64 }).primaryKey(),
@@ -227,6 +231,9 @@ export const milestones = pgTable("milestones", {
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
 });
+
+// Index for milestones table
+export const milestonesContractIdx = index("milestones_contract_idx").on(milestones.contractId);
 
 export type Milestone = typeof milestones.$inferSelect;
 export type InsertMilestone = typeof milestones.$inferInsert;
@@ -376,6 +383,10 @@ export const auditLogs = pgTable("auditLogs", {
   metadata: text("metadata"), // Additional context as JSON
   createdAt: timestamp("createdAt").defaultNow(),
 });
+
+// Index for auditLogs table
+export const auditLogsEntityIdx = index("audit_logs_entity_idx").on(auditLogs.entityId, auditLogs.entityType);
+export const auditLogsUserIdx = index("audit_logs_user_idx").on(auditLogs.userId);
 
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type InsertAuditLog = typeof auditLogs.$inferInsert;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
-import { trpc } from "@/lib/trpc";
 import { useUser } from "@clerk/clerk-react";
+import { trpc } from "@/lib/trpc";
 import { MD3Button } from "@/components/md3/Button";
 import { MD3Card, MD3CardContent, MD3CardHeader } from "@/components/md3/Card";
 import { Skeleton } from "@/components/ui/skeleton";

@@ -1,4 +1,4 @@
-import { eq, and, or, desc } from "drizzle-orm";
+import { eq, and, or, desc, SQL } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { 
   InsertUser, 
@@ -166,19 +166,23 @@ export async function createContractTemplate(template: InsertContractTemplate) {
 
 // ===== Contracts =====
 
-export async function getUserContracts(userId: string) {
+export async function getUserContracts(userId: string, status?: string) {
   const db = await getDb();
   if (!db) return [];
-  
+
+  const userFilter = or(
+    eq(contracts.clientId, userId),
+    eq(contracts.providerId, userId)
+  );
+
+  const whereClause: SQL = status
+    ? and(userFilter, eq(contracts.status, status as any))!
+    : userFilter!;
+
   return await db
     .select()
     .from(contracts)
-    .where(
-      or(
-        eq(contracts.clientId, userId),
-        eq(contracts.providerId, userId)
-      )
-    )
+    .where(whereClause)
     .orderBy(desc(contracts.createdAt));
 }
 

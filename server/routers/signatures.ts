@@ -299,7 +299,7 @@ export const signaturesRouter = router({
           });
         }
 
-        console.log(`[DocuSeal] Created submission ${submission.id} for contract ${contract.id}`);
+        // DocuSeal submission logged
       } else if (provider === 'docusign') {
         // Create DocuSign envelope
         const pdfBase64 = generateContractPDF(contract);

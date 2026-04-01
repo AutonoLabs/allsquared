@@ -222,14 +222,23 @@ export default function NewContractBuilder() {
   const chatEndRef = useRef<HTMLDivElement>(null);
   const chatMutation = trpc.ai.chatMessage.useMutation();
   
-  // Save — use contracts.create for new drafts from the builder
+  // Save — use contracts.create for new drafts, contracts.update if draft already saved
   const [saving, setSaving] = useState(false);
+  const [savedContractId, setSavedContractId] = useState<string | null>(null);
   const createMutation = trpc.contracts.create.useMutation({
     onSuccess: (data) => {
+      setSavedContractId(data.contractId);
       toast.success("Contract saved!");
       setLocation(`/dashboard/contracts/${data.contractId}`);
     },
     onError: (err) => toast.error(err.message || "Failed to save contract"),
+  });
+  const updateMutation = trpc.contracts.update.useMutation({
+    onSuccess: (data) => {
+      toast.success("Contract updated!");
+      setLocation(`/dashboard/contracts/${savedContractId}`);
+    },
+    onError: (err) => toast.error(err.message || "Failed to update contract"),
   });
 
   function handleSaveDraft() {
@@ -258,18 +267,34 @@ export default function NewContractBuilder() {
     const startDate = timeModule?.questions.find((q) => q.id === "time_start")?.answer || undefined;
     const endDate = timeModule?.questions.find((q) => q.id === "time_end")?.answer || undefined;
 
-    createMutation.mutate(
-      {
-        title: contractTitle || "Untitled Contract",
-        description: `Contract between ${partyA.name || "Party A"} and ${partyB.name || "Party B"}`,
-        category: "service_agreement",
-        totalAmount,
-        startDate: startDate || undefined,
-        endDate: endDate || undefined,
-        content,
-      },
-      { onSettled: () => setSaving(false) }
-    );
+    // If already saved once this session, update instead of creating a duplicate
+    if (savedContractId) {
+      updateMutation.mutate(
+        {
+          id: savedContractId,
+          title: contractTitle || "Untitled Contract",
+          description: `Contract between ${partyA.name || "Party A"} and ${partyB.name || "Party B"}`,
+          totalAmount,
+          startDate: startDate || undefined,
+          endDate: endDate || undefined,
+          content,
+        },
+        { onSettled: () => setSaving(false) }
+      );
+    } else {
+      createMutation.mutate(
+        {
+          title: contractTitle || "Untitled Contract",
+          description: `Contract between ${partyA.name || "Party A"} and ${partyB.name || "Party B"}`,
+          category: "service_agreement",
+          totalAmount,
+          startDate: startDate || undefined,
+          endDate: endDate || undefined,
+          content,
+        },
+        { onSettled: () => setSaving(false) }
+      );
+    }
   }
 
   useEffect(() => {

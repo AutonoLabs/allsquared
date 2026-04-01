@@ -24,31 +24,20 @@ export const contractsRouter = router({
     )
     .query(async ({ ctx, input }) => {
       const { status, page = 1, limit = 20 } = input || {};
-      
-      let contracts = await getUserContracts(ctx.user.id);
-      
-      // Filter by status if provided
-      if (status) {
-        contracts = contracts.filter((c) => c.status === status);
-      }
-      
-      // Sort by most recent first
-      contracts.sort((a, b) => {
-        const dateA = new Date(a.createdAt || 0).getTime();
-        const dateB = new Date(b.createdAt || 0).getTime();
-        return dateB - dateA;
-      });
-      
+
+      // Filter in DB — avoids fetching all contracts then filtering in JS
+      const allContracts = await getUserContracts(ctx.user.id, status);
+
       // Pagination
+      const total = allContracts.length;
       const start = (page - 1) * limit;
-      const end = start + limit;
-      const paginated = contracts.slice(start, end);
-      
+      const paginated = allContracts.slice(start, start + limit);
+
       return {
         contracts: paginated,
-        total: contracts.length,
+        total,
         page,
-        totalPages: Math.ceil(contracts.length / limit),
+        totalPages: Math.ceil(total / limit),
       };
     }),
 

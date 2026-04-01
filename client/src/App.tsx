@@ -118,27 +118,37 @@ function Router() {
         {/* Dashboard routes - protected */}
         <Route path="/dashboard">
           <DashboardLayout>
-            <Dashboard />
+            <ErrorBoundary>
+              <Dashboard />
+            </ErrorBoundary>
           </DashboardLayout>
         </Route>
         <Route path="/dashboard/contracts">
           <DashboardLayout>
-            <Contracts />
+            <ErrorBoundary>
+              <Contracts />
+            </ErrorBoundary>
           </DashboardLayout>
         </Route>
         <Route path="/dashboard/contracts/new">
           <DashboardLayout>
-            <NewContractBuilder />
+            <ErrorBoundary>
+              <NewContractBuilder />
+            </ErrorBoundary>
           </DashboardLayout>
         </Route>
         <Route path="/dashboard/contracts/new/classic">
           <DashboardLayout>
-            <NewContractTypeform />
+            <ErrorBoundary>
+              <NewContractTypeform />
+            </ErrorBoundary>
           </DashboardLayout>
         </Route>
         <Route path="/dashboard/contracts/:id">
           <DashboardLayout>
-            <ContractDetail />
+            <ErrorBoundary>
+              <ContractDetail />
+            </ErrorBoundary>
           </DashboardLayout>
         </Route>
         <Route path="/dashboard/templates">
