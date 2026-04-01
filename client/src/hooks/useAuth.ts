@@ -44,7 +44,7 @@ export function useAuth(options?: UseAuthOptions) {
   // Sync Clerk user to our database (non-blocking)
   const syncUserMutation = trpc.auth.syncClerkUser.useMutation({
     onSuccess: () => {
-      console.log('[useAuth] syncClerkUser succeeded');
+      // syncClerkUser succeeded
       setSynced(true);
       utils.auth.me.invalidate();
     },
@@ -58,7 +58,7 @@ export function useAuth(options?: UseAuthOptions) {
   // Sync user on sign-in
   useEffect(() => {
     if (isLoaded && isSignedIn && clerkUser && !synced && !syncUserMutation.isPending) {
-      console.log('[useAuth] Starting syncClerkUser for', clerkUser.id);
+      // Starting syncClerkUser
       syncUserMutation.mutate({
         clerkId: clerkUser.id,
         email: clerkUser.primaryEmailAddress?.emailAddress ?? null,

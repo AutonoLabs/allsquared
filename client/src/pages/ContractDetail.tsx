@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRoute, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { safeJsonParse } from "@/lib/utils";
 import MilestoneManager from "@/components/MilestoneManager";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -116,12 +117,7 @@ export default function ContractDetail() {
   const contractContent = (() => {
     if (!contract.contractContent) return {};
     const raw = contract.contractContent as string;
-    try {
-      return JSON.parse(raw);
-    } catch {
-      // Content is markdown/plain text, not JSON
-      return { content: raw, variables: [] };
-    }
+    return safeJsonParse(raw, { content: raw, variables: [] });
   })();
   const signatures = contractContent.signatures || [];
 

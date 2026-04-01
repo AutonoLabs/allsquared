@@ -204,12 +204,21 @@ export default function NewContractTypeform() {
     [step]
   );
 
+  const [showValidation, setShowValidation] = useState(false);
+
   const canAdvance = (): boolean => {
     if (step === 0) return !!partyA.name.trim();
     if (step === 1) return !!partyB.name.trim();
     if (step === 2) return !!category;
     if (step === 3) return true; // questions are optional
     return true;
+  };
+
+  const validationMessage = (): string | null => {
+    if (step === 0 && !partyA.name.trim()) return "Please enter the client's name to continue.";
+    if (step === 1 && !partyB.name.trim()) return "Please enter the contractor's name to continue.";
+    if (step === 2 && !category) return "Please select a service category.";
+    return null;
   };
 
   // ── Save handlers ────────────────────────────────────────────────────────────
@@ -559,14 +568,25 @@ export default function NewContractTypeform() {
           </Button>
 
           {step < STEPS.length - 1 && (
-            <Button
-              onClick={() => go(step + 1)}
-              disabled={!canAdvance()}
-              className="bg-violet-600 hover:bg-violet-700 text-white gap-1.5"
-            >
-              Continue
-              <ArrowRight className="w-4 h-4" />
-            </Button>
+            <div className="flex flex-col items-end gap-1">
+              {showValidation && validationMessage() && (
+                <p className="text-sm text-destructive">{validationMessage()}</p>
+              )}
+              <Button
+                onClick={() => {
+                  if (!canAdvance()) {
+                    setShowValidation(true);
+                    return;
+                  }
+                  setShowValidation(false);
+                  go(step + 1);
+                }}
+                className="bg-violet-600 hover:bg-violet-700 text-white gap-1.5"
+              >
+                Continue
+                <ArrowRight className="w-4 h-4" />
+              </Button>
+            </div>
           )}
         </div>
       </div>
