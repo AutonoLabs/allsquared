@@ -3,6 +3,7 @@ import { useRoute, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { safeJsonParse } from "@/lib/utils";
 import MilestoneManager from "@/components/MilestoneManager";
+import { StatusBadge } from "@/components/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -230,7 +231,7 @@ export default function ContractDetail() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {signatures.map((sig: any) => (
+                  {signatures.map((sig: { userId?: string; name: string; signedAt: string }) => (
                     <div key={sig.userId || sig.name} className="flex items-center gap-3 p-3 rounded-lg border bg-emerald-50/50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900">
                       <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
                       <div>
@@ -339,22 +340,4 @@ export default function ContractDetail() {
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const statusConfig: Record<string, { label: string; className: string; dot: string }> = {
-    draft: { label: "Draft", className: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300", dot: "bg-gray-400" },
-    pending_signature: { label: "Pending Signature", className: "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-200", dot: "bg-amber-500" },
-    active: { label: "Active", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-200", dot: "bg-emerald-500" },
-    completed: { label: "Completed", className: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200", dot: "bg-blue-500" },
-    disputed: { label: "Disputed", className: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200", dot: "bg-red-500" },
-    cancelled: { label: "Cancelled", className: "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400", dot: "bg-gray-400" },
-  };
 
-  const config = statusConfig[status] || statusConfig.draft;
-
-  return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium ${config.className}`}>
-      <span className={`h-1.5 w-1.5 rounded-full ${config.dot}`} />
-      {config.label}
-    </span>
-  );
-}

@@ -32,6 +32,7 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [selectedMilestone, setSelectedMilestone] = useState<string | null>(null);
   const [submissionNotes, setSubmissionNotes] = useState("");
+  const [rejectionReason, setRejectionReason] = useState("");
 
   const submitMutation = trpc.milestones.submit.useMutation({
     onSuccess: () => {
@@ -98,7 +99,18 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
     }
   };
 
-  const completedMilestones = milestones.filter((m: any) => m.status === "approved").length;
+  interface Milestone {
+    id: string;
+    title: string;
+    description: string | null;
+    status: string;
+    amount: string;
+    submittedAt: string | null;
+    submissionNotes: string | null;
+    rejectionReason: string | null;
+  }
+
+  const completedMilestones = milestones.filter((m: Milestone) => m.status === "approved").length;
   const totalMilestones = milestones.length;
   const progressPercentage = totalMilestones > 0 ? (completedMilestones / totalMilestones) * 100 : 0;
 
@@ -117,7 +129,7 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
             <Progress value={progressPercentage} className="h-3" />
             <div className="flex justify-between text-sm text-muted-foreground">
               <span>{Math.round(progressPercentage)}% Complete</span>
-              <span>£{milestones.reduce((sum: number, m: any) => m.status === "approved" ? sum + parseFloat(m.amount) : sum, 0).toLocaleString()} released</span>
+              <span>£{milestones.reduce((sum: number, m: Milestone) => m.status === "approved" ? sum + parseFloat(m.amount) : sum, 0).toLocaleString()} released</span>
             </div>
           </div>
         </CardContent>
@@ -125,7 +137,7 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
 
       {/* Milestone List */}
       <div className="space-y-4">
-        {milestones.map((milestone: any, index: number) => (
+        {milestones.map((milestone: Milestone, index: number) => (
           <Card key={milestone.id} className={milestone.status === "submitted" ? "border-blue-500" : ""}>
             <CardHeader>
               <div className="flex items-start justify-between">
@@ -277,7 +289,8 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
                         </DialogHeader>
                         <div className="space-y-4">
                           <Textarea
-                            id="rejection-reason"
+                            value={rejectionReason}
+                            onChange={(e) => setRejectionReason(e.target.value)}
                             placeholder="Explain why this milestone doesn't meet requirements..."
                             rows={4}
                           />
@@ -287,10 +300,10 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
                           <Button
                             variant="destructive"
                             onClick={() => {
-                              const reason = (document.getElementById("rejection-reason") as HTMLTextAreaElement)?.value;
-                              handleReject(milestone.id, reason);
+                              handleReject(milestone.id, rejectionReason);
+                              setRejectionReason("");
                             }}
-                            disabled={rejectMutation.isPending}
+                            disabled={rejectMutation.isPending || !rejectionReason.trim()}
                           >
                             Reject Milestone
                           </Button>

@@ -1,10 +1,11 @@
-import { useState, useEffect } from "react";
-import { useUser } from "@clerk/clerk-react";
+import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 import { trpc } from "@/lib/trpc";
 import { MD3Button } from "@/components/md3/Button";
 import { MD3Card, MD3CardContent, MD3CardHeader } from "@/components/md3/Card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
+import { StatusBadge } from "@/components/StatusBadge";
 import {
   FileText,
   CheckCircle2,
@@ -22,16 +23,18 @@ import {
 const ONBOARDING_DISMISSED_KEY = "allsquared_onboarding_dismissed";
 
 export default function Dashboard() {
-  const { isLoaded, isSignedIn } = useUser();
-  const ready = isLoaded && isSignedIn;
+  const { loading, isAuthenticated } = useAuth();
+  // Gate queries on auth readiness (Clerk loaded + user synced) to prevent
+  // queries firing before the DB user exists, which caused infinite retries / hang.
+  const ready = !loading && isAuthenticated;
 
-  const { data: stats, isLoading: statsLoading } = trpc.contracts.stats.useQuery(
+  const { data: stats, isLoading: statsLoading, error: statsError } = trpc.contracts.stats.useQuery(
     undefined,
-    { enabled: ready }
+    { enabled: ready, retry: 2 }
   );
-  const { data: contractsData, isLoading: contractsLoading } = trpc.contracts.list.useQuery(
+  const { data: contractsData, isLoading: contractsLoading, error: contractsError } = trpc.contracts.list.useQuery(
     { page: 1, limit: 5 },
-    { enabled: ready }
+    { enabled: ready, retry: 2 }
   );
 
   const [onboardingDismissed, setOnboardingDismissed] = useState(() => {
@@ -344,21 +347,4 @@ export default function Dashboard() {
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const statusConfig: Record<string, { label: string; className: string }> = {
-    draft: { label: "Draft", className: "bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)]" },
-    pending_signature: { label: "Pending", className: "bg-[var(--md-sys-color-tertiary-container)] text-[var(--md-sys-color-on-tertiary-container)]" },
-    active: { label: "Active", className: "bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)]" },
-    completed: { label: "Completed", className: "bg-[var(--md-sys-color-secondary-container)] text-[var(--md-sys-color-on-secondary-container)]" },
-    disputed: { label: "Disputed", className: "bg-[var(--md-sys-color-error-container)] text-[var(--md-sys-color-on-error-container)]" },
-    cancelled: { label: "Cancelled", className: "bg-[var(--md-sys-color-surface-container-highest)] text-[var(--md-sys-color-on-surface-variant)]" },
-  };
 
-  const config = statusConfig[status] || statusConfig.draft;
-
-  return (
-    <span className={`inline-flex items-center px-2 py-0.5 rounded-[var(--md-sys-shape-small)] text-[11px] font-medium ${config.className}`}>
-      {config.label}
-    </span>
-  );
-}

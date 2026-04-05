@@ -184,6 +184,8 @@ function DashboardLayoutContent({
                   />
                   <button
                     onClick={toggleSidebar}
+                    aria-label="Expand sidebar"
+                    aria-pressed={!isCollapsed}
                     className="absolute inset-0 flex items-center justify-center bg-[var(--md-sys-color-secondary-container)] rounded-[var(--md-sys-shape-medium)] ring-1 ring-[var(--md-sys-color-outline-variant)] opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--md-sys-color-primary)]"
                   >
                     <PanelLeft className="h-4 w-4 text-[var(--md-sys-color-on-surface)]" />
@@ -203,6 +205,8 @@ function DashboardLayoutContent({
                   </div>
                   <button
                     onClick={toggleSidebar}
+                    aria-label="Collapse sidebar"
+                    aria-pressed={!isCollapsed}
                     className="ml-auto h-8 w-8 flex items-center justify-center hover:bg-[var(--md-sys-color-on-surface)]/[0.08] rounded-[var(--md-sys-shape-full)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--md-sys-color-primary)] shrink-0"
                   >
                     <PanelLeft className="h-4 w-4 text-[var(--md-sys-color-on-surface-variant)]" />

@@ -528,8 +528,8 @@ export default function NewContractBuilder() {
 
         {/* Party cards — two-panel M3 layout */}
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-          {renderPartyForm(partyA, setPartyA, "Party A — You", "bg-gradient-to-r from-[#0F172A] to-[#6D28D9]")}
-          {renderPartyForm(partyB, setPartyB, "Party B — Counterparty", "bg-gradient-to-r from-[#6D28D9] to-[#A78BFA]")}
+          {renderPartyForm(partyA, setPartyA, "Party A — You", "bg-gradient-to-r from-slate-900 to-purple-700")}
+          {renderPartyForm(partyB, setPartyB, "Party B — Counterparty", "bg-gradient-to-r from-purple-700 to-violet-400")}
         </div>
       </div>
     );
@@ -553,8 +553,8 @@ export default function NewContractBuilder() {
               onClick={() => toggleModule(mod.id)}
               className={`group relative rounded-2xl border p-4 text-left transition-all duration-200 ${
                 mod.enabled
-                  ? "border-[#6D28D9]/30 bg-[#F1F0FF] shadow-sm"
-                  : "border-border bg-card hover:border-[#6D28D9]/20 hover:bg-muted/40"
+                  ? "border-purple-700/30 bg-violet-50 shadow-sm dark:bg-violet-950/30"
+                  : "border-border bg-card hover:border-purple-700/20 hover:bg-muted/40"
               }`}
             >
               {/* M3 state layer */}
@@ -566,7 +566,7 @@ export default function NewContractBuilder() {
                   <div
                     className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl transition-colors ${
                       mod.enabled
-                        ? "bg-[#6D28D9] text-white"
+                        ? "bg-purple-700 text-white"
                         : "bg-muted text-muted-foreground group-hover:bg-muted/80"
                     }`}
                   >
@@ -578,7 +578,7 @@ export default function NewContractBuilder() {
                     {mod.icon === "X"        && <X        className="h-5 w-5" />}
                   </div>
                   <div>
-                    <p className={`m3-label-lg font-semibold ${mod.enabled ? "text-[#4C1D95]" : "text-foreground"}`}>
+                    <p className={`m3-label-lg font-semibold ${mod.enabled ? "text-purple-900 dark:text-purple-200" : "text-foreground"}`}>
                       {mod.name}
                     </p>
                     <p className="m3-body-sm text-muted-foreground">{mod.description}</p>
@@ -620,7 +620,7 @@ export default function NewContractBuilder() {
                 onClick={() => setActiveModuleIdx(i)}
                 className={`rounded-full px-3.5 py-1 text-xs font-medium transition-all ${
                   i === activeModuleIdx
-                    ? "bg-[#0F172A] text-white shadow-sm"
+                    ? "bg-slate-900 text-white shadow-sm dark:bg-slate-100 dark:text-slate-900"
                     : "bg-muted text-muted-foreground hover:bg-muted/70"
                 }`}
               >
@@ -670,8 +670,8 @@ export default function NewContractBuilder() {
                       onClick={() => updateAnswer(currentModule.id, q.id, opt)}
                       className={`m3-state-layer flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
                         q.answer === opt
-                          ? "border-[#6D28D9] bg-[#F1F0FF] text-[#4C1D95] shadow-sm"
-                          : "border-border hover:border-[#6D28D9]/40 hover:bg-muted/60"
+                          ? "border-purple-700 bg-violet-50 text-purple-900 shadow-sm dark:bg-violet-950/30 dark:text-purple-200"
+                          : "border-border hover:border-purple-700/40 hover:bg-muted/60"
                       }`}
                     >
                       {q.answer === opt && <Check className="h-3 w-3" />}
@@ -726,7 +726,7 @@ export default function NewContractBuilder() {
               {enabledModules.map((m) => (
                 <span
                   key={m.id}
-                  className="inline-flex items-center gap-1 rounded-full bg-[#F1F0FF] px-3 py-1 text-xs font-medium text-[#4C1D95]"
+                  className="inline-flex items-center gap-1 rounded-full bg-violet-50 px-3 py-1 text-xs font-medium text-purple-900 dark:bg-violet-950/30 dark:text-purple-200"
                 >
                   <Check className="h-3 w-3" />
                   {m.name}
@@ -750,7 +750,7 @@ export default function NewContractBuilder() {
           </Button>
           <Button
             size="lg"
-            className="rounded-[1.75rem] bg-[#6D28D9] text-white hover:bg-[#5B21B6]"
+            className="rounded-[1.75rem] bg-purple-700 text-white hover:bg-purple-800"
           >
             <Send className="mr-2 h-4 w-4" />
             Save & Send for Signature
@@ -774,7 +774,7 @@ export default function NewContractBuilder() {
         {/* Panel header */}
         <div className="flex items-center justify-between border-b px-4 py-3.5">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#6D28D9]">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple-700">
               <Bot className="h-4 w-4 text-white" />
             </div>
             <div>
@@ -814,7 +814,7 @@ export default function NewContractBuilder() {
                   onClick={() => { setChatModel(m.id as ChatbotModelId); setShowModelPicker(false); }}
                   className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs transition-colors ${
                     chatModel === m.id
-                      ? "bg-[#F1F0FF] text-[#4C1D95] font-semibold"
+                      ? "bg-violet-50 text-purple-900 font-semibold dark:bg-violet-950/30 dark:text-purple-200"
                       : "text-foreground hover:bg-muted/60"
                   }`}
                 >
@@ -830,7 +830,7 @@ export default function NewContractBuilder() {
         </div>
 
         {/* Messages */}
-        <div className="flex-1 space-y-3 overflow-y-auto p-4">
+        <div className="flex-1 space-y-3 overflow-y-auto p-4" aria-live="polite">
           {chatMessages.map((msg, i) => (
             <div
               key={i}
@@ -839,7 +839,7 @@ export default function NewContractBuilder() {
               <div
                 className={`max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm leading-relaxed ${
                   msg.role === "user"
-                    ? "rounded-br-sm bg-[#0F172A] text-white"
+                    ? "rounded-br-sm bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
                     : "rounded-bl-sm bg-muted text-foreground"
                 }`}
               >
@@ -871,7 +871,7 @@ export default function NewContractBuilder() {
             />
             <Button
               size="sm"
-              className="h-9 w-9 flex-shrink-0 rounded-full bg-[#6D28D9] p-0 text-white hover:bg-[#5B21B6]"
+              className="h-9 w-9 flex-shrink-0 rounded-full bg-purple-700 p-0 text-white hover:bg-purple-800"
               onClick={sendChat}
               disabled={!chatInput.trim() || chatLoading}
             >
@@ -914,9 +914,9 @@ export default function NewContractBuilder() {
                 key={i}
                 className={`h-1 flex-1 rounded-full transition-all duration-300 ${
                   i < step
-                    ? "bg-[#6D28D9]"
+                    ? "bg-purple-700"
                     : i === step
-                    ? "bg-[#A78BFA]"
+                    ? "bg-violet-400"
                     : "bg-muted"
                 }`}
               />
@@ -964,7 +964,7 @@ export default function NewContractBuilder() {
             </Button>
 
             <Button
-              className="rounded-full bg-[#6D28D9] text-white hover:bg-[#5B21B6]"
+              className="rounded-full bg-purple-700 text-white hover:bg-purple-800"
               onClick={() => setStep(step + 1)}
             >
               Next

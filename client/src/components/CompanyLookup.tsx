@@ -67,7 +67,7 @@ export default function CompanyLookup({
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const { data, isLoading } = trpc.companiesHouse.search.useQuery(
+  const { data, isLoading, error } = trpc.companiesHouse.search.useQuery(
     { query: debouncedQuery, limit: 8 },
     { enabled: debouncedQuery.length >= 2 && !selected }
   );
@@ -152,6 +152,12 @@ export default function CompanyLookup({
           <div className="absolute z-50 w-full mt-1 bg-background border border-border rounded-lg shadow-lg p-4 text-center text-sm text-muted-foreground">
             No companies found
           </div>
+        )}
+
+        {error && (
+          <p className="text-xs text-red-600 mt-1">
+            Failed to search Companies House. Please try again.
+          </p>
         )}
 
         {data?.message && (

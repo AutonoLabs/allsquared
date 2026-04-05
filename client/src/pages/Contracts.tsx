@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { StatusBadge } from "@/components/StatusBadge";
 import {
   Select,
   SelectContent,
@@ -12,14 +13,14 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Link } from "wouter";
-import { Plus, Search, FileText, ArrowRight, Calendar, Banknote, Tag } from "lucide-react";
+import { Plus, Search, FileText, ArrowRight, Calendar, Banknote, Tag, AlertCircle } from "lucide-react";
 
 export default function Contracts() {
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { data, isLoading } = trpc.contracts.list.useQuery({
-    status: statusFilter as any,
+  const { data, isLoading, error } = trpc.contracts.list.useQuery({
+    status: statusFilter,
     page: 1,
     limit: 50,
   });
@@ -70,6 +71,29 @@ export default function Contracts() {
             </Card>
           ))}
         </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6 p-2">
+        <Card className="border-0 shadow-sm">
+          <CardContent className="py-16">
+            <div className="text-center">
+              <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-red-100 dark:bg-red-900/20 mb-4">
+                <AlertCircle className="h-8 w-8 text-red-500" />
+              </div>
+              <h3 className="text-lg font-semibold">Failed to load contracts</h3>
+              <p className="text-sm text-muted-foreground mt-2 mb-6 max-w-sm mx-auto">
+                {error.message || "An unexpected error occurred. Please try again."}
+              </p>
+              <Button onClick={() => window.location.reload()}>
+                Try Again
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -210,28 +234,4 @@ export default function Contracts() {
   );
 }
 
-function StatusBadge({ status }: { status: string }) {
-  const statusConfig: Record<string, { label: string; className: string; dot: string }> = {
-    draft: { label: "Draft", className: "bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300", dot: "bg-gray-400" },
-    pending_signature: {
-      label: "Pending Signature",
-      className: "bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-200",
-      dot: "bg-amber-500",
-    },
-    active: { label: "Active", className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900 dark:text-emerald-200", dot: "bg-emerald-500" },
-    completed: { label: "Completed", className: "bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-200", dot: "bg-blue-500" },
-    disputed: { label: "Disputed", className: "bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-200", dot: "bg-red-500" },
-    cancelled: { label: "Cancelled", className: "bg-gray-100 text-gray-500 dark:bg-gray-800 dark:text-gray-400", dot: "bg-gray-400" },
-  };
 
-  const config = statusConfig[status] || statusConfig.draft;
-
-  return (
-    <span
-      className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${config.className}`}
-    >
-      <span className={`h-1.5 w-1.5 rounded-full ${config.dot}`} />
-      {config.label}
-    </span>
-  );
-}

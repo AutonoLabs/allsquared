@@ -99,8 +99,8 @@ export default function Profile() {
       setEmail(user.email || "");
       setCompany(user.businessName || "");
       setPhone(user.phone || "");
-      setCompanyNumber((user as any).companyNumber || "");
-      setVatNumber((user as any).vatNumber || "");
+      setCompanyNumber((user as Record<string, string>).companyNumber || "");
+      setVatNumber((user as Record<string, string>).vatNumber || "");
       const addr = parseAddress(user.address);
       setAddressLine1(addr.line1);
       setAddressLine2(addr.line2);

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,12 +12,22 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDistanceToNow } from "date-fns";
 import { useUser } from "@clerk/clerk-react";
 
+interface Notification {
+  id: string;
+  type: string;
+  title: string;
+  message: string;
+  isRead: string;
+  createdAt: string | null;
+}
+
 export default function NotificationCenter() {
   const { isSignedIn } = useUser();
-  const { data, refetch } = trpc.notifications.list.useQuery(undefined, {
-    enabled: !!isSignedIn, // Only query when authenticated
+  const { data, refetch, error } = trpc.notifications.list.useQuery(undefined, {
+    enabled: !!isSignedIn,
+    refetchInterval: 30000, // Poll every 30 seconds
   });
-  const notifications = data?.notifications || [];
+  const notifications: Notification[] = data?.notifications || [];
   const unreadCount = data?.unreadCount || 0;
   
   const markAsReadMutation = trpc.notifications.markAsRead.useMutation({
@@ -71,14 +80,22 @@ export default function NotificationCenter() {
           )}
         </div>
         <ScrollArea className="h-[400px]">
-          {notifications.length === 0 ? (
+          {error ? (
+            <div className="flex flex-col items-center justify-center py-8 text-center">
+              <AlertCircle className="h-12 w-12 text-red-400 mb-2" />
+              <p className="text-sm text-muted-foreground">Failed to load notifications</p>
+              <Button variant="ghost" size="sm" className="mt-2" onClick={() => refetch()}>
+                Retry
+              </Button>
+            </div>
+          ) : notifications.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-8 text-center">
               <Bell className="h-12 w-12 text-muted-foreground mb-2" />
               <p className="text-sm text-muted-foreground">No notifications yet</p>
             </div>
           ) : (
-            <div className="divide-y">
-              {notifications.map((notification: any) => (
+            <div className="divide-y" aria-live="polite">
+              {notifications.map((notification) => (
                 <div
                   key={notification.id}
                   className={`px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors ${
@@ -115,4 +132,3 @@ export default function NotificationCenter() {
     </DropdownMenu>
   );
 }
-
