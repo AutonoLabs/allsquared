@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import { z } from "zod";
 import { router, protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
@@ -21,7 +22,7 @@ export const partyProfilesRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database not available" });
 
       const id = `party_${nanoid(16)}`;
       await db.insert(partyProfiles).values({
@@ -50,7 +51,7 @@ export const partyProfilesRouter = router({
   // Get user's saved profiles
   list: protectedProcedure.query(async ({ ctx }) => {
     const db = await getDb();
-    if (!db) throw new Error("Database not available");
+    if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database not available" });
 
     return db
       .select()
@@ -63,7 +64,7 @@ export const partyProfilesRouter = router({
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database not available" });
 
       const result = await db
         .select()
@@ -76,7 +77,7 @@ export const partyProfilesRouter = router({
         )
         .limit(1);
 
-      if (!result[0]) throw new Error("Profile not found");
+      if (!result[0]) throw new TRPCError({ code: 'NOT_FOUND', message: "Profile not found" });
       return result[0];
     }),
 });

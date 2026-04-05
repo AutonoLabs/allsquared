@@ -1,12 +1,25 @@
+import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
+import { nanoid } from 'nanoid';
 import { router, protectedProcedure } from '../_core/trpc';
 import {
   getUserContracts,
+  getUserContractsCount,
   getContract,
   createContract,
   updateContract,
 } from '../db';
 import { createNotification } from '../db';
+
+// Valid contract status transitions (state machine)
+const VALID_STATUS_TRANSITIONS: Record<string, string[]> = {
+  draft: ['pending_signature', 'cancelled'],
+  pending_signature: ['active', 'draft', 'cancelled'],
+  active: ['completed', 'disputed', 'cancelled'],
+  completed: [],
+  cancelled: [],
+  disputed: ['active', 'cancelled'],
+};
 
 export const contractsRouter = router({
   // List user's contracts
@@ -25,13 +38,12 @@ export const contractsRouter = router({
     .query(async ({ ctx, input }) => {
       const { status, page = 1, limit = 20 } = input || {};
 
-      // Filter in DB — avoids fetching all contracts then filtering in JS
-      const allContracts = await getUserContracts(ctx.user.id, status);
+      // Get total count for pagination
+      const total = await getUserContractsCount(ctx.user.id, status);
 
-      // Pagination
-      const total = allContracts.length;
-      const start = (page - 1) * limit;
-      const paginated = allContracts.slice(start, start + limit);
+      // Paginate in DB using LIMIT/OFFSET
+      const offset = (page - 1) * limit;
+      const paginated = await getUserContracts(ctx.user.id, status, { limit, offset });
 
       return {
         contracts: paginated,
@@ -52,12 +64,12 @@ export const contractsRouter = router({
       const contract = await getContract(input.id);
       
       if (!contract) {
-        throw new Error('Contract not found');
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Contract not found' });
       }
       
       // Verify user has access
       if (contract.clientId !== ctx.user.id && contract.providerId !== ctx.user.id) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
       
       return contract;
@@ -80,7 +92,7 @@ export const contractsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const contractId = `contract_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const contractId = `contract_${nanoid(16)}`;
       
       const contract = await createContract({
         id: contractId,
@@ -123,14 +135,26 @@ export const contractsRouter = router({
       const contract = await getContract(input.id);
       
       if (!contract) {
-        throw new Error('Contract not found');
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Contract not found' });
       }
       
       // Only creator can update draft contracts
       if (contract.clientId !== ctx.user.id && contract.providerId !== ctx.user.id) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
       
+      // Validate status transitions using state machine
+      if (input.status) {
+        const currentStatus = contract.status as string;
+        const allowedTransitions = VALID_STATUS_TRANSITIONS[currentStatus] || [];
+        if (!allowedTransitions.includes(input.status)) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: `Cannot transition contract from '${currentStatus}' to '${input.status}'. Allowed: ${allowedTransitions.join(', ') || 'none'}`,
+          });
+        }
+      }
+
       const updates: any = { updatedAt: new Date() };
       if (input.title) updates.title = input.title;
       if (input.description) updates.description = input.description;
@@ -156,12 +180,12 @@ export const contractsRouter = router({
       const contract = await getContract(input.id);
       
       if (!contract) {
-        throw new Error('Contract not found');
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Contract not found' });
       }
       
       // Only creator can delete draft contracts
       if (contract.status !== 'draft' || contract.clientId !== ctx.user.id) {
-        throw new Error('Cannot delete this contract');
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot delete this contract' });
       }
       
       await updateContract(input.id, { status: 'cancelled', updatedAt: new Date() });
@@ -180,15 +204,15 @@ export const contractsRouter = router({
       const contract = await getContract(input.id);
       
       if (!contract) {
-        throw new Error('Contract not found');
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Contract not found' });
       }
       
       if (contract.clientId !== ctx.user.id) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
       
       if (contract.status !== 'draft') {
-        throw new Error('Contract already sent');
+        throw new TRPCError({ code: 'CONFLICT', message: 'Contract already sent' });
       }
       
       await updateContract(input.id, {
@@ -199,7 +223,7 @@ export const contractsRouter = router({
       // Send notification to provider
       if (contract.providerId) {
         await createNotification({
-          id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          id: `notif_${nanoid(16)}`,
           userId: contract.providerId,
           type: 'contract',
           title: 'New Contract Awaiting Signature',
@@ -225,12 +249,12 @@ export const contractsRouter = router({
       const contract = await getContract(input.id);
       
       if (!contract) {
-        throw new Error('Contract not found');
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Contract not found' });
       }
       
       // Verify user is party to contract
       if (contract.clientId !== ctx.user.id && contract.providerId !== ctx.user.id) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
       
       // For MVP, we'll track signatures in contract content
@@ -267,7 +291,7 @@ export const contractsRouter = router({
       if (allSigned) {
         // Notify both parties
         await createNotification({
-          id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          id: `notif_${nanoid(16)}`,
           userId: contract.clientId,
           type: 'contract',
           title: 'Contract Fully Executed',
@@ -279,7 +303,7 @@ export const contractsRouter = router({
         
         if (contract.providerId && contract.providerId !== contract.clientId) {
           await createNotification({
-            id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            id: `notif_${nanoid(16)}`,
             userId: contract.providerId,
             type: 'contract',
             title: 'Contract Fully Executed',

@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { router, adminProcedure } from '../_core/trpc';
 import { getDb } from '../db';
@@ -11,6 +12,7 @@ import {
   payments,
 } from '../../drizzle/schema';
 import { eq, desc, and, or, like, sql, count } from 'drizzle-orm';
+import { nanoid } from 'nanoid';
 
 // Helper to create audit log entries
 async function createAuditLog(
@@ -27,7 +29,7 @@ async function createAuditLog(
   if (!db) return;
 
   await db.insert(auditLogs).values({
-    id: `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+    id: `audit_${nanoid(16)}`,
     userId,
     action,
     entityType,
@@ -160,7 +162,7 @@ const usersRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       // Get current user state for audit log
       const [currentUser] = await db
@@ -169,7 +171,7 @@ const usersRouter = router({
         .where(eq(users.id, input.id))
         .limit(1);
 
-      if (!currentUser) throw new Error('User not found');
+      if (!currentUser) throw new TRPCError({ code: 'NOT_FOUND', message: 'User not found' });
 
       await db
         .update(users)
@@ -197,7 +199,7 @@ const usersRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const [currentUser] = await db
         .select()
@@ -205,7 +207,7 @@ const usersRouter = router({
         .where(eq(users.id, input.id))
         .limit(1);
 
-      if (!currentUser) throw new Error('User not found');
+      if (!currentUser) throw new TRPCError({ code: 'NOT_FOUND', message: 'User not found' });
 
       await db
         .update(users)
@@ -233,7 +235,7 @@ const usersRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       // For now, we'll use verified: 'no' as a ban indicator
       // In production, you'd add a 'banned' column
@@ -243,7 +245,7 @@ const usersRouter = router({
         .where(eq(users.id, input.id))
         .limit(1);
 
-      if (!currentUser) throw new Error('User not found');
+      if (!currentUser) throw new TRPCError({ code: 'NOT_FOUND', message: 'User not found' });
 
       await db
         .update(users)
@@ -373,7 +375,7 @@ const contractsAdminRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const [currentContract] = await db
         .select()
@@ -381,7 +383,7 @@ const contractsAdminRouter = router({
         .where(eq(contracts.id, input.id))
         .limit(1);
 
-      if (!currentContract) throw new Error('Contract not found');
+      if (!currentContract) throw new TRPCError({ code: 'NOT_FOUND', message: 'Contract not found' });
 
       await db
         .update(contracts)
@@ -409,7 +411,7 @@ const contractsAdminRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const [currentContract] = await db
         .select()
@@ -417,7 +419,7 @@ const contractsAdminRouter = router({
         .where(eq(contracts.id, input.id))
         .limit(1);
 
-      if (!currentContract) throw new Error('Contract not found');
+      if (!currentContract) throw new TRPCError({ code: 'NOT_FOUND', message: 'Contract not found' });
 
       await db
         .update(contracts)
@@ -527,7 +529,7 @@ const disputesRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const [currentDispute] = await db
         .select()
@@ -535,7 +537,7 @@ const disputesRouter = router({
         .where(eq(disputes.id, input.id))
         .limit(1);
 
-      if (!currentDispute) throw new Error('Dispute not found');
+      if (!currentDispute) throw new TRPCError({ code: 'NOT_FOUND', message: 'Dispute not found' });
 
       await db
         .update(disputes)
@@ -611,7 +613,7 @@ const kycRouter = router({
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const [currentKyc] = await db
         .select()
@@ -619,7 +621,7 @@ const kycRouter = router({
         .where(eq(kycVerifications.id, input.id))
         .limit(1);
 
-      if (!currentKyc) throw new Error('KYC verification not found');
+      if (!currentKyc) throw new TRPCError({ code: 'NOT_FOUND', message: 'KYC verification not found' });
 
       await db
         .update(kycVerifications)
@@ -657,7 +659,7 @@ const kycRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const [currentKyc] = await db
         .select()
@@ -665,7 +667,7 @@ const kycRouter = router({
         .where(eq(kycVerifications.id, input.id))
         .limit(1);
 
-      if (!currentKyc) throw new Error('KYC verification not found');
+      if (!currentKyc) throw new TRPCError({ code: 'NOT_FOUND', message: 'KYC verification not found' });
 
       await db
         .update(kycVerifications)

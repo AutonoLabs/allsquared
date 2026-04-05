@@ -7,6 +7,15 @@ const clerkClient = createClerkClient({
   secretKey: process.env.CLERK_SECRET_KEY,
 });
 
+// Mask email for log output in production
+function maskEmail(email: string | null | undefined): string {
+  if (!email) return '[no-email]';
+  if (process.env.NODE_ENV !== 'production') return email;
+  const [local, domain] = email.split('@');
+  if (!domain) return '***@***';
+  return `${local.slice(0, 2)}***@${domain}`;
+}
+
 export async function authenticateClerkRequest(req: Request): Promise<User | null> {
   try {
     const secretKey = process.env.CLERK_SECRET_KEY;
@@ -61,7 +70,7 @@ export async function authenticateClerkRequest(req: Request): Promise<User | nul
       }
     }
 
-    console.log('[Auth] DB user found:', user.id, user.email);
+    console.log('[Auth] DB user found:', user.id, maskEmail(user.email));
 
     // Update last signed in
     await db.upsertUser({

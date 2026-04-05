@@ -36,6 +36,7 @@ const About = lazyRetry(() => import("./pages/About"));
 const Contact = lazyRetry(() => import("./pages/Contact"));
 const Terms = lazyRetry(() => import("./pages/Terms"));
 const Privacy = lazyRetry(() => import("./pages/Privacy"));
+const CookiePolicy = lazyRetry(() => import("./pages/CookiePolicy"));
 const Freelancers = lazyRetry(() => import("./pages/Freelancers"));
 const Clients = lazyRetry(() => import("./pages/Clients"));
 const LegalServices = lazyRetry(() => import("./pages/LegalServices"));
@@ -234,6 +235,7 @@ function Router() {
                   <Route path={"/contact"} component={Contact} />
                   <Route path={"/terms"} component={Terms} />
                   <Route path={"/privacy"} component={Privacy} />
+                  <Route path={"/cookie-policy"} component={CookiePolicy} />
                   <Route path={"/freelancers"} component={Freelancers} />
                   <Route path={"/clients"} component={Clients} />
                   <Route path={"/legal-services"} component={LegalServices} />

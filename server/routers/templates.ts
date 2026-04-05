@@ -1,8 +1,10 @@
+import { TRPCError } from '@trpc/server';
 import { z } from "zod";
 import { router, protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
 import { contractTemplates } from "../../drizzle/schema";
 import { eq, and, desc } from "drizzle-orm";
+import { nanoid } from 'nanoid';
 
 export const templatesRouter = router({
   // List all templates
@@ -14,7 +16,7 @@ export const templatesRouter = router({
     )
     .query(async ({ input }: any) => {
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database not available" });
       let query = db.select().from(contractTemplates);
       
       if (input.category) {
@@ -35,7 +37,7 @@ export const templatesRouter = router({
     )
     .query(async ({ input }: any) => {
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database not available" });
       const template = await db
         .select()
         .from(contractTemplates)
@@ -43,7 +45,7 @@ export const templatesRouter = router({
         .limit(1);
 
       if (template.length === 0) {
-        throw new Error("Template not found");
+        throw new TRPCError({ code: 'NOT_FOUND', message: "Template not found" });
       }
 
       return template[0];
@@ -61,7 +63,7 @@ export const templatesRouter = router({
       })
     )
     .mutation(async ({ input }: any) => {
-      const templateId = `tmpl_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const templateId = `tmpl_${nanoid(16)}`;
 
       const templateContent = {
         content: input.content,
@@ -69,14 +71,14 @@ export const templatesRouter = router({
       };
 
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database not available" });
       await db.insert(contractTemplates).values({
         id: templateId,
         name: input.name,
         description: input.description,
         category: input.category,
         templateContent: JSON.stringify(templateContent),
-        isActive: "yes",
+        isActive: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -113,7 +115,7 @@ export const templatesRouter = router({
       }
 
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database not available" });
       await db
         .update(contractTemplates)
         .set(updateData)
@@ -131,7 +133,7 @@ export const templatesRouter = router({
     )
     .mutation(async ({ input }: any) => {
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database not available" });
       await db
         .delete(contractTemplates)
         .where(eq(contractTemplates.id, input.id));

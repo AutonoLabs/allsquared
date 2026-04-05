@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { TRPCError } from '@trpc/server';
 import { router, protectedProcedure } from '../_core/trpc';
 import {
   getUserNotifications,
@@ -28,7 +29,7 @@ export const notificationsRouter = router({
       };
     }),
 
-  // Mark notification as read
+  // Mark notification as read (with ownership check)
   markAsRead: protectedProcedure
     .input(
       z.object({
@@ -36,7 +37,7 @@ export const notificationsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await markNotificationAsRead(input.id);
+      await markNotificationAsRead(input.id, ctx.user.id);
       return { success: true };
     }),
 

@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import { z } from "zod";
 import { router, protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
@@ -9,12 +10,12 @@ export const templateBuilderRouter = router({
   // List available legal templates (with variable defs and clause banks)
   listLegalTemplates: protectedProcedure.query(async () => {
     const db = await getDb();
-    if (!db) throw new Error("Database not available");
+    if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database not available" });
 
     const templates = await db
       .select()
       .from(contractTemplates)
-      .where(eq(contractTemplates.isActive, "yes"));
+      .where(eq(contractTemplates.isActive, true));
 
     // Only return templates that have templateSlug (i.e. legal templates)
     return templates
@@ -35,7 +36,7 @@ export const templateBuilderRouter = router({
     .input(z.object({ id: z.string() }))
     .query(async ({ input }) => {
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database not available" });
 
       const result = await db
         .select()
@@ -44,7 +45,7 @@ export const templateBuilderRouter = router({
         .limit(1);
 
       if (result.length === 0) {
-        throw new Error("Template not found");
+        throw new TRPCError({ code: 'NOT_FOUND', message: "Template not found" });
       }
 
       const t = result[0];
@@ -71,7 +72,7 @@ export const templateBuilderRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database not available" });
 
       // Get the template
       const result = await db
@@ -81,7 +82,7 @@ export const templateBuilderRouter = router({
         .limit(1);
 
       if (result.length === 0) {
-        throw new Error("Template not found");
+        throw new TRPCError({ code: 'NOT_FOUND', message: "Template not found" });
       }
 
       const template = result[0];
@@ -142,7 +143,7 @@ export const templateBuilderRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database not available" });
 
       if (input.contractId) {
         // Update existing

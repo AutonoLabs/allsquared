@@ -1,4 +1,4 @@
-import { eq, and, or, desc, SQL } from "drizzle-orm";
+import { eq, and, or, desc, sql, SQL } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { 
   InsertUser, 
@@ -139,7 +139,7 @@ export async function getAllContractTemplates() {
   return await db
     .select()
     .from(contractTemplates)
-    .where(eq(contractTemplates.isActive, "yes"))
+    .where(eq(contractTemplates.isActive, true))
     .orderBy(contractTemplates.category);
 }
 
@@ -166,7 +166,7 @@ export async function createContractTemplate(template: InsertContractTemplate) {
 
 // ===== Contracts =====
 
-export async function getUserContracts(userId: string, status?: string) {
+export async function getUserContracts(userId: string, status?: string, options?: { limit?: number; offset?: number }) {
   const db = await getDb();
   if (!db) return [];
 
@@ -179,11 +179,41 @@ export async function getUserContracts(userId: string, status?: string) {
     ? and(userFilter, eq(contracts.status, status as any))!
     : userFilter!;
 
-  return await db
+  let query = db
     .select()
     .from(contracts)
     .where(whereClause)
     .orderBy(desc(contracts.createdAt));
+
+  if (options?.limit !== undefined) {
+    query = query.limit(options.limit) as any;
+  }
+  if (options?.offset !== undefined) {
+    query = query.offset(options.offset) as any;
+  }
+
+  return await query;
+}
+
+export async function getUserContractsCount(userId: string, status?: string): Promise<number> {
+  const db = await getDb();
+  if (!db) return 0;
+
+  const userFilter = or(
+    eq(contracts.clientId, userId),
+    eq(contracts.providerId, userId)
+  );
+
+  const whereClause: SQL = status
+    ? and(userFilter, eq(contracts.status, status as any))!
+    : userFilter!;
+
+  const result = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(contracts)
+    .where(whereClause);
+
+  return Number(result[0]?.count ?? 0);
 }
 
 export async function getContract(id: string) {
@@ -376,14 +406,19 @@ export async function createNotification(notification: InsertNotification) {
   return notification;
 }
 
-export async function markNotificationAsRead(id: string) {
+export async function markNotificationAsRead(id: string, userId?: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
+  // If userId is provided, enforce ownership check
+  const condition = userId
+    ? and(eq(notifications.id, id), eq(notifications.userId, userId))
+    : eq(notifications.id, id);
+  
   await db
     .update(notifications)
-    .set({ isRead: "yes" })
-    .where(eq(notifications.id, id));
+    .set({ isRead: true })
+    .where(condition);
 }
 
 export async function markAllNotificationsAsRead(userId: string) {
@@ -392,11 +427,11 @@ export async function markAllNotificationsAsRead(userId: string) {
   
   await db
     .update(notifications)
-    .set({ isRead: "yes" })
+    .set({ isRead: true })
     .where(
       and(
         eq(notifications.userId, userId),
-        eq(notifications.isRead, "no")
+        eq(notifications.isRead, false)
       )
     );
 }

@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import { z } from "zod";
 import { router, protectedProcedure } from "../_core/trpc";
 import { getDb } from "../db";
@@ -9,7 +10,7 @@ export const kycRouter = router({
   /** Get the current user's latest KYC verification status */
   status: protectedProcedure.query(async ({ ctx }) => {
     const db = await getDb();
-    if (!db) throw new Error("Database unavailable");
+    if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database unavailable" });
     const [latest] = await db
       .select({
         id: kycVerifications.id,
@@ -32,7 +33,7 @@ export const kycRouter = router({
   initiate: protectedProcedure
     .mutation(async ({ ctx }) => {
       const db = await getDb();
-      if (!db) throw new Error("Database unavailable");
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database unavailable" });
       const userId = ctx.user!.id;
 
       // Check if there's already a pending or verified record
@@ -44,10 +45,10 @@ export const kycRouter = router({
         .limit(1);
 
       if (existing?.status === "verified") {
-        throw new Error("Identity already verified");
+        throw new TRPCError({ code: 'CONFLICT', message: "Identity already verified" });
       }
       if (existing?.status === "pending" || existing?.status === "processing") {
-        throw new Error("Verification already in progress");
+        throw new TRPCError({ code: 'CONFLICT', message: "Verification already in progress" });
       }
 
       const id = `kyc_${nanoid(16)}`;

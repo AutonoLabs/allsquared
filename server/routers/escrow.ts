@@ -1,5 +1,6 @@
 import { z } from 'zod';
-import { router, protectedProcedure, publicProcedure } from '../_core/trpc';
+import { TRPCError } from '@trpc/server';
+import { router, protectedProcedure, publicProcedure, adminProcedure } from '../_core/trpc';
 import { getDb, createNotification } from '../db';
 import {
   escrowTransactions,
@@ -50,7 +51,7 @@ export const escrowRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       // Verify contract exists and user is the client
       const contract = await db
@@ -60,11 +61,11 @@ export const escrowRouter = router({
         .limit(1);
 
       if (!contract[0]) {
-        throw new Error('Contract not found');
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Contract not found' });
       }
 
       if (contract[0].clientId !== ctx.user.id) {
-        throw new Error('Only the client can initiate escrow deposits');
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Only the client can initiate escrow deposits' });
       }
 
       // Verify milestone if specified
@@ -81,7 +82,7 @@ export const escrowRouter = router({
           .limit(1);
 
         if (!milestone[0]) {
-          throw new Error('Milestone not found');
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Milestone not found' });
         }
       }
 
@@ -168,7 +169,7 @@ export const escrowRouter = router({
     )
     .query(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const escrow = await db
         .select()
@@ -177,7 +178,7 @@ export const escrowRouter = router({
         .limit(1);
 
       if (!escrow[0]) {
-        throw new Error('Escrow transaction not found');
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Escrow transaction not found' });
       }
 
       // Verify user has access (is party to the contract)
@@ -191,7 +192,7 @@ export const escrowRouter = router({
         !contract[0] ||
         (contract[0].clientId !== ctx.user.id && contract[0].providerId !== ctx.user.id)
       ) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
 
       // Get latest status from Transpact (SOAP: ViewTranspact)
@@ -231,7 +232,7 @@ export const escrowRouter = router({
     )
     .query(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       // Verify user has access
       const contract = await db
@@ -244,7 +245,7 @@ export const escrowRouter = router({
         !contract[0] ||
         (contract[0].clientId !== ctx.user.id && contract[0].providerId !== ctx.user.id)
       ) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
 
       const escrows = await db
@@ -267,7 +268,7 @@ export const escrowRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const escrow = await db
         .select()
@@ -276,7 +277,7 @@ export const escrowRouter = router({
         .limit(1);
 
       if (!escrow[0]) {
-        throw new Error('Escrow transaction not found');
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Escrow transaction not found' });
       }
 
       // Verify user is the client (only client can release)
@@ -287,11 +288,11 @@ export const escrowRouter = router({
         .limit(1);
 
       if (!contract[0] || contract[0].clientId !== ctx.user.id) {
-        throw new Error('Only the client can release escrow funds');
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Only the client can release escrow funds' });
       }
 
       if (escrow[0].status !== 'held') {
-        throw new Error('Escrow funds are not in held status');
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Escrow funds are not in held status' });
       }
 
       const releaseAmount = input.amount || parseInt(escrow[0].amount, 10);
@@ -390,7 +391,7 @@ export const escrowRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const escrow = await db
         .select()
@@ -399,7 +400,7 @@ export const escrowRouter = router({
         .limit(1);
 
       if (!escrow[0]) {
-        throw new Error('Escrow transaction not found');
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Escrow transaction not found' });
       }
 
       // Verify user is party to the contract
@@ -413,11 +414,11 @@ export const escrowRouter = router({
         !contract[0] ||
         (contract[0].clientId !== ctx.user.id && contract[0].providerId !== ctx.user.id)
       ) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
 
       if (escrow[0].status !== 'held') {
-        throw new Error('Escrow funds are not available for refund');
+        throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Escrow funds are not available for refund' });
       }
 
       // Mark contract as disputed
@@ -466,8 +467,8 @@ export const escrowRouter = router({
       };
     }),
 
-  // Process refund (admin or after dispute resolution)
-  processRefund: protectedProcedure
+  // Process refund (admin only)
+  processRefund: adminProcedure
     .input(
       z.object({
         escrowId: z.string(),
@@ -478,9 +479,8 @@ export const escrowRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
-      // In production, this would be admin-only
       const escrow = await db
         .select()
         .from(escrowTransactions)
@@ -488,7 +488,7 @@ export const escrowRouter = router({
         .limit(1);
 
       if (!escrow[0]) {
-        throw new Error('Escrow transaction not found');
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Escrow transaction not found' });
       }
 
       // Process refund via Transpact (SOAP: VoidTranspact)
@@ -568,7 +568,7 @@ export const escrowRouter = router({
     )
     .mutation(async ({ input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const webhookId = `webhook_${nanoid(16)}`;
 
@@ -661,7 +661,7 @@ export const escrowRouter = router({
   // Get escrow summary for user
   getSummary: protectedProcedure.query(async ({ ctx }) => {
     const db = await getDb();
-    if (!db) throw new Error('Database not available');
+    if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
     // Get all escrows for contracts where user is client or provider
     const userContracts = await db

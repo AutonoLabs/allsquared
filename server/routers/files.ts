@@ -1,10 +1,26 @@
+import { TRPCError } from '@trpc/server';
 import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import { uploadToR2, getR2DownloadUrl, deleteFromR2, isR2Configured, validateFileType } from "../r2";
 import { getDb } from "../db";
-import { fileAttachments } from "../../drizzle/schema";
-import { eq, and } from "drizzle-orm";
+import { fileAttachments, contracts } from "../../drizzle/schema";
+import { eq, and, or } from "drizzle-orm";
 import { nanoid } from "nanoid";
+
+// Helper: check if a user is a party to a contract
+async function isUserPartyToContract(db: any, userId: string, contractId: string): Promise<boolean> {
+  const result = await db
+    .select({ id: contracts.id })
+    .from(contracts)
+    .where(
+      and(
+        eq(contracts.id, contractId),
+        or(eq(contracts.clientId, userId), eq(contracts.providerId, userId))
+      )
+    )
+    .limit(1);
+  return result.length > 0;
+}
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
@@ -24,18 +40,18 @@ export const filesRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) throw new Error("User not authenticated");
+      if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED', message: "User not authenticated" });
 
       if (!isR2Configured()) {
-        throw new Error("File storage is not configured. R2 credentials are missing.");
+        throw new TRPCError({ code: 'BAD_REQUEST', message: "File storage is not configured. R2 credentials are missing." });
       }
 
       if (!validateFileType(input.fileType)) {
-        throw new Error(`File type ${input.fileType} is not allowed`);
+        throw new TRPCError({ code: 'BAD_REQUEST', message: `File type ${input.fileType} is not allowed` });
       }
 
       if (input.fileSize > MAX_FILE_SIZE) {
-        throw new Error("File size exceeds maximum allowed size of 50MB");
+        throw new TRPCError({ code: 'BAD_REQUEST', message: "File size exceeds maximum allowed size of 50MB" });
       }
 
       const fileBuffer = Buffer.from(input.fileData, "base64");
@@ -50,7 +66,7 @@ export const filesRouter = router({
       const fileKey = await uploadToR2(fileBuffer, input.fileName, input.fileType, folder);
 
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database not available" });
 
       const fileId = nanoid();
       await db.insert(fileAttachments).values({
@@ -79,10 +95,10 @@ export const filesRouter = router({
   getDownloadUrl: protectedProcedure
     .input(z.object({ fileId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) throw new Error("User not authenticated");
+      if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED', message: "User not authenticated" });
 
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database not available" });
 
       const files = await db
         .select()
@@ -90,16 +106,21 @@ export const filesRouter = router({
         .where(eq(fileAttachments.id, input.fileId))
         .limit(1);
 
-      if (files.length === 0) throw new Error("File not found");
+      if (files.length === 0) throw new TRPCError({ code: 'NOT_FOUND', message: "File not found" });
 
       const file = files[0];
 
-      if (file.uploadedBy !== ctx.user.id && ctx.user.role !== "admin") {
-        throw new Error("You do not have permission to access this file");
+      // Check access: uploader, admin, or party to the associated contract
+      let hasAccess = file.uploadedBy === ctx.user.id || ctx.user.role === "admin";
+      if (!hasAccess && file.entityType === "contract" && file.entityId) {
+        hasAccess = await isUserPartyToContract(db, ctx.user.id, file.entityId);
+      }
+      if (!hasAccess) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'You do not have permission to access this file' });
       }
 
       if (!isR2Configured()) {
-        throw new Error("File storage is not configured");
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'File storage is not configured' });
       }
 
       const downloadUrl = await getR2DownloadUrl(file.fileUrl, 60);
@@ -117,10 +138,10 @@ export const filesRouter = router({
   delete: protectedProcedure
     .input(z.object({ fileId: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      if (!ctx.user) throw new Error("User not authenticated");
+      if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED', message: "User not authenticated" });
 
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database not available" });
 
       const files = await db
         .select()
@@ -128,11 +149,16 @@ export const filesRouter = router({
         .where(eq(fileAttachments.id, input.fileId))
         .limit(1);
 
-      if (files.length === 0) throw new Error("File not found");
+      if (files.length === 0) throw new TRPCError({ code: 'NOT_FOUND', message: 'File not found' });
       const file = files[0];
 
-      if (file.uploadedBy !== ctx.user.id && ctx.user.role !== "admin") {
-        throw new Error("You do not have permission to delete this file");
+      // Check access: uploader, admin, or party to the associated contract
+      let hasDeleteAccess = file.uploadedBy === ctx.user.id || ctx.user.role === "admin";
+      if (!hasDeleteAccess && file.entityType === "contract" && file.entityId) {
+        hasDeleteAccess = await isUserPartyToContract(db, ctx.user.id, file.entityId);
+      }
+      if (!hasDeleteAccess) {
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'You do not have permission to delete this file' });
       }
 
       if (isR2Configured()) {
@@ -154,10 +180,10 @@ export const filesRouter = router({
       })
     )
     .query(async ({ ctx, input }) => {
-      if (!ctx.user) throw new Error("User not authenticated");
+      if (!ctx.user) throw new TRPCError({ code: 'UNAUTHORIZED', message: "User not authenticated" });
 
       const db = await getDb();
-      if (!db) throw new Error("Database not available");
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: "Database not available" });
 
       return db
         .select()

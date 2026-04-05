@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { router, protectedProcedure } from '../_core/trpc';
 import { getDb } from '../db';
@@ -8,6 +9,26 @@ import { CHATBOT_MODELS, DEFAULT_CHATBOT_MODEL, type ChatbotModelId } from '../.
 
 // OpenAI API configuration
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
+
+// ── In-memory rate limiter: 10 AI requests per minute per user ──
+const AI_RATE_LIMIT = 10;
+const AI_RATE_WINDOW_MS = 60_000;
+const aiRateLimitMap = new Map<string, number[]>();
+
+function checkAiRateLimit(userId: string): void {
+  const now = Date.now();
+  const timestamps = aiRateLimitMap.get(userId) || [];
+  // Remove timestamps outside the window
+  const recent = timestamps.filter((t) => now - t < AI_RATE_WINDOW_MS);
+  if (recent.length >= AI_RATE_LIMIT) {
+    throw new TRPCError({
+      code: 'TOO_MANY_REQUESTS',
+      message: `Rate limit exceeded: max ${AI_RATE_LIMIT} AI requests per minute. Please try again shortly.`,
+    });
+  }
+  recent.push(now);
+  aiRateLimitMap.set(userId, recent);
+}
 
 // LexAI RAG — legal research engine (env var with localhost fallback)
 const LEXAI_API_URL = process.env.LEXAI_API_URL || 'http://localhost:8002';
@@ -148,7 +169,7 @@ Generate the contract in a structured format with clear sections. Include placeh
     if (!response.ok) {
       const error = await response.text();
       console.error('OpenAI API error:', error);
-      throw new Error('Failed to generate contract');
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to generate contract' });
     }
 
     const data = await response.json();
@@ -266,10 +287,11 @@ export const aiRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      checkAiRateLimit(ctx.user.id);
       const generationId = `aigen_${nanoid(16)}`;
 
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       // Get template if specified
       let templateContent: string | undefined;
@@ -333,8 +355,9 @@ export const aiRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      checkAiRateLimit(ctx.user.id);
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       // Get original generation
       const original = await db
@@ -344,7 +367,7 @@ export const aiRouter = router({
         .limit(1);
 
       if (!original[0] || original[0].userId !== ctx.user.id) {
-        throw new Error('Generation not found');
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Generation not found' });
       }
 
       const newGenerationId = `aigen_${nanoid(16)}`;
@@ -397,7 +420,7 @@ export const aiRouter = router({
     )
     .query(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const { page = 1, limit = 10 } = input || {};
 
@@ -426,7 +449,7 @@ export const aiRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const generation = await db
         .select()
@@ -435,7 +458,7 @@ export const aiRouter = router({
         .limit(1);
 
       if (!generation[0] || generation[0].userId !== ctx.user.id) {
-        throw new Error('Generation not found');
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Generation not found' });
       }
 
       await db
@@ -455,6 +478,7 @@ export const aiRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      checkAiRateLimit(ctx.user.id);
       const apiKey = process.env.OPENAI_API_KEY;
 
       if (!apiKey) {
@@ -494,7 +518,7 @@ Format each clause with a title and the clause text.`;
         });
 
         if (!response.ok) {
-          throw new Error('Failed to generate clauses');
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Failed to generate clauses' });
         }
 
         const data = await response.json();
@@ -523,7 +547,8 @@ Format each clause with a title and the clause text.`;
         })).optional(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      checkAiRateLimit(ctx.user.id);
       const modelCfg = CHATBOT_MODELS[input.modelId];
       const apiKey = process.env.OPENAI_API_KEY;
 
@@ -632,7 +657,7 @@ ${input.contractContext ? `\nCurrent contract context:\n${input.contractContext.
         if (!resp.ok) {
           const errText = await resp.text();
           console.error(`[chatbot] ${modelCfg.apiModel} error:`, errText);
-          throw new Error('API error');
+          throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'API error' });
         }
 
         const data = await resp.json();

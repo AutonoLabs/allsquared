@@ -4,17 +4,19 @@ import dotenv from "dotenv";
 // Load environment variables
 dotenv.config();
 
+const isProduction = process.env.NODE_ENV === "production";
+
 // Define environment schema - Clerk-based auth
 const EnvSchema = z.object({
   // Clerk authentication
-  CLERK_SECRET_KEY: z.string().min(1).optional(),
+  CLERK_SECRET_KEY: isProduction ? z.string().min(1, "CLERK_SECRET_KEY is required in production") : z.string().min(1).optional(),
   VITE_CLERK_PUBLISHABLE_KEY: z.string().min(1).optional(),
   
   // Database
-  DATABASE_URL: z.string().url().optional(),
+  DATABASE_URL: isProduction ? z.string().url("DATABASE_URL is required in production") : z.string().url().optional(),
   
   // JWT for internal session signing (fallback)
-  JWT_SECRET: z.string().min(1).optional(),
+  JWT_SECRET: isProduction ? z.string().min(1, "JWT_SECRET is required in production") : z.string().min(1).optional(),
   
   // Environment
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
@@ -33,7 +35,13 @@ const EnvSchema = z.object({
   // Stripe (optional for payments)
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_PUBLISHABLE_KEY: z.string().optional(),
-  
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+
+  // OpenAI
+  OPENAI_API_KEY: z.string().optional(),
+
+  // Companies House
+  COMPANIES_HOUSE_API_KEY: z.string().optional(),
 });
 
 // Parse and validate environment variables (soft fail for missing vars)
@@ -53,7 +61,13 @@ try {
 export const ENV = {
   clerkSecretKey: envVars.CLERK_SECRET_KEY ?? "",
   databaseUrl: envVars.DATABASE_URL ?? "",
-  cookieSecret: envVars.JWT_SECRET ?? "dev-secret-change-in-production",
+  cookieSecret: (() => {
+    const secret = envVars.JWT_SECRET;
+    if (!secret && isProduction) {
+      throw new Error("JWT_SECRET must be set in production");
+    }
+    return secret ?? "dev-secret-DO-NOT-USE-IN-PROD";
+  })(),
   isProduction: envVars.NODE_ENV === "production",
   appTitle: envVars.VITE_APP_TITLE,
   appLogo: envVars.VITE_APP_LOGO,
@@ -66,5 +80,13 @@ export const ENV = {
   
   // Stripe
   stripeSecretKey: envVars.STRIPE_SECRET_KEY,
-  
+
+  // Stripe Webhook
+  stripeWebhookSecret: envVars.STRIPE_WEBHOOK_SECRET,
+
+  // OpenAI
+  openaiApiKey: envVars.OPENAI_API_KEY,
+
+  // Companies House
+  companiesHouseApiKey: envVars.COMPANIES_HOUSE_API_KEY,
 };

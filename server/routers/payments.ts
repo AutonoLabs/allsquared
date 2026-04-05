@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { router, protectedProcedure, publicProcedure } from '../_core/trpc';
 import { getDb } from '../db';
@@ -33,7 +34,7 @@ async function stripeRequest(
   const apiKey = process.env.STRIPE_SECRET_KEY;
 
   if (!apiKey) {
-    throw new Error('Stripe is not configured');
+    throw new TRPCError({ code: 'BAD_REQUEST', message: 'Stripe is not configured' });
   }
 
   const options: RequestInit = {
@@ -82,7 +83,7 @@ export const paymentsRouter = router({
   // Get user's subscription status
   getSubscription: protectedProcedure.query(async ({ ctx }) => {
     const db = await getDb();
-    if (!db) throw new Error('Database not available');
+    if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
     const subscription = await db
       .select()
@@ -168,7 +169,7 @@ export const paymentsRouter = router({
   // Create or update Stripe customer
   createCustomer: protectedProcedure.mutation(async ({ ctx }) => {
     const db = await getDb();
-    if (!db) throw new Error('Database not available');
+    if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
     const user = ctx.user;
 
@@ -199,7 +200,7 @@ export const paymentsRouter = router({
   // Create Stripe Connect account for providers
   createConnectedAccount: protectedProcedure.mutation(async ({ ctx }) => {
     const db = await getDb();
-    if (!db) throw new Error('Database not available');
+    if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
     const user = ctx.user;
 
@@ -264,7 +265,7 @@ export const paymentsRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const user = ctx.user;
 
@@ -292,7 +293,7 @@ export const paymentsRouter = router({
       const priceId = process.env[`STRIPE_PRICE_${input.tier.toUpperCase()}`];
 
       if (!priceId) {
-        throw new Error('Subscription tier not configured');
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Subscription tier not configured' });
       }
 
       // Create checkout session
@@ -332,7 +333,7 @@ export const paymentsRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const user = ctx.user;
 
@@ -435,7 +436,7 @@ export const paymentsRouter = router({
     )
     .query(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const { page = 1, limit = 20, type } = input || {};
 
@@ -462,7 +463,7 @@ export const paymentsRouter = router({
   // Cancel subscription
   cancelSubscription: protectedProcedure.mutation(async ({ ctx }) => {
     const db = await getDb();
-    if (!db) throw new Error('Database not available');
+    if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
     const subscription = await db
       .select()
@@ -471,7 +472,7 @@ export const paymentsRouter = router({
       .limit(1);
 
     if (!subscription[0] || !subscription[0].stripeSubscriptionId) {
-      throw new Error('No active subscription found');
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'No active subscription found' });
     }
 
     // Cancel at period end (not immediately)
@@ -507,7 +508,7 @@ export const paymentsRouter = router({
   // Reactivate subscription
   reactivateSubscription: protectedProcedure.mutation(async ({ ctx }) => {
     const db = await getDb();
-    if (!db) throw new Error('Database not available');
+    if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
     const subscription = await db
       .select()
@@ -516,7 +517,7 @@ export const paymentsRouter = router({
       .limit(1);
 
     if (!subscription[0] || !subscription[0].stripeSubscriptionId) {
-      throw new Error('No subscription found');
+      throw new TRPCError({ code: 'BAD_REQUEST', message: 'No subscription found' });
     }
 
     // Reactivate subscription
@@ -576,17 +577,38 @@ export const paymentsRouter = router({
   }),
 
   // Handle Stripe webhook (called from webhook endpoint)
+  // NOTE: Stripe webhook signature should be verified at the HTTP layer before calling this.
+  // If raw body + STRIPE_WEBHOOK_SECRET are available, use Stripe.webhooks.constructEvent().
   handleWebhook: publicProcedure
     .input(
       z.object({
         eventType: z.string(),
         eventId: z.string(),
         data: z.any(),
+        rawBody: z.string().optional(),
+        signature: z.string().optional(),
       })
     )
     .mutation(async ({ input }) => {
+      // Verify Stripe webhook signature if secret is configured
+      const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+      if (webhookSecret && input.rawBody && input.signature) {
+        try {
+          const Stripe = (await import('stripe')).default;
+          const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', { apiVersion: '2023-10-16' as any });
+          stripe.webhooks.constructEvent(input.rawBody, input.signature, webhookSecret);
+        } catch (err) {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Invalid Stripe webhook signature' });
+        }
+      } else if (webhookSecret) {
+        // If we have a secret but no signature, reject in production
+        if (process.env.NODE_ENV === 'production') {
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Missing Stripe webhook signature' });
+        }
+      }
+
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const webhookId = `webhook_${nanoid(16)}`;
 

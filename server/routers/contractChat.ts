@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { router, protectedProcedure } from '../_core/trpc';
 
@@ -22,7 +23,7 @@ async function queryOpenAI(
   model: string,
 ): Promise<{ reply: string; model: string }> {
   const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) throw new Error('OPENAI_API_KEY not configured');
+  if (!apiKey) throw new TRPCError({ code: 'BAD_REQUEST', message: 'OPENAI_API_KEY not configured' });
 
   const resp = await fetch(OPENAI_API_URL, {
     method: 'POST',
@@ -43,7 +44,7 @@ async function queryOpenAI(
 
   if (!resp.ok) {
     const err = await resp.text().catch(() => 'Unknown error');
-    throw new Error(`OpenAI API error (${resp.status}): ${err}`);
+    throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: `OpenAI API error (${resp.status}): ${err}` });
   }
 
   const data = await resp.json();
@@ -57,7 +58,7 @@ async function queryLexAI(
   question: string,
   context: string,
 ): Promise<{ reply: string; model: string; sources: Array<{ citation: string; text: string }> }> {
-  if (!LEXAI_API_URL) throw new Error('LEXAI_API_URL not configured');
+  if (!LEXAI_API_URL) throw new TRPCError({ code: 'BAD_REQUEST', message: 'LEXAI_API_URL not configured' });
 
   // Query LexAI RAG for relevant legal context
   const ragResp = await fetch(`${LEXAI_API_URL}/query`, {
@@ -74,7 +75,7 @@ async function queryLexAI(
   });
 
   if (!ragResp.ok) {
-    throw new Error(`LexAI API error (${ragResp.status})`);
+    throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: `LexAI API error (${ragResp.status})` });
   }
 
   const ragData = await ragResp.json();
@@ -127,7 +128,7 @@ export const contractChatRouter = router({
       const modelConfig = AI_MODELS[input.model as ModelId];
 
       if (!modelConfig) {
-        throw new Error(`Unknown model: ${input.model}`);
+        throw new TRPCError({ code: 'BAD_REQUEST', message: `Unknown model: ${input.model}` });
       }
 
       try {

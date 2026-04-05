@@ -1,6 +1,8 @@
+import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { router, protectedProcedure } from '../_core/trpc';
 import {
+import { nanoid } from 'nanoid';
   getContractMilestones,
   getMilestone,
   createMilestone,
@@ -21,7 +23,7 @@ export const milestonesRouter = router({
       // Verify user has access to contract
       const contract = await getContract(input.contractId);
       if (!contract || (contract.clientId !== ctx.user.id && contract.providerId !== ctx.user.id)) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
       
       const milestones = await getContractMilestones(input.contractId);
@@ -41,13 +43,13 @@ export const milestonesRouter = router({
       const milestone = await getMilestone(input.id);
       
       if (!milestone) {
-        throw new Error('Milestone not found');
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Milestone not found' });
       }
       
       // Verify access
       const contract = await getContract(milestone.contractId);
       if (!contract || (contract.clientId !== ctx.user.id && contract.providerId !== ctx.user.id)) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
       
       return milestone;
@@ -69,10 +71,10 @@ export const milestonesRouter = router({
       const contract = await getContract(input.contractId);
       
       if (!contract || contract.clientId !== ctx.user.id) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
       
-      const milestoneId = `milestone_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const milestoneId = `milestone_${nanoid(16)}`;
       
       await createMilestone({
         id: milestoneId,
@@ -108,12 +110,12 @@ export const milestonesRouter = router({
       const milestone = await getMilestone(input.id);
       
       if (!milestone) {
-        throw new Error('Milestone not found');
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Milestone not found' });
       }
       
       const contract = await getContract(milestone.contractId);
       if (!contract || (contract.clientId !== ctx.user.id && contract.providerId !== ctx.user.id)) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
       
       const updates: any = { updatedAt: new Date() };
@@ -140,12 +142,12 @@ export const milestonesRouter = router({
       const milestone = await getMilestone(input.id);
       
       if (!milestone) {
-        throw new Error('Milestone not found');
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Milestone not found' });
       }
       
       const contract = await getContract(milestone.contractId);
       if (!contract || contract.providerId !== ctx.user.id) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
       
       await updateMilestone(input.id, {
@@ -155,7 +157,7 @@ export const milestonesRouter = router({
       
       // Notify client
       await createNotification({
-        id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: `notif_${nanoid(16)}`,
         userId: contract.clientId,
         type: 'milestone',
         title: 'Milestone Submitted for Approval',
@@ -180,12 +182,12 @@ export const milestonesRouter = router({
       const milestone = await getMilestone(input.id);
       
       if (!milestone) {
-        throw new Error('Milestone not found');
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Milestone not found' });
       }
       
       const contract = await getContract(milestone.contractId);
       if (!contract || contract.clientId !== ctx.user.id) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
       
       await updateMilestone(input.id, {
@@ -196,7 +198,7 @@ export const milestonesRouter = router({
       
       // Notify provider
       await createNotification({
-        id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: `notif_${nanoid(16)}`,
         userId: contract.providerId,
         type: 'milestone',
         title: 'Milestone Approved',
@@ -221,12 +223,12 @@ export const milestonesRouter = router({
       const milestone = await getMilestone(input.id);
       
       if (!milestone) {
-        throw new Error('Milestone not found');
+        throw new TRPCError({ code: 'NOT_FOUND', message: 'Milestone not found' });
       }
       
       const contract = await getContract(milestone.contractId);
       if (!contract || contract.clientId !== ctx.user.id) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
       
       await updateMilestone(input.id, {
@@ -236,7 +238,7 @@ export const milestonesRouter = router({
       
       // Notify provider
       await createNotification({
-        id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: `notif_${nanoid(16)}`,
         userId: contract.providerId,
         type: 'milestone',
         title: 'Milestone Requires Revision',

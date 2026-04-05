@@ -22,6 +22,7 @@ import { updateUser, getUserByClerkId, upsertUser, getUser, getDb } from "./db";
 import { users } from "../drizzle/schema";
 import { z } from "zod";
 import { nanoid } from "nanoid";
+import { TRPCError } from "@trpc/server";
 
 export const appRouter = router({
   system: systemRouter,
@@ -36,7 +37,7 @@ export const appRouter = router({
       } as const;
     }),
     // Sync Clerk user to our database
-    syncClerkUser: publicProcedure
+    syncClerkUser: protectedProcedure
       .input(
         z.object({
           clerkId: z.string().min(1),
@@ -45,8 +46,18 @@ export const appRouter = router({
           emailVerified: z.boolean().optional(),
         })
       )
-      .mutation(async ({ input }) => {
+      .mutation(async ({ ctx, input }) => {
         const { clerkId, email, name } = input;
+
+        // Verify the authenticated user matches the clerkId being synced
+        // Allow if: user's clerkId matches, or user is admin, or this is for first-user creation
+        const db = await getDb();
+        const existingUsers = db ? await db.select({ id: users.id }).from(users).limit(1) : [];
+        const isFirstUser = existingUsers.length === 0;
+
+        if (!isFirstUser && ctx.user.role !== 'admin' && ctx.user.clerkId !== clerkId) {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot sync a different user' });
+        }
         
         // Check if user already exists
         let user = await getUserByClerkId(clerkId);
@@ -68,9 +79,6 @@ export const appRouter = router({
 
         // Create new user with admin role if first user or matches owner email
         const userId = `clerk_${nanoid(16)}`;
-        const db = await getDb();
-        const existingUsers = db ? await db.select({ id: users.id }).from(users).limit(1) : [];
-        const isFirstUser = existingUsers.length === 0;
 
         await upsertUser({
           id: userId,
@@ -97,7 +105,7 @@ export const appRouter = router({
       )
       .mutation(async ({ ctx, input }) => {
         if (!ctx.user) {
-          throw new Error("User not authenticated");
+          throw new TRPCError({ code: 'UNAUTHORIZED', message: 'User not authenticated' });
         }
         const updatedUser = await updateUser(ctx.user.id, input);
         return updatedUser;

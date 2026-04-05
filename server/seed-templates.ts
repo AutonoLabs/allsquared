@@ -239,7 +239,7 @@ export async function seedTemplates(db: ReturnType<typeof drizzle>) {
       description: config.description,
       category: config.category,
       templateContent: JSON.stringify({ content: config.description, variables: config.variables.map((v) => v.name) }),
-      isActive: "yes" as const,
+      isActive: true,
       variables: JSON.stringify(config.variables),
       clauseBanks: JSON.stringify(config.clauseBanks),
       templateMarkdown: markdown,

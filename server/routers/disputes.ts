@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { router, protectedProcedure } from '../_core/trpc';
 import { getDb, createNotification } from '../db';
@@ -110,7 +111,7 @@ ${legalContext}`;
     });
 
     if (!response.ok) {
-      throw new Error(`OpenAI API error: ${response.status}`);
+      throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: `OpenAI API error: ${response.status}` });
     }
 
     const data = await response.json();
@@ -208,7 +209,7 @@ export const disputesRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       // Verify contract exists and user is a party
       const [contract] = await db
@@ -217,10 +218,10 @@ export const disputesRouter = router({
         .where(eq(contracts.id, input.contractId))
         .limit(1);
 
-      if (!contract) throw new Error('Contract not found');
+      if (!contract) throw new TRPCError({ code: 'NOT_FOUND', message: 'Contract not found' });
 
       if (contract.clientId !== ctx.user.id && contract.providerId !== ctx.user.id) {
-        throw new Error('You are not a party to this contract');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'You are not a party to this contract' });
       }
 
       // Verify milestone if provided
@@ -236,7 +237,7 @@ export const disputesRouter = router({
           )
           .limit(1);
 
-        if (!milestone) throw new Error('Milestone not found for this contract');
+        if (!milestone) throw new TRPCError({ code: 'NOT_FOUND', message: 'Milestone not found for this contract' });
       }
 
       // Create the dispute
@@ -360,7 +361,7 @@ export const disputesRouter = router({
     .input(z.object({ id: z.string() }))
     .query(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const [dispute] = await db
         .select()
@@ -368,7 +369,7 @@ export const disputesRouter = router({
         .where(eq(disputes.id, input.id))
         .limit(1);
 
-      if (!dispute) throw new Error('Dispute not found');
+      if (!dispute) throw new TRPCError({ code: 'NOT_FOUND', message: 'Dispute not found' });
 
       // Verify user is a party to the contract
       const [contract] = await db
@@ -381,7 +382,7 @@ export const disputesRouter = router({
         !contract ||
         (contract.clientId !== ctx.user.id && contract.providerId !== ctx.user.id)
       ) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
 
       // Get all related data in parallel
@@ -449,7 +450,7 @@ export const disputesRouter = router({
     )
     .query(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const { status, page = 1, limit = 20 } = input || {};
 
@@ -509,7 +510,7 @@ export const disputesRouter = router({
     .input(z.object({ disputeId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const [dispute] = await db
         .select()
@@ -517,7 +518,7 @@ export const disputesRouter = router({
         .where(eq(disputes.id, input.disputeId))
         .limit(1);
 
-      if (!dispute) throw new Error('Dispute not found');
+      if (!dispute) throw new TRPCError({ code: 'NOT_FOUND', message: 'Dispute not found' });
 
       // Verify access
       const [contract] = await db
@@ -530,7 +531,7 @@ export const disputesRouter = router({
         !contract ||
         (contract.clientId !== ctx.user.id && contract.providerId !== ctx.user.id)
       ) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
 
       const claimantId = dispute.raisedBy;
@@ -569,7 +570,7 @@ export const disputesRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const [dispute] = await db
         .select()
@@ -577,10 +578,10 @@ export const disputesRouter = router({
         .where(eq(disputes.id, input.disputeId))
         .limit(1);
 
-      if (!dispute) throw new Error('Dispute not found');
+      if (!dispute) throw new TRPCError({ code: 'NOT_FOUND', message: 'Dispute not found' });
 
       if (dispute.status !== 'open' && dispute.status !== 'under_review') {
-        throw new Error('Dispute is not open for mediation');
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'Dispute is not open for mediation' });
       }
 
       const [contract] = await db
@@ -593,7 +594,7 @@ export const disputesRouter = router({
         !contract ||
         (contract.clientId !== ctx.user.id && contract.providerId !== ctx.user.id)
       ) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
 
       // Determine role
@@ -682,7 +683,7 @@ export const disputesRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const [dispute] = await db
         .select()
@@ -690,7 +691,7 @@ export const disputesRouter = router({
         .where(eq(disputes.id, input.disputeId))
         .limit(1);
 
-      if (!dispute) throw new Error('Dispute not found');
+      if (!dispute) throw new TRPCError({ code: 'NOT_FOUND', message: 'Dispute not found' });
 
       const [contract] = await db
         .select()
@@ -702,7 +703,7 @@ export const disputesRouter = router({
         !contract ||
         (contract.clientId !== ctx.user.id && contract.providerId !== ctx.user.id)
       ) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
 
       const isClaimant = dispute.raisedBy === ctx.user.id;
@@ -743,7 +744,7 @@ export const disputesRouter = router({
     .input(z.object({ settlementId: z.string() }))
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const [settlement] = await db
         .select()
@@ -751,10 +752,10 @@ export const disputesRouter = router({
         .where(eq(settlementOptions.id, input.settlementId))
         .limit(1);
 
-      if (!settlement) throw new Error('Settlement option not found');
+      if (!settlement) throw new TRPCError({ code: 'NOT_FOUND', message: 'Settlement option not found' });
 
       if (settlement.status !== 'proposed') {
-        throw new Error('This settlement is no longer available');
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'This settlement is no longer available' });
       }
 
       if (settlement.expiresAt && settlement.expiresAt < new Date()) {
@@ -762,7 +763,7 @@ export const disputesRouter = router({
           .update(settlementOptions)
           .set({ status: 'expired' })
           .where(eq(settlementOptions.id, input.settlementId));
-        throw new Error('This settlement has expired');
+        throw new TRPCError({ code: 'BAD_REQUEST', message: 'This settlement has expired' });
       }
 
       const [dispute] = await db
@@ -771,7 +772,7 @@ export const disputesRouter = router({
         .where(eq(disputes.id, settlement.disputeId))
         .limit(1);
 
-      if (!dispute) throw new Error('Dispute not found');
+      if (!dispute) throw new TRPCError({ code: 'NOT_FOUND', message: 'Dispute not found' });
 
       const [contract] = await db
         .select()
@@ -783,7 +784,7 @@ export const disputesRouter = router({
         !contract ||
         (contract.clientId !== ctx.user.id && contract.providerId !== ctx.user.id)
       ) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
 
       // Determine which role is accepting
@@ -900,7 +901,7 @@ export const disputesRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
-      if (!db) throw new Error('Database not available');
+      if (!db) throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR', message: 'Database not available' });
 
       const [dispute] = await db
         .select()
@@ -908,10 +909,10 @@ export const disputesRouter = router({
         .where(eq(disputes.id, input.disputeId))
         .limit(1);
 
-      if (!dispute) throw new Error('Dispute not found');
+      if (!dispute) throw new TRPCError({ code: 'NOT_FOUND', message: 'Dispute not found' });
 
       if (dispute.status === 'resolved' || dispute.status === 'closed') {
-        throw new Error('Cannot escalate a resolved or closed dispute');
+        throw new TRPCError({ code: 'FORBIDDEN', message: 'Cannot escalate a resolved or closed dispute' });
       }
 
       const [contract] = await db
@@ -924,7 +925,7 @@ export const disputesRouter = router({
         !contract ||
         (contract.clientId !== ctx.user.id && contract.providerId !== ctx.user.id)
       ) {
-        throw new Error('Unauthorized');
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
       }
 
       // Update dispute status
