@@ -115,10 +115,10 @@ export default function AdminUserDetail() {
             {user.role}
           </Badge>
           <Badge
-            variant={user.verified === "yes" ? "default" : "outline"}
-            className={user.verified === "yes" ? "bg-green-500" : ""}
+            variant={user.verified === true ? "default" : "outline"}
+            className={user.verified === true ? "bg-green-500" : ""}
           >
-            {user.verified === "yes" ? "Verified" : "Not Verified"}
+            {user.verified === true ? "Verified" : "Not Verified"}
           </Badge>
         </div>
       </div>
@@ -209,19 +209,19 @@ export default function AdminUserDetail() {
               <p className="text-sm text-muted-foreground mb-2">Verification Status</p>
               <div className="flex gap-2">
                 <Button
-                  variant={user.verified === "yes" ? "default" : "outline"}
+                  variant={user.verified === true ? "default" : "outline"}
                   size="sm"
-                  onClick={() => verifyMutation.mutate({ id: user.id, verified: "yes" })}
-                  disabled={verifyMutation.isPending || user.verified === "yes"}
+                  onClick={() => verifyMutation.mutate({ id: user.id, verified: true })}
+                  disabled={verifyMutation.isPending || user.verified === true}
                 >
                   <Shield className="h-4 w-4 mr-2" />
                   Verify
                 </Button>
                 <Button
-                  variant={user.verified === "no" ? "destructive" : "outline"}
+                  variant={user.verified === false ? "destructive" : "outline"}
                   size="sm"
-                  onClick={() => verifyMutation.mutate({ id: user.id, verified: "no" })}
-                  disabled={verifyMutation.isPending || user.verified === "no"}
+                  onClick={() => verifyMutation.mutate({ id: user.id, verified: false })}
+                  disabled={verifyMutation.isPending || user.verified === false}
                 >
                   Unverify
                 </Button>

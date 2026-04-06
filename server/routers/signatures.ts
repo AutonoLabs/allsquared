@@ -458,7 +458,7 @@ export const signaturesRouter = router({
             title: 'Signature Requested',
             message: `You have been asked to sign "${contract.title}". Please review and sign by ${expiresAt.toLocaleDateString('en-GB')}.`,
             relatedId: input.contractId,
-            isRead: 'no',
+            isRead: false,
             createdAt: new Date(),
           });
         }
@@ -623,7 +623,7 @@ export const signaturesRouter = router({
                 title: 'Contract Fully Executed',
                 message: `"${contract.title}" has been signed by all parties and is now active.`,
                 relatedId: sig[0].contractId,
-                isRead: 'no',
+                isRead: false,
                 createdAt: new Date(),
               });
             }
@@ -705,7 +705,7 @@ export const signaturesRouter = router({
             title: 'Signature Declined',
             message: `A party has declined to sign "${contract.title}". Reason: ${input.reason.substring(0, 100)}...`,
             relatedId: sig[0].contractId,
-            isRead: 'no',
+            isRead: false,
             createdAt: new Date(),
           });
         }
@@ -778,7 +778,7 @@ export const signaturesRouter = router({
         title: 'Signature Reminder',
         message: `Reminder: Please sign "${contract.title}". The request will expire on ${newExpiry.toLocaleDateString('en-GB')}.`,
         relatedId: sig[0].contractId,
-        isRead: 'no',
+        isRead: false,
         createdAt: new Date(),
       });
 

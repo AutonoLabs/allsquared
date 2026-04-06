@@ -51,7 +51,7 @@ const usersRouter = router({
         limit: z.number().default(20),
         search: z.string().optional(),
         role: z.enum(['user', 'admin']).optional(),
-        verified: z.enum(['yes', 'no']).optional(),
+        verified: z.boolean().optional(),
         userType: z.enum(['provider', 'client', 'both']).optional(),
       }).optional()
     )
@@ -194,7 +194,7 @@ const usersRouter = router({
     .input(
       z.object({
         id: z.string(),
-        verified: z.enum(['yes', 'no']),
+        verified: z.boolean(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -249,7 +249,7 @@ const usersRouter = router({
 
       await db
         .update(users)
-        .set({ verified: 'no' })
+        .set({ verified: false })
         .where(eq(users.id, input.id));
 
       await createAuditLog(
@@ -258,7 +258,7 @@ const usersRouter = router({
         'user',
         input.id,
         { verified: currentUser.verified },
-        { verified: 'no', reason: input.reason }
+        { verified: false, reason: input.reason }
       );
 
       return { success: true };
@@ -635,7 +635,7 @@ const kycRouter = router({
       // Also update user verification status
       await db
         .update(users)
-        .set({ verified: 'yes' })
+        .set({ verified: true })
         .where(eq(users.id, currentKyc.userId));
 
       await createAuditLog(

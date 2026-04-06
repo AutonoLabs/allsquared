@@ -303,7 +303,7 @@ export const aiRouter = router({
           .limit(1);
 
         if (template[0]) {
-          templateContent = template[0].templateContent;
+          templateContent = template[0].templateContent as string;
         }
       }
 
@@ -334,7 +334,7 @@ export const aiRouter = router({
         prompt: fullRequirements,
         generatedContent: content,
         model: tokensUsed > 0 ? 'gpt-4-turbo-preview' : 'template',
-        tokensUsed: String(tokensUsed),
+        tokensUsed: tokensUsed,
         status: 'completed',
         createdAt: new Date(),
       });
@@ -371,7 +371,7 @@ export const aiRouter = router({
       }
 
       const newGenerationId = `aigen_${nanoid(16)}`;
-      const revisionCount = parseInt(original[0].revisionCount || '0', 10) + 1;
+      const revisionCount = (original[0].revisionCount || 0) + 1;
 
       // Build revision prompt
       const revisionPrompt = `Original contract:\n${original[0].generatedContent}\n\nRevision instructions:\n${input.revisionInstructions}`;
@@ -390,9 +390,9 @@ export const aiRouter = router({
         prompt: revisionPrompt,
         generatedContent: content,
         model: tokensUsed > 0 ? 'gpt-4-turbo-preview' : 'template',
-        tokensUsed: String(tokensUsed),
+        tokensUsed: tokensUsed,
         status: 'revised',
-        revisionCount: String(revisionCount),
+        revisionCount: revisionCount,
         createdAt: new Date(),
       });
 

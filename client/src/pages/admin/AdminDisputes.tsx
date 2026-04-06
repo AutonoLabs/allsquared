@@ -253,11 +253,11 @@ export default function AdminDisputes() {
                 <p className="mt-1 p-3 bg-muted rounded-md">{disputeDetail.dispute.reason}</p>
               </div>
 
-              {disputeDetail.dispute.evidence && (
+              {disputeDetail.dispute.evidence != null && (
                 <div>
                   <p className="text-sm text-muted-foreground">Evidence</p>
                   <p className="mt-1 p-3 bg-muted rounded-md text-sm">
-                    {disputeDetail.dispute.evidence}
+                    {String(disputeDetail.dispute.evidence)}
                   </p>
                 </div>
               )}

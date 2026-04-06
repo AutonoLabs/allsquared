@@ -99,8 +99,8 @@ export default function Profile() {
       setEmail(user.email || "");
       setCompany(user.businessName || "");
       setPhone(user.phone || "");
-      setCompanyNumber((user as Record<string, string>).companyNumber || "");
-      setVatNumber((user as Record<string, string>).vatNumber || "");
+      setCompanyNumber((user as unknown as Record<string, string>).companyNumber || "");
+      setVatNumber((user as unknown as Record<string, string>).vatNumber || "");
       const addr = parseAddress(user.address);
       setAddressLine1(addr.line1);
       setAddressLine2(addr.line2);
@@ -301,7 +301,7 @@ export default function Profile() {
               <Label htmlFor="email">
                 <Mail className="inline h-4 w-4 mr-2" />
                 Email Address
-                {user?.verified === "yes" ? (
+                {user?.verified === true ? (
                   <Badge variant="default" className="ml-2 bg-green-500 text-xs">
                     <CheckCircle2 className="h-3 w-3 mr-1" />
                     Verified

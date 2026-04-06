@@ -62,7 +62,7 @@ export const appRouter = router({
         // Check if user already exists
         let user = await getUserByClerkId(clerkId);
         
-        const verified = input.emailVerified ? 'yes' as const : undefined;
+        const verified = input.emailVerified ? true : undefined;
 
         if (user) {
           // Update existing user
@@ -87,7 +87,7 @@ export const appRouter = router({
           name,
           loginMethod: 'clerk',
           role: isFirstUser ? 'admin' : 'user',
-          verified: verified || 'no',
+          verified: verified || false,
           lastSignedIn: new Date(),
         });
 

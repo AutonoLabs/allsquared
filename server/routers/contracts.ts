@@ -229,7 +229,7 @@ export const contractsRouter = router({
           title: 'New Contract Awaiting Signature',
           message: `${ctx.user.name} has sent you a contract to review and sign: "${contract.title}"`,
           relatedId: input.id,
-          isRead: 'no',
+          isRead: false,
           createdAt: new Date(),
         });
       }
@@ -297,7 +297,7 @@ export const contractsRouter = router({
           title: 'Contract Fully Executed',
           message: `The contract "${contract.title}" has been signed by all parties and is now active.`,
           relatedId: input.id,
-          isRead: 'no',
+          isRead: false,
           createdAt: new Date(),
         });
         
@@ -309,7 +309,7 @@ export const contractsRouter = router({
             title: 'Contract Fully Executed',
             message: `The contract "${contract.title}" has been signed by all parties and is now active.`,
             relatedId: input.id,
-            isRead: 'no',
+            isRead: false,
             createdAt: new Date(),
           });
         }

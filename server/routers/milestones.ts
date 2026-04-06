@@ -1,8 +1,8 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { router, protectedProcedure } from '../_core/trpc';
-import {
 import { nanoid } from 'nanoid';
+import {
   getContractMilestones,
   getMilestone,
   createMilestone,
@@ -29,7 +29,7 @@ export const milestonesRouter = router({
       const milestones = await getContractMilestones(input.contractId);
       
       // Sort by order
-      return milestones.sort((a, b) => parseInt(a.order || '0') - parseInt(b.order || '0'));
+      return milestones.sort((a, b) => (a.order || 0) - (b.order || 0));
     }),
 
   // Get single milestone
@@ -84,7 +84,7 @@ export const milestonesRouter = router({
         amount: String(Math.round(input.amount * 100)), // Convert to pence as string
         dueDate: input.dueDate ? new Date(input.dueDate) : undefined,
         status: 'pending',
-        order: String(input.order),
+        order: input.order,
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -163,7 +163,7 @@ export const milestonesRouter = router({
         title: 'Milestone Submitted for Approval',
         message: `${ctx.user.name} has submitted "${milestone.title}" for your review.`,
         relatedId: milestone.contractId,
-        isRead: 'no',
+        isRead: false,
         createdAt: new Date(),
       });
       
@@ -204,7 +204,7 @@ export const milestonesRouter = router({
         title: 'Milestone Approved',
         message: `"${milestone.title}" has been approved by ${ctx.user.name}.`,
         relatedId: milestone.contractId,
-        isRead: 'no',
+        isRead: false,
         createdAt: new Date(),
       });
       
@@ -244,7 +244,7 @@ export const milestonesRouter = router({
         title: 'Milestone Requires Revision',
         message: `"${milestone.title}" needs revision. Reason: ${input.reason}`,
         relatedId: milestone.contractId,
-        isRead: 'no',
+        isRead: false,
         createdAt: new Date(),
       });
       

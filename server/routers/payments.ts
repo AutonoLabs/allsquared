@@ -486,7 +486,7 @@ export const paymentsRouter = router({
     await db
       .update(subscriptions)
       .set({
-        cancelAtPeriodEnd: 'yes',
+        cancelAtPeriodEnd: true,
         updatedAt: new Date(),
       })
       .where(eq(subscriptions.id, subscription[0].id));
@@ -531,7 +531,7 @@ export const paymentsRouter = router({
     await db
       .update(subscriptions)
       .set({
-        cancelAtPeriodEnd: 'no',
+        cancelAtPeriodEnd: false,
         updatedAt: new Date(),
       })
       .where(eq(subscriptions.id, subscription[0].id));
@@ -652,7 +652,7 @@ export const paymentsRouter = router({
                 status: subscription.status === 'active' ? 'active' : 'past_due',
                 currentPeriodStart: new Date(subscription.current_period_start * 1000),
                 currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-                cancelAtPeriodEnd: subscription.cancel_at_period_end ? 'yes' : 'no',
+                cancelAtPeriodEnd: !!subscription.cancel_at_period_end,
                 updatedAt: new Date(),
               })
               .where(eq(subscriptions.stripeSubscriptionId, subscription.id));

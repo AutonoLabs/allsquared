@@ -26,8 +26,8 @@ export const templateBuilderRouter = router({
         description: t.description,
         category: t.category,
         templateSlug: t.templateSlug,
-        variables: t.variables ? JSON.parse(t.variables) : [],
-        clauseBanks: t.clauseBanks ? JSON.parse(t.clauseBanks) : {},
+        variables: t.variables ? JSON.parse(t.variables as string) : [],
+        clauseBanks: t.clauseBanks ? JSON.parse(t.clauseBanks as string) : {},
       }));
   }),
 
@@ -56,8 +56,8 @@ export const templateBuilderRouter = router({
         category: t.category,
         templateSlug: t.templateSlug,
         templateMarkdown: t.templateMarkdown,
-        variables: t.variables ? JSON.parse(t.variables) : [],
-        clauseBanks: t.clauseBanks ? JSON.parse(t.clauseBanks) : {},
+        variables: t.variables ? JSON.parse(t.variables as string) : [],
+        clauseBanks: t.clauseBanks ? JSON.parse(t.clauseBanks as string) : {},
       };
     }),
 

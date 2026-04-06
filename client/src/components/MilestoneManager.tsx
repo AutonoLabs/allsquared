@@ -99,18 +99,7 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
     }
   };
 
-  interface Milestone {
-    id: string;
-    title: string;
-    description: string | null;
-    status: string;
-    amount: string;
-    submittedAt: string | null;
-    submissionNotes: string | null;
-    rejectionReason: string | null;
-  }
-
-  const completedMilestones = milestones.filter((m: Milestone) => m.status === "approved").length;
+  const completedMilestones = milestones.filter((m) => m.status === "approved").length;
   const totalMilestones = milestones.length;
   const progressPercentage = totalMilestones > 0 ? (completedMilestones / totalMilestones) * 100 : 0;
 
@@ -129,7 +118,7 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
             <Progress value={progressPercentage} className="h-3" />
             <div className="flex justify-between text-sm text-muted-foreground">
               <span>{Math.round(progressPercentage)}% Complete</span>
-              <span>£{milestones.reduce((sum: number, m: Milestone) => m.status === "approved" ? sum + parseFloat(m.amount) : sum, 0).toLocaleString()} released</span>
+              <span>£{milestones.reduce((sum, m) => m.status === "approved" ? sum + parseFloat(m.amount) : sum, 0).toLocaleString()} released</span>
             </div>
           </div>
         </CardContent>
@@ -137,7 +126,7 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
 
       {/* Milestone List */}
       <div className="space-y-4">
-        {milestones.map((milestone: Milestone, index: number) => (
+        {milestones.map((milestone, index) => (
           <Card key={milestone.id} className={milestone.status === "submitted" ? "border-blue-500" : ""}>
             <CardHeader>
               <div className="flex items-start justify-between">
@@ -181,10 +170,10 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
               )}
 
               {/* Rejection Info */}
-              {milestone.status === "rejected" && milestone.rejectionReason && (
+              {milestone.status === "rejected" && milestone.approvalNotes && (
                 <div className="bg-destructive/10 p-3 rounded-lg space-y-2">
                   <p className="text-sm font-medium text-destructive">Rejection Reason</p>
-                  <p className="text-sm">{milestone.rejectionReason}</p>
+                  <p className="text-sm">{milestone.approvalNotes}</p>
                 </div>
               )}
 

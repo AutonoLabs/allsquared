@@ -118,9 +118,9 @@ export default function ContractDetail() {
   const contractContent = (() => {
     if (!contract.contractContent) return {};
     const raw = contract.contractContent as string;
-    return safeJsonParse(raw, { content: raw, variables: [] });
+    return safeJsonParse(raw, { content: raw, variables: [], signatures: [] });
   })();
-  const signatures = contractContent.signatures || [];
+  const signatures = (contractContent as Record<string, unknown>).signatures as Array<Record<string, unknown>> || [];
 
   return (
     <div className="space-y-6 p-2">
@@ -231,13 +231,13 @@ export default function ContractDetail() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {signatures.map((sig: { userId?: string; name: string; signedAt: string }) => (
-                    <div key={sig.userId || sig.name} className="flex items-center gap-3 p-3 rounded-lg border bg-emerald-50/50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900">
+                  {signatures.map((sig: Record<string, unknown>) => (
+                    <div key={String(sig.userId || sig.name)} className="flex items-center gap-3 p-3 rounded-lg border bg-emerald-50/50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900">
                       <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
                       <div>
-                        <p className="font-medium">{sig.name}</p>
+                        <p className="font-medium">{String(sig.name)}</p>
                         <p className="text-sm text-muted-foreground">
-                          Signed on {new Date(sig.signedAt).toLocaleDateString("en-GB")}
+                          Signed on {new Date(String(sig.signedAt)).toLocaleDateString("en-GB")}
                         </p>
                       </div>
                     </div>

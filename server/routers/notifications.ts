@@ -21,7 +21,7 @@ export const notificationsRouter = router({
       const limit = input?.limit || 50;
       const notifications = await getUserNotifications(ctx.user.id, limit);
       
-      const unreadCount = notifications.filter((n) => n.isRead === 'no').length;
+      const unreadCount = notifications.filter((n) => n.isRead === false).length;
       
       return {
         notifications,
@@ -50,7 +50,7 @@ export const notificationsRouter = router({
   // Get unread count
   unreadCount: protectedProcedure.query(async ({ ctx }) => {
     const notifications = await getUserNotifications(ctx.user.id, 100);
-    const count = notifications.filter((n) => n.isRead === 'no').length;
+    const count = notifications.filter((n) => n.isRead === false).length;
     return { count };
   }),
 });

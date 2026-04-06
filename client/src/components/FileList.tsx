@@ -65,8 +65,8 @@ export function FileList({ entityType, entityId, onFileDeleted, showDelete = tru
     return <File className="h-6 w-6 text-muted-foreground" />;
   };
 
-  const formatFileSize = (bytes: string) => {
-    const size = parseInt(bytes);
+  const formatFileSize = (bytes: string | number) => {
+    const size = typeof bytes === 'number' ? bytes : parseInt(bytes);
     if (isNaN(size)) return "Unknown size";
 
     const kb = size / 1024;

@@ -319,7 +319,7 @@ export const disputesRouter = router({
         title: 'Dispute Filed Against You',
         message: `A dispute has been filed on contract "${contract.title}". Please review and respond.`,
         relatedId: disputeId,
-        isRead: 'no',
+        isRead: false,
         createdAt: new Date(),
       });
 
@@ -544,7 +544,7 @@ export const disputesRouter = router({
       const analysis = await analyzeDisputeWithAI(
         contractText,
         dispute.reason,
-        dispute.evidence,
+        dispute.evidence as string,
         claimant?.name || 'Claimant',
         respondent?.name || 'Respondent',
       );
@@ -656,7 +656,7 @@ export const disputesRouter = router({
         title: 'New Mediation Response',
         message: `A new mediation message has been submitted for the dispute on "${contract.title}".`,
         relatedId: input.disputeId,
-        isRead: 'no',
+        isRead: false,
         createdAt: new Date(),
       });
 
@@ -732,7 +732,7 @@ export const disputesRouter = router({
         title: 'Settlement Proposed',
         message: `A settlement has been proposed for the dispute on "${contract.title}". Please review and respond.`,
         relatedId: input.disputeId,
-        isRead: 'no',
+        isRead: false,
         createdAt: new Date(),
       });
 
@@ -819,7 +819,7 @@ export const disputesRouter = router({
 
         // Handle escrow if financial terms exist
         if (settlement.financialTerms) {
-          const terms = JSON.parse(settlement.financialTerms);
+          const terms = JSON.parse(settlement.financialTerms as string);
           if (terms.escrowAction) {
             const escrows = await db
               .select()
@@ -866,7 +866,7 @@ export const disputesRouter = router({
             title: 'Dispute Resolved',
             message: `The dispute on "${contract.title}" has been resolved via settlement.`,
             relatedId: settlement.disputeId,
-            isRead: 'no',
+            isRead: false,
             createdAt: new Date(),
           });
         }
@@ -883,7 +883,7 @@ export const disputesRouter = router({
           title: 'Settlement Accepted by Other Party',
           message: `The other party has accepted the settlement for the dispute on "${contract.title}". Your acceptance is needed to finalise.`,
           relatedId: settlement.disputeId,
-          isRead: 'no',
+          isRead: false,
           createdAt: new Date(),
         });
       }
@@ -968,7 +968,7 @@ export const disputesRouter = router({
           title: 'Dispute Escalated to Legal Review',
           message: `The dispute on "${contract.title}" has been escalated to a legal professional for review.`,
           relatedId: input.disputeId,
-          isRead: 'no',
+          isRead: false,
           createdAt: new Date(),
         });
       }

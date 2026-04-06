@@ -120,7 +120,7 @@ export default function Billing() {
   }
 
   const currentTier = subscription?.tier || "free";
-  const isCancelled = subscription && 'cancelAtPeriodEnd' in subscription && subscription.cancelAtPeriodEnd === "yes";
+  const isCancelled = subscription && 'cancelAtPeriodEnd' in subscription && subscription.cancelAtPeriodEnd === true;
 
   return (
     <div className="space-y-8">

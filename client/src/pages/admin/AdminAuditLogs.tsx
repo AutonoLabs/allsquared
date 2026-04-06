@@ -35,11 +35,11 @@ type AuditLog = {
   action: string;
   entityType: string;
   entityId: string | null;
-  previousValue: string | null;
-  newValue: string | null;
+  previousValue: unknown;
+  newValue: unknown;
   ipAddress: string | null;
   userAgent: string | null;
-  metadata: string | null;
+  metadata: unknown;
   createdAt: Date | null;
 };
 
@@ -268,29 +268,29 @@ export default function AdminAuditLogs() {
                 </div>
               )}
 
-              {selectedLog.previousValue && (
+              {selectedLog.previousValue != null && (
                 <div>
                   <p className="text-sm text-muted-foreground">Previous Value</p>
                   <pre className="text-sm bg-muted p-2 rounded-md overflow-auto max-h-32">
-                    {JSON.stringify(safeJsonParse(selectedLog.previousValue, selectedLog.previousValue), null, 2)}
+                    {JSON.stringify(selectedLog.previousValue, null, 2)}
                   </pre>
                 </div>
               )}
 
-              {selectedLog.newValue && (
+              {selectedLog.newValue != null && (
                 <div>
                   <p className="text-sm text-muted-foreground">New Value</p>
                   <pre className="text-sm bg-muted p-2 rounded-md overflow-auto max-h-32">
-                    {JSON.stringify(safeJsonParse(selectedLog.newValue, selectedLog.newValue), null, 2)}
+                    {JSON.stringify(selectedLog.newValue, null, 2)}
                   </pre>
                 </div>
               )}
 
-              {selectedLog.metadata && (
+              {selectedLog.metadata != null && (
                 <div>
                   <p className="text-sm text-muted-foreground">Metadata</p>
                   <pre className="text-sm bg-muted p-2 rounded-md overflow-auto max-h-32">
-                    {JSON.stringify(safeJsonParse(selectedLog.metadata, selectedLog.metadata), null, 2)}
+                    {JSON.stringify(selectedLog.metadata, null, 2)}
                   </pre>
                 </div>
               )}

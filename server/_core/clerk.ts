@@ -93,7 +93,7 @@ export async function syncClerkUser(data: {
 }): Promise<User> {
   const { clerkId, email, name, emailVerified } = data;
 
-  const verified = emailVerified ? 'yes' as const : undefined;
+  const verified = emailVerified ? true : undefined;
 
   let user = await db.getUserByClerkId(clerkId);
 
@@ -116,7 +116,7 @@ export async function syncClerkUser(data: {
     email,
     name,
     loginMethod: 'clerk',
-    verified: verified || 'no',
+    verified: verified || false,
     lastSignedIn: new Date(),
   });
 

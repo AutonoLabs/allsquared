@@ -75,7 +75,7 @@ export const filesRouter = router({
         entityId: input.entityId,
         uploadedBy: ctx.user.id,
         fileName: input.fileName,
-        fileSize: input.fileSize.toString(),
+        fileSize: input.fileSize,
         fileType: input.fileType,
         fileUrl: fileKey, // R2 object key
       });

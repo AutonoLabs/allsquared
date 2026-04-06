@@ -144,7 +144,7 @@ export const escrowRouter = router({
           title: 'Escrow Deposit Initiated',
           message: `The client has initiated an escrow deposit of £${(input.amount / 100).toFixed(2)} for "${contract[0].title}".`,
           relatedId: input.contractId,
-          isRead: 'no',
+          isRead: false,
           createdAt: new Date(),
         });
       }
@@ -368,7 +368,7 @@ export const escrowRouter = router({
           title: 'Payment Released',
           message: `£${(releaseAmount / 100).toFixed(2)} has been released from escrow for "${contract[0].title}". Funds will arrive in your account within 2-3 business days.`,
           relatedId: escrow[0].contractId,
-          isRead: 'no',
+          isRead: false,
           createdAt: new Date(),
         });
       }
@@ -455,7 +455,7 @@ export const escrowRouter = router({
             title: 'Refund Requested',
             message: `A refund has been requested for "${contract[0].title}". Reason: ${input.reason.substring(0, 100)}...`,
             relatedId: escrow[0].contractId,
-            isRead: 'no',
+            isRead: false,
             createdAt: new Date(),
           });
         }
@@ -546,7 +546,7 @@ export const escrowRouter = router({
         title: 'Refund Processed',
         message: `A refund of £${(input.amount / 100).toFixed(2)} has been processed. Funds will arrive in your account within 5-7 business days.`,
         relatedId: escrow[0].contractId,
-        isRead: 'no',
+        isRead: false,
         createdAt: new Date(),
       });
 

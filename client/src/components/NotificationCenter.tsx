@@ -14,11 +14,13 @@ import { useUser } from "@clerk/clerk-react";
 
 interface Notification {
   id: string;
+  userId: string;
   type: string;
   title: string;
   message: string;
-  isRead: string;
-  createdAt: string | null;
+  isRead: boolean;
+  relatedId: string | null;
+  createdAt: Date | null;
 }
 
 export default function NotificationCenter() {
@@ -99,9 +101,9 @@ export default function NotificationCenter() {
                 <div
                   key={notification.id}
                   className={`px-4 py-3 hover:bg-muted/50 cursor-pointer transition-colors ${
-                    notification.isRead === "no" ? "bg-blue-50/50" : ""
+                    !notification.isRead ? "bg-blue-50/50" : ""
                   }`}
-                  onClick={() => notification.isRead === "no" && handleMarkAsRead(notification.id)}
+                  onClick={() => !notification.isRead && handleMarkAsRead(notification.id)}
                 >
                   <div className="flex gap-3">
                     <div className="mt-1">{getIcon(notification.type)}</div>
@@ -119,7 +121,7 @@ export default function NotificationCenter() {
                           })}
                       </p>
                     </div>
-                    {notification.isRead === "no" && (
+                    {!notification.isRead && (
                       <div className="h-2 w-2 rounded-full bg-blue-500 mt-2" />
                     )}
                   </div>

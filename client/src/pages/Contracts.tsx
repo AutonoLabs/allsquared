@@ -16,7 +16,7 @@ import { Link } from "wouter";
 import { Plus, Search, FileText, ArrowRight, Calendar, Banknote, Tag, AlertCircle } from "lucide-react";
 
 export default function Contracts() {
-  const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
+  const [statusFilter, setStatusFilter] = useState<"draft" | "pending_signature" | "active" | "completed" | "disputed" | "cancelled" | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data, isLoading, error } = trpc.contracts.list.useQuery({
@@ -129,7 +129,7 @@ export default function Contracts() {
                 className="pl-10"
               />
             </div>
-            <Select value={statusFilter || "all"} onValueChange={(value) => setStatusFilter(value === "all" ? undefined : value)}>
+            <Select value={statusFilter || "all"} onValueChange={(value) => setStatusFilter(value === "all" ? undefined : value as "draft" | "pending_signature" | "active" | "completed" | "disputed" | "cancelled")}>
               <SelectTrigger className="w-full sm:w-48">
                 <SelectValue placeholder="All Statuses" />
               </SelectTrigger>

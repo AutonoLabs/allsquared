@@ -28,7 +28,7 @@ export default function AdminUsers() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<"user" | "admin" | undefined>();
-  const [verifiedFilter, setVerifiedFilter] = useState<"yes" | "no" | undefined>();
+  const [verifiedFilter, setVerifiedFilter] = useState<boolean | undefined>();
 
   const { data, isLoading } = trpc.admin.users.list.useQuery({
     page,
@@ -80,9 +80,9 @@ export default function AdminUsers() {
               </SelectContent>
             </Select>
             <Select
-              value={verifiedFilter || "all"}
+              value={verifiedFilter === undefined ? "all" : verifiedFilter ? "yes" : "no"}
               onValueChange={(v) => {
-                setVerifiedFilter(v === "all" ? undefined : (v as "yes" | "no"));
+                setVerifiedFilter(v === "all" ? undefined : v === "yes");
                 setPage(1);
               }}
             >
@@ -151,14 +151,14 @@ export default function AdminUsers() {
                           </TableCell>
                           <TableCell>
                             <Badge
-                              variant={user.verified === "yes" ? "default" : "outline"}
+                              variant={user.verified === true ? "default" : "outline"}
                               className={
-                                user.verified === "yes"
+                                user.verified === true
                                   ? "bg-green-500"
                                   : ""
                               }
                             >
-                              {user.verified === "yes" ? "Yes" : "No"}
+                              {user.verified === true ? "Yes" : "No"}
                             </Badge>
                           </TableCell>
                           <TableCell className="text-muted-foreground">
