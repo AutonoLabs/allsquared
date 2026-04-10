@@ -139,7 +139,7 @@ export default function Home() {
     <div className="flex flex-col overflow-hidden">
 
       {/* ── Hero ───────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-[var(--md-sys-color-primary)] py-16 md:py-32 lg:py-44">
+      <section className="relative overflow-hidden bg-[var(--md-sys-color-primary)] min-h-[85vh] md:min-h-0 py-16 md:py-32 lg:py-44 flex items-center">
 
         {/* Geometric decorative shapes — brand motif */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
