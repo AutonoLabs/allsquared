@@ -93,8 +93,8 @@ export default function Clients() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="py-12 md:py-20 bg-gradient-to-b from-primary/5 to-background">
-        <div className="container">
+      <section className="min-h-screen md:min-h-0 py-12 md:py-20 bg-gradient-to-b from-primary/5 to-background flex items-center">
+        <div className="container w-full">
           <div className="mx-auto max-w-3xl text-center space-y-6">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
               Hire with Confidence.

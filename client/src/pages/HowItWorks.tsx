@@ -145,8 +145,8 @@ export default function HowItWorks() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="py-12 md:py-20 bg-gradient-to-b from-primary/5 via-primary/3 to-background">
-        <div className="container">
+      <section className="min-h-screen md:min-h-0 py-12 md:py-20 bg-gradient-to-b from-primary/5 via-primary/3 to-background flex items-center">
+        <div className="container w-full">
           <motion.div
             initial="hidden"
             animate="visible"

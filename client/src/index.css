@@ -256,6 +256,7 @@
     @apply bg-background text-foreground;
     font-family: var(--font-sans);
     line-height: 1.5;
+    overflow-x: hidden;
   }
 
   /* M3 Typography classes */
