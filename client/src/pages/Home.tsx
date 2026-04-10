@@ -128,10 +128,16 @@ export default function Home() {
     if (isAuthenticated) {
       setLocation("/dashboard");
     } else {
-      openSignIn({
-        afterSignInUrl: "/dashboard",
-        afterSignUpUrl: "/dashboard",
-      });
+      try {
+        openSignIn({
+          afterSignInUrl: "/dashboard",
+          afterSignUpUrl: "/dashboard",
+        });
+      } catch (err) {
+        console.error('[Home] openSignIn failed:', err);
+        // Fallback: navigate to dashboard (Clerk will show auth screen there)
+        setLocation("/dashboard");
+      }
     }
   }
 
