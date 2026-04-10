@@ -199,13 +199,9 @@ export default function Home() {
                 size="lg"
                 className="h-13 bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] shadow-lg shadow-[var(--md-sys-color-primary)]/25 hover:shadow-xl"
                 onClick={handleGetStarted}
-                disabled={loading}
               >
-                {loading ? (
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                ) : null}
                 {isAuthenticated ? "Go to Dashboard" : "Get Started Free"}
-                {!loading && <ArrowRight className="ml-2 h-5 w-5" />}
+                <ArrowRight className="ml-2 h-5 w-5" />
               </MD3Button>
 
               <MD3Button
