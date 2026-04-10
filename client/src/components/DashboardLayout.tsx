@@ -65,6 +65,9 @@ const DEFAULT_WIDTH = 280;
 const MIN_WIDTH = 200;
 const MAX_WIDTH = 480;
 
+// Max ms to show skeleton before falling through to auth screen
+const AUTH_LOAD_TIMEOUT_MS = 3000;
+
 export default function DashboardLayout({
   children,
 }: {
@@ -75,13 +78,24 @@ export default function DashboardLayout({
     return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
   });
   const { loading, user, isAuthenticated } = useAuth();
+  const [authTimeout, setAuthTimeout] = useState(false);
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
   }, [sidebarWidth]);
 
-  // Show auth screen only if definitely not authenticated
-  if (!loading && !isAuthenticated) {
+  // Safety timeout: if Clerk is still loading unauthenticated after 3s, show auth screen
+  useEffect(() => {
+    if (!loading || isAuthenticated) {
+      setAuthTimeout(false);
+      return;
+    }
+    const t = setTimeout(() => setAuthTimeout(true), AUTH_LOAD_TIMEOUT_MS);
+    return () => clearTimeout(t);
+  }, [loading, isAuthenticated]);
+
+  // Show auth screen if definitely not authenticated OR auth load timed out
+  if ((!loading && !isAuthenticated) || authTimeout) {
     return <AuthScreen />;
   }
 

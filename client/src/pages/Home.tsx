@@ -1,4 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
+import { useClerk } from "@clerk/clerk-react";
 import { MD3Button } from "@/components/md3/Button";
 import { MD3Card, MD3CardContent } from "@/components/md3/Card";
 import {
@@ -15,8 +16,9 @@ import {
   ArrowRight,
   Star,
   Sparkles,
+  Loader2,
 } from "lucide-react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
 
 // ── M3 Motion Presets ─────────────────────────────────────────────
@@ -118,7 +120,20 @@ const STATS = [
 
 // ─────────────────────────────────────────────────────────────────
 export default function Home() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+  const { openSignIn } = useClerk();
+  const [, setLocation] = useLocation();
+
+  function handleGetStarted() {
+    if (isAuthenticated) {
+      setLocation("/dashboard");
+    } else {
+      openSignIn({
+        afterSignInUrl: "/dashboard",
+        afterSignUpUrl: "/dashboard",
+      });
+    }
+  }
 
   return (
     <div className="flex flex-col overflow-hidden">
@@ -183,12 +198,14 @@ export default function Home() {
                 variant="tonal"
                 size="lg"
                 className="h-13 bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)] shadow-lg shadow-[var(--md-sys-color-primary)]/25 hover:shadow-xl"
-                asChild
+                onClick={handleGetStarted}
+                disabled={loading}
               >
-                <Link href="/dashboard">
-                  {isAuthenticated ? "Go to Dashboard" : "Get Started Free"}
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
+                {loading ? (
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                ) : null}
+                {isAuthenticated ? "Go to Dashboard" : "Get Started Free"}
+                {!loading && <ArrowRight className="ml-2 h-5 w-5" />}
               </MD3Button>
 
               <MD3Button
@@ -434,12 +451,14 @@ export default function Home() {
                 variant="filled"
                 size="lg"
                 className="h-13 shadow-md shadow-[var(--md-sys-color-primary)]/20 hover:shadow-lg"
-                asChild
+                onClick={handleGetStarted}
+                disabled={loading}
               >
-                <Link href="/dashboard">
-                  {isAuthenticated ? "Go to Dashboard" : "Join Waitlist — Free"}
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
+                {loading ? (
+                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                ) : null}
+                {isAuthenticated ? "Go to Dashboard" : "Join Waitlist — Free"}
+                {!loading && <ArrowRight className="ml-2 h-5 w-5" />}
               </MD3Button>
               <MD3Button
                 variant="outlined"
