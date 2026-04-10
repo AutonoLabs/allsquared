@@ -83,7 +83,7 @@ export default function Freelancers() {
   return (
     <div className="flex flex-col">
       {/* Hero Section */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-primary/5 to-background">
+      <section className="py-12 md:py-20 bg-gradient-to-b from-primary/5 to-background">
         <div className="container">
           <div className="mx-auto max-w-3xl text-center space-y-6">
             <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
@@ -111,7 +111,7 @@ export default function Freelancers() {
       </section>
 
       {/* Pain Points */}
-      <section className="py-16 md:py-24">
+      <section className="py-10 md:py-20">
         <div className="container">
           <div className="mx-auto max-w-3xl">
             <h2 className="text-3xl font-bold tracking-tight text-center mb-4">
@@ -142,7 +142,7 @@ export default function Freelancers() {
       </section>
 
       {/* Benefits */}
-      <section className="py-16 md:py-24 bg-muted/50">
+      <section className="py-10 md:py-20 bg-muted/50">
         <div className="container">
           <div className="mx-auto max-w-3xl text-center mb-12">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
@@ -173,7 +173,7 @@ export default function Freelancers() {
       </section>
 
       {/* Statistics */}
-      <section className="py-16 md:py-24">
+      <section className="py-10 md:py-20">
         <div className="container">
           <div className="mx-auto max-w-5xl">
             <div className="grid gap-8 md:grid-cols-3 text-center">
@@ -201,7 +201,7 @@ export default function Freelancers() {
       </section>
 
       {/* Use Cases */}
-      <section className="py-16 md:py-24 bg-muted/50">
+      <section className="py-10 md:py-20 bg-muted/50">
         <div className="container">
           <div className="mx-auto max-w-3xl text-center mb-12">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
@@ -226,7 +226,7 @@ export default function Freelancers() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-16 md:py-24">
+      <section className="py-10 md:py-20">
         <div className="container">
           <div className="mx-auto max-w-4xl">
             <h2 className="text-3xl font-bold tracking-tight text-center mb-12">
@@ -257,7 +257,7 @@ export default function Freelancers() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 md:py-24 bg-primary/5">
+      <section className="py-10 md:py-20 bg-primary/5">
         <div className="container">
           <div className="mx-auto max-w-3xl text-center space-y-8">
             <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">

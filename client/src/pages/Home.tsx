@@ -124,7 +124,7 @@ export default function Home() {
     <div className="flex flex-col overflow-hidden">
 
       {/* ── Hero ───────────────────────────────────────────────── */}
-      <section className="relative overflow-hidden bg-[var(--md-sys-color-primary)] py-28 md:py-40 lg:py-48">
+      <section className="relative overflow-hidden bg-[var(--md-sys-color-primary)] py-16 md:py-32 lg:py-44">
 
         {/* Geometric decorative shapes — brand motif */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -241,7 +241,7 @@ export default function Home() {
       </section>
 
       {/* ── Problem Statement ───────────────────────────────────── */}
-      <section className="py-20 md:py-28 bg-[var(--md-sys-color-surface)]">
+      <section className="py-12 md:py-20 bg-[var(--md-sys-color-surface)]">
         <div className="container">
           <motion.div
             initial="hidden"
@@ -320,7 +320,7 @@ export default function Home() {
       </section>
 
       {/* ── How It Works ────────────────────────────────────────── */}
-      <section className="py-20 md:py-28 bg-[var(--md-sys-color-surface)]">
+      <section className="py-12 md:py-20 bg-[var(--md-sys-color-surface)]">
         <div className="container">
           <motion.div
             initial="hidden"
@@ -410,7 +410,7 @@ export default function Home() {
       </section>
 
       {/* ── CTA ─────────────────────────────────────────────────── */}
-      <section className="py-24 md:py-32 bg-[var(--md-sys-color-surface)]">
+      <section className="py-14 md:py-24 bg-[var(--md-sys-color-surface)]">
         <div className="container">
           <motion.div
             initial="hidden"

@@ -145,7 +145,7 @@ export default function HowItWorks() {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-primary/5 via-primary/3 to-background">
+      <section className="py-12 md:py-20 bg-gradient-to-b from-primary/5 via-primary/3 to-background">
         <div className="container">
           <motion.div
             initial="hidden"
@@ -171,7 +171,7 @@ export default function HowItWorks() {
       </section>
 
       {/* Steps */}
-      <section className="py-16 md:py-24">
+      <section className="py-10 md:py-20">
         <div className="container">
           <div className="grid gap-12 lg:gap-16">
             {steps.map((step, index) => {
@@ -224,7 +224,7 @@ export default function HowItWorks() {
       </section>
 
       {/* Benefits */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-muted/50 to-background">
+      <section className="py-10 md:py-20 bg-gradient-to-b from-muted/50 to-background">
         <div className="container">
           <motion.div
             initial="hidden"
@@ -272,7 +272,7 @@ export default function HowItWorks() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 md:py-24">
+      <section className="py-10 md:py-20">
         <div className="container">
           <motion.div
             initial="hidden"
