@@ -25,6 +25,9 @@ Progress: █████████░ 90%
 - Production deploy succeeded via Vercel prebuilt output and `LAB-116` is closed
 - `allsquared-app` is now documented as the canonical production repo for marketing and app
 - `allsquared-website` is now documented as historical brand reference/archive only
+- Sign-up and draft-contract entry now route through explicit Clerk auth pages
+- Production auth CSP now allows the AllSquared Clerk custom domain and Clerk worker runtime
+- Cloudflare DNS now points `allsquared.io` and `www.allsquared.io` at Vercel instead of the old Pages site
 - `pnpm test` still fails because no matching test files exist; `LAB-114` tracks executable test coverage
 
 ## Pending Todos
@@ -32,16 +35,16 @@ Progress: █████████░ 90%
 - Continue updating Linear when marketing tasks are completed or added
 - Review refreshed Terms and Privacy copy for legal/compliance accuracy
 - Add executable tests before treating the release as fully verified
-- Commit/push the deployed local changes so source control matches production
 - Confirm whether to actually archive `AutonoLabs/allsquared-website` in GitHub after checking external dependencies
 
 ## Blockers / Concerns
 
 - `gsd-sdk` is not installed in this environment, so GSD orchestration is being bootstrapped manually
-- Production currently matches a Vercel deployment from local changes; GitHub still needs commit/push parity
+- `pnpm test` is still blocked by missing test files, tracked in Linear as `LAB-114`
+- GitHub reports dependency vulnerabilities on the default branch; this remains a separate hardening workstream
 
 ## Session Continuity
 
-Last session: 2026-05-03
-Stopped at: Production deployed; Phase 3 / Plan 03-02 and Phase 4 test coverage remain
+Last session: 2026-05-04
+Stopped at: Production deployed from pushed commit `2b2cc5e`; live apex auth/signup verified
 Resume file: none
