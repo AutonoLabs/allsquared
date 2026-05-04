@@ -28,23 +28,24 @@ Progress: █████████░ 90%
 - Sign-up and draft-contract entry now route through explicit Clerk auth pages
 - Production auth CSP now allows the AllSquared Clerk custom domain and Clerk worker runtime
 - Cloudflare DNS now points `allsquared.io` and `www.allsquared.io` at Vercel instead of the old Pages site
-- `pnpm test` still fails because no matching test files exist; `LAB-114` tracks executable test coverage
+- `LAB-121` production hardening added executable tests, dependency audit cleanup, DB constraints migration, AI rate limiting, contract state transitions, Stripe SDK usage, and production log/CSP tightening
+- `pnpm test`, `pnpm check`, `pnpm build`, and `pnpm audit` pass locally
 
 ## Pending Todos
 
 - Continue updating Linear when marketing tasks are completed or added
 - Review refreshed Terms and Privacy copy for legal/compliance accuracy
-- Add executable tests before treating the release as fully verified
 - Confirm whether to actually archive `AutonoLabs/allsquared-website` in GitHub after checking external dependencies
+- Complete remaining distributed security follow-ups: Redis/Vercel KV AI rate limiting and nonce-based CSP
 
 ## Blockers / Concerns
 
 - `gsd-sdk` is not installed in this environment, so GSD orchestration is being bootstrapped manually
-- `pnpm test` is still blocked by missing test files, tracked in Linear as `LAB-114`
-- GitHub reports dependency vulnerabilities on the default branch; this remains a separate hardening workstream
+- CSP still permits inline scripts until a nonce strategy is implemented
+- AI rate limiting is per-process; use Redis/Vercel KV before relying on it across multiple serverless instances
 
 ## Session Continuity
 
 Last session: 2026-05-04
-Stopped at: Production deployed from pushed commit `2b2cc5e`; live apex auth/signup verified
+Stopped at: `LAB-121` local hardening complete; awaiting commit/push/deploy after Linear triage
 Resume file: none

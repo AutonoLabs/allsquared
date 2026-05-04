@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { router, protectedProcedure } from '../_core/trpc';
+import { assertAiRateLimit } from '../lib/rate-limit';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 const LEXAI_API_URL = process.env.LEXAI_API_URL || ''; // e.g. http://localhost:8400
@@ -123,7 +124,8 @@ export const contractChatRouter = router({
         content: z.string(),
       })).max(20).default([]),
     }))
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      assertAiRateLimit(ctx.user.id);
       const modelConfig = AI_MODELS[input.model as ModelId];
 
       if (!modelConfig) {

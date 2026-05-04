@@ -4,9 +4,7 @@ import { getDb } from '../db';
 import { payments, subscriptions, users, webhookEvents, auditLogs } from '../../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
-
-// Stripe API configuration
-const STRIPE_API_URL = 'https://api.stripe.com/v1';
+import Stripe from 'stripe';
 
 // Subscription tier pricing (in pence)
 const TIER_PRICING = {
@@ -24,51 +22,13 @@ const TRANSACTION_FEES = {
   enterprise: { rate: 0.01, min: 500, max: 2500 }, // 1.0%, min £5, max £25
 } as const;
 
-// Helper to make Stripe API calls
-async function stripeRequest(
-  endpoint: string,
-  method: 'GET' | 'POST' | 'DELETE' = 'POST',
-  body?: Record<string, any>
-) {
+function getStripeClient() {
   const apiKey = process.env.STRIPE_SECRET_KEY;
-
   if (!apiKey) {
     throw new Error('Stripe is not configured');
   }
 
-  const options: RequestInit = {
-    method,
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-  };
-
-  if (body && method !== 'GET') {
-    const params = new URLSearchParams();
-    for (const [key, value] of Object.entries(body)) {
-      if (value !== undefined && value !== null) {
-        if (typeof value === 'object') {
-          for (const [subKey, subValue] of Object.entries(value)) {
-            params.append(`${key}[${subKey}]`, String(subValue));
-          }
-        } else {
-          params.append(key, String(value));
-        }
-      }
-    }
-    options.body = params.toString();
-  }
-
-  const response = await fetch(`${STRIPE_API_URL}${endpoint}`, options);
-  const data = await response.json();
-
-  if (!response.ok) {
-    console.error('Stripe API error:', data);
-    throw new Error(data.error?.message || 'Stripe API error');
-  }
-
-  return data;
+  return new Stripe(apiKey);
 }
 
 // Calculate platform fee based on user's subscription tier
@@ -178,9 +138,10 @@ export const paymentsRouter = router({
     }
 
     // Create Stripe customer
-    const customer = await stripeRequest('/customers', 'POST', {
-      email: user.email,
-      name: user.name,
+    const stripe = getStripeClient();
+    const customer = await stripe.customers.create({
+      email: user.email ?? undefined,
+      name: user.name ?? undefined,
       metadata: {
         userId: user.id,
         platform: 'allsquared',
@@ -206,7 +167,8 @@ export const paymentsRouter = router({
     // Check if user already has a connected account
     if (user.stripeConnectedAccountId) {
       // Get account link for onboarding completion
-      const accountLink = await stripeRequest('/account_links', 'POST', {
+      const stripe = getStripeClient();
+      const accountLink = await stripe.accountLinks.create({
         account: user.stripeConnectedAccountId,
         refresh_url: `${process.env.APP_URL}/settings/payments?refresh=true`,
         return_url: `${process.env.APP_URL}/settings/payments?success=true`,
@@ -220,10 +182,11 @@ export const paymentsRouter = router({
     }
 
     // Create Stripe Connect Express account
-    const account = await stripeRequest('/accounts', 'POST', {
+    const stripe = getStripeClient();
+    const account = await stripe.accounts.create({
       type: 'express',
       country: 'GB',
-      email: user.email,
+      email: user.email ?? undefined,
       capabilities: {
         card_payments: { requested: true },
         transfers: { requested: true },
@@ -242,7 +205,7 @@ export const paymentsRouter = router({
       .where(eq(users.id, user.id));
 
     // Create account link for onboarding
-    const accountLink = await stripeRequest('/account_links', 'POST', {
+    const accountLink = await stripe.accountLinks.create({
       account: account.id,
       refresh_url: `${process.env.APP_URL}/settings/payments?refresh=true`,
       return_url: `${process.env.APP_URL}/settings/payments?success=true`,
@@ -271,9 +234,10 @@ export const paymentsRouter = router({
       // Ensure user has Stripe customer
       let customerId = user.stripeCustomerId;
       if (!customerId) {
-        const customer = await stripeRequest('/customers', 'POST', {
-          email: user.email,
-          name: user.name,
+        const stripe = getStripeClient();
+        const customer = await stripe.customers.create({
+          email: user.email ?? undefined,
+          name: user.name ?? undefined,
           metadata: {
             userId: user.id,
             platform: 'allsquared',
@@ -296,11 +260,11 @@ export const paymentsRouter = router({
       }
 
       // Create checkout session
-      const session = await stripeRequest('/checkout/sessions', 'POST', {
+      const stripe = getStripeClient();
+      const session = await stripe.checkout.sessions.create({
         customer: customerId,
         mode: 'subscription',
-        'line_items[0][price]': priceId,
-        'line_items[0][quantity]': 1,
+        line_items: [{ price: priceId, quantity: 1 }],
         success_url: `${process.env.APP_URL}/settings/billing?success=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${process.env.APP_URL}/settings/billing?cancelled=true`,
         metadata: {
@@ -350,9 +314,10 @@ export const paymentsRouter = router({
       // Ensure user has Stripe customer
       let customerId = user.stripeCustomerId;
       if (!customerId) {
-        const customer = await stripeRequest('/customers', 'POST', {
-          email: user.email,
-          name: user.name,
+        const stripe = getStripeClient();
+        const customer = await stripe.customers.create({
+          email: user.email ?? undefined,
+          name: user.name ?? undefined,
           metadata: { userId: user.id },
         });
         customerId = customer.id;
@@ -364,7 +329,8 @@ export const paymentsRouter = router({
       }
 
       // Create payment intent
-      const paymentIntent = await stripeRequest('/payment_intents', 'POST', {
+      const stripe = getStripeClient();
+      const paymentIntent = await stripe.paymentIntents.create({
         amount: totalAmount,
         currency: 'gbp',
         customer: customerId,
@@ -475,11 +441,10 @@ export const paymentsRouter = router({
     }
 
     // Cancel at period end (not immediately)
-    await stripeRequest(
-      `/subscriptions/${subscription[0].stripeSubscriptionId}`,
-      'POST',
-      { cancel_at_period_end: true }
-    );
+    const stripe = getStripeClient();
+    await stripe.subscriptions.update(subscription[0].stripeSubscriptionId, {
+      cancel_at_period_end: true,
+    });
 
     // Update local record
     await db
@@ -520,11 +485,10 @@ export const paymentsRouter = router({
     }
 
     // Reactivate subscription
-    await stripeRequest(
-      `/subscriptions/${subscription[0].stripeSubscriptionId}`,
-      'POST',
-      { cancel_at_period_end: false }
-    );
+    const stripe = getStripeClient();
+    await stripe.subscriptions.update(subscription[0].stripeSubscriptionId, {
+      cancel_at_period_end: false,
+    });
 
     // Update local record
     await db
@@ -552,10 +516,8 @@ export const paymentsRouter = router({
     }
 
     try {
-      const account = await stripeRequest(
-        `/accounts/${user.stripeConnectedAccountId}`,
-        'GET'
-      );
+      const stripe = getStripeClient();
+      const account = await stripe.accounts.retrieve(user.stripeConnectedAccountId);
 
       return {
         hasAccount: true,

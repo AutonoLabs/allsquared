@@ -5,8 +5,11 @@ import {
   getContract,
   createContract,
   updateContract,
+  getUserContractsPage,
 } from '../db';
 import { createNotification } from '../db';
+import { assertContractStatusTransition, type ContractStatus } from '../lib/contract-state';
+import { nanoid } from 'nanoid';
 
 export const contractsRouter = router({
   // List user's contracts
@@ -25,16 +28,14 @@ export const contractsRouter = router({
     .query(async ({ ctx, input }) => {
       const { status, page = 1, limit = 20 } = input || {};
 
-      // Filter in DB — avoids fetching all contracts then filtering in JS
-      const allContracts = await getUserContracts(ctx.user.id, status);
-
-      // Pagination
-      const total = allContracts.length;
-      const start = (page - 1) * limit;
-      const paginated = allContracts.slice(start, start + limit);
+      const { contracts, total } = await getUserContractsPage(ctx.user.id, {
+        status,
+        page,
+        limit,
+      });
 
       return {
-        contracts: paginated,
+        contracts,
         total,
         page,
         totalPages: Math.ceil(total / limit),
@@ -80,7 +81,7 @@ export const contractsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const contractId = `contract_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const contractId = `contract_${nanoid(16)}`;
       
       const contract = await createContract({
         id: contractId,
@@ -138,7 +139,13 @@ export const contractsRouter = router({
       if (input.startDate) updates.startDate = new Date(input.startDate);
       if (input.endDate) updates.endDate = new Date(input.endDate);
       if (input.content) updates.contractContent = JSON.stringify(input.content);
-      if (input.status) updates.status = input.status;
+      if (input.status) {
+        assertContractStatusTransition(
+          contract.status as ContractStatus,
+          input.status as ContractStatus
+        );
+        updates.status = input.status;
+      }
       
       await updateContract(input.id, updates);
       
@@ -199,7 +206,7 @@ export const contractsRouter = router({
       // Send notification to provider
       if (contract.providerId) {
         await createNotification({
-          id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          id: `notif_${nanoid(16)}`,
           userId: contract.providerId,
           type: 'contract',
           title: 'New Contract Awaiting Signature',
@@ -267,7 +274,7 @@ export const contractsRouter = router({
       if (allSigned) {
         // Notify both parties
         await createNotification({
-          id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          id: `notif_${nanoid(16)}`,
           userId: contract.clientId,
           type: 'contract',
           title: 'Contract Fully Executed',
@@ -279,7 +286,7 @@ export const contractsRouter = router({
         
         if (contract.providerId && contract.providerId !== contract.clientId) {
           await createNotification({
-            id: `notif_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            id: `notif_${nanoid(16)}`,
             userId: contract.providerId,
             type: 'contract',
             title: 'Contract Fully Executed',
@@ -315,4 +322,3 @@ export const contractsRouter = router({
     };
   }),
 });
-

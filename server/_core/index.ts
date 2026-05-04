@@ -43,7 +43,7 @@ app.use((req: Request, res: Response, next: NextFunction) => {
     'Content-Security-Policy',
     [
       "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.google-analytics.com https://clerk.allsquared.io https://accounts.allsquared.io https://*.clerk.accounts.dev https://challenges.cloudflare.com",
+      "script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.google-analytics.com https://clerk.allsquared.io https://accounts.allsquared.io https://*.clerk.accounts.dev https://challenges.cloudflare.com",
       "worker-src 'self' blob:",
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "font-src 'self' https://fonts.gstatic.com",

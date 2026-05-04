@@ -8,6 +8,13 @@
       "when": 1774135220263,
       "tag": "0000_nappy_leader",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1777908554689,
+      "tag": "0001_condemned_sunfire",
+      "breakpoints": true
     }
   ]
 }

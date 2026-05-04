@@ -1,0 +1,2729 @@
+{
+  "id": "b66bfbec-c7bb-4ea0-8d59-88af2a4e3b05",
+  "prevId": "c61440df-e290-46b0-a4cb-0e721e636c73",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.aiGenerations": {
+      "name": "aiGenerations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contractId": {
+          "name": "contractId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "templateId": {
+          "name": "templateId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "prompt": {
+          "name": "prompt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "generatedContent": {
+          "name": "generatedContent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "model": {
+          "name": "model",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tokensUsed": {
+          "name": "tokensUsed",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "ai_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'completed'"
+        },
+        "userFeedback": {
+          "name": "userFeedback",
+          "type": "user_feedback",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "revisionCount": {
+          "name": "revisionCount",
+          "type": "varchar(5)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'0'"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "aiGenerations_userId_users_id_fk": {
+          "name": "aiGenerations_userId_users_id_fk",
+          "tableFrom": "aiGenerations",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "aiGenerations_contractId_contracts_id_fk": {
+          "name": "aiGenerations_contractId_contracts_id_fk",
+          "tableFrom": "aiGenerations",
+          "tableTo": "contracts",
+          "columnsFrom": [
+            "contractId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "aiGenerations_templateId_contractTemplates_id_fk": {
+          "name": "aiGenerations_templateId_contractTemplates_id_fk",
+          "tableFrom": "aiGenerations",
+          "tableTo": "contractTemplates",
+          "columnsFrom": [
+            "templateId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.auditLogs": {
+      "name": "auditLogs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "action": {
+          "name": "action",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entityType": {
+          "name": "entityType",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entityId": {
+          "name": "entityId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "previousValue": {
+          "name": "previousValue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "newValue": {
+          "name": "newValue",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ipAddress": {
+          "name": "ipAddress",
+          "type": "varchar(45)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "userAgent": {
+          "name": "userAgent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "audit_logs_entity_idx": {
+          "name": "audit_logs_entity_idx",
+          "columns": [
+            {
+              "expression": "entityId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "entityType",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "audit_logs_user_idx": {
+          "name": "audit_logs_user_idx",
+          "columns": [
+            {
+              "expression": "userId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.contractTemplates": {
+      "name": "contractTemplates",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "category": {
+          "name": "category",
+          "type": "category",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "templateContent": {
+          "name": "templateContent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isActive": {
+          "name": "isActive",
+          "type": "is_active",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'yes'"
+        },
+        "variables": {
+          "name": "variables",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "clauseBanks": {
+          "name": "clauseBanks",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "templateMarkdown": {
+          "name": "templateMarkdown",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "templateSlug": {
+          "name": "templateSlug",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "contract_templates_slug_unique": {
+          "name": "contract_templates_slug_unique",
+          "columns": [
+            {
+              "expression": "templateSlug",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.contracts": {
+      "name": "contracts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "templateId": {
+          "name": "templateId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "clientId": {
+          "name": "clientId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "providerId": {
+          "name": "providerId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "category": {
+          "name": "category",
+          "type": "category",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "totalAmount": {
+          "name": "totalAmount",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currency": {
+          "name": "currency",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'GBP'"
+        },
+        "status": {
+          "name": "status",
+          "type": "contract_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'draft'"
+        },
+        "contractContent": {
+          "name": "contractContent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "selectedClauses": {
+          "name": "selectedClauses",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "filledVariables": {
+          "name": "filledVariables",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "generatedMarkdown": {
+          "name": "generatedMarkdown",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "partyAId": {
+          "name": "partyAId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "partyBId": {
+          "name": "partyBId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "clientSignedAt": {
+          "name": "clientSignedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "providerSignedAt": {
+          "name": "providerSignedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "startDate": {
+          "name": "startDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "endDate": {
+          "name": "endDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "contracts_client_status_idx": {
+          "name": "contracts_client_status_idx",
+          "columns": [
+            {
+              "expression": "clientId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "contracts_provider_status_idx": {
+          "name": "contracts_provider_status_idx",
+          "columns": [
+            {
+              "expression": "providerId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "contracts_templateId_contractTemplates_id_fk": {
+          "name": "contracts_templateId_contractTemplates_id_fk",
+          "tableFrom": "contracts",
+          "tableTo": "contractTemplates",
+          "columnsFrom": [
+            "templateId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "contracts_clientId_users_id_fk": {
+          "name": "contracts_clientId_users_id_fk",
+          "tableFrom": "contracts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "clientId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.disputeAnalyses": {
+      "name": "disputeAnalyses",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "disputeId": {
+          "name": "disputeId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contractSummary": {
+          "name": "contractSummary",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "claimantPosition": {
+          "name": "claimantPosition",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "respondentPosition": {
+          "name": "respondentPosition",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "strengthAssessment": {
+          "name": "strengthAssessment",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "relevantClauses": {
+          "name": "relevantClauses",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "recommendedAction": {
+          "name": "recommendedAction",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "confidence": {
+          "name": "confidence",
+          "type": "confidence",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "aiModel": {
+          "name": "aiModel",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.disputes": {
+      "name": "disputes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "contractId": {
+          "name": "contractId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "milestoneId": {
+          "name": "milestoneId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "raisedBy": {
+          "name": "raisedBy",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "reason": {
+          "name": "reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "evidence": {
+          "name": "evidence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "dispute_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'open'"
+        },
+        "resolution": {
+          "name": "resolution",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "resolvedAt": {
+          "name": "resolvedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "disputes_contractId_contracts_id_fk": {
+          "name": "disputes_contractId_contracts_id_fk",
+          "tableFrom": "disputes",
+          "tableTo": "contracts",
+          "columnsFrom": [
+            "contractId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "disputes_milestoneId_milestones_id_fk": {
+          "name": "disputes_milestoneId_milestones_id_fk",
+          "tableFrom": "disputes",
+          "tableTo": "milestones",
+          "columnsFrom": [
+            "milestoneId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "disputes_raisedBy_users_id_fk": {
+          "name": "disputes_raisedBy_users_id_fk",
+          "tableFrom": "disputes",
+          "tableTo": "users",
+          "columnsFrom": [
+            "raisedBy"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.escrowTransactions": {
+      "name": "escrowTransactions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "contractId": {
+          "name": "contractId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "milestoneId": {
+          "name": "milestoneId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "amount": {
+          "name": "amount",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currency": {
+          "name": "currency",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'GBP'"
+        },
+        "status": {
+          "name": "status",
+          "type": "escrow_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "escrowProvider": {
+          "name": "escrowProvider",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "escrowReference": {
+          "name": "escrowReference",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "depositedAt": {
+          "name": "depositedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "releasedAt": {
+          "name": "releasedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "escrowTransactions_contractId_contracts_id_fk": {
+          "name": "escrowTransactions_contractId_contracts_id_fk",
+          "tableFrom": "escrowTransactions",
+          "tableTo": "contracts",
+          "columnsFrom": [
+            "contractId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "escrowTransactions_milestoneId_milestones_id_fk": {
+          "name": "escrowTransactions_milestoneId_milestones_id_fk",
+          "tableFrom": "escrowTransactions",
+          "tableTo": "milestones",
+          "columnsFrom": [
+            "milestoneId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.fileAttachments": {
+      "name": "fileAttachments",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "entityType": {
+          "name": "entityType",
+          "type": "entity_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entityId": {
+          "name": "entityId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "uploadedBy": {
+          "name": "uploadedBy",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fileName": {
+          "name": "fileName",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fileSize": {
+          "name": "fileSize",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "fileType": {
+          "name": "fileType",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fileUrl": {
+          "name": "fileUrl",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "fileAttachments_uploadedBy_users_id_fk": {
+          "name": "fileAttachments_uploadedBy_users_id_fk",
+          "tableFrom": "fileAttachments",
+          "tableTo": "users",
+          "columnsFrom": [
+            "uploadedBy"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.kycVerifications": {
+      "name": "kycVerifications",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "kyc_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "provider": {
+          "name": "provider",
+          "type": "kyc_provider",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "providerVerificationId": {
+          "name": "providerVerificationId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "verificationType": {
+          "name": "verificationType",
+          "type": "verification_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'identity'"
+        },
+        "documentType": {
+          "name": "documentType",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "firstName": {
+          "name": "firstName",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "lastName": {
+          "name": "lastName",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dateOfBirth": {
+          "name": "dateOfBirth",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "addressVerified": {
+          "name": "addressVerified",
+          "type": "address_verified",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'no'"
+        },
+        "riskScore": {
+          "name": "riskScore",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "failureReason": {
+          "name": "failureReason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "verifiedAt": {
+          "name": "verifiedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.litlReferrals": {
+      "name": "litlReferrals",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contractId": {
+          "name": "contractId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "requestType": {
+          "name": "requestType",
+          "type": "litl_request_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "litl_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "lawyerName": {
+          "name": "lawyerName",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "callScheduledAt": {
+          "name": "callScheduledAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "completedAt": {
+          "name": "completedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fee": {
+          "name": "fee",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "litlReferrals_userId_users_id_fk": {
+          "name": "litlReferrals_userId_users_id_fk",
+          "tableFrom": "litlReferrals",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "litlReferrals_contractId_contracts_id_fk": {
+          "name": "litlReferrals_contractId_contracts_id_fk",
+          "tableFrom": "litlReferrals",
+          "tableTo": "contracts",
+          "columnsFrom": [
+            "contractId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.mediationResponses": {
+      "name": "mediationResponses",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "disputeId": {
+          "name": "disputeId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "responderId": {
+          "name": "responderId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "role": {
+          "name": "role",
+          "type": "mediation_role",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "aiSuggestion": {
+          "name": "aiSuggestion",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "round": {
+          "name": "round",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.milestones": {
+      "name": "milestones",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "contractId": {
+          "name": "contractId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "amount": {
+          "name": "amount",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "order": {
+          "name": "order",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "milestone_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "deliverables": {
+          "name": "deliverables",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "submissionNotes": {
+          "name": "submissionNotes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "approvalNotes": {
+          "name": "approvalNotes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "dueDate": {
+          "name": "dueDate",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "submittedAt": {
+          "name": "submittedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "completedAt": {
+          "name": "completedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "approvedAt": {
+          "name": "approvedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "paidAt": {
+          "name": "paidAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "milestones_contract_idx": {
+          "name": "milestones_contract_idx",
+          "columns": [
+            {
+              "expression": "contractId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "milestones_contractId_contracts_id_fk": {
+          "name": "milestones_contractId_contracts_id_fk",
+          "tableFrom": "milestones",
+          "tableTo": "contracts",
+          "columnsFrom": [
+            "contractId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.notifications": {
+      "name": "notifications",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "message": {
+          "name": "message",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "type": {
+          "name": "type",
+          "type": "notification_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "isRead": {
+          "name": "isRead",
+          "type": "is_read",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'no'"
+        },
+        "relatedId": {
+          "name": "relatedId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "notifications_userId_users_id_fk": {
+          "name": "notifications_userId_users_id_fk",
+          "tableFrom": "notifications",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.partyProfiles": {
+      "name": "partyProfiles",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "companyNumber": {
+          "name": "companyNumber",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(320)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "party_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'company'"
+        },
+        "companiesHouseData": {
+          "name": "companiesHouseData",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.payments": {
+      "name": "payments",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "contractId": {
+          "name": "contractId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "milestoneId": {
+          "name": "milestoneId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "subscriptionId": {
+          "name": "subscriptionId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "type": {
+          "name": "type",
+          "type": "payment_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "amount": {
+          "name": "amount",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "currency": {
+          "name": "currency",
+          "type": "varchar(3)",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'GBP'"
+        },
+        "status": {
+          "name": "status",
+          "type": "payment_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "stripePaymentIntentId": {
+          "name": "stripePaymentIntentId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stripeChargeId": {
+          "name": "stripeChargeId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stripeTransferId": {
+          "name": "stripeTransferId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "metadata": {
+          "name": "metadata",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "failureReason": {
+          "name": "failureReason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "processedAt": {
+          "name": "processedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "payments_userId_users_id_fk": {
+          "name": "payments_userId_users_id_fk",
+          "tableFrom": "payments",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "payments_contractId_contracts_id_fk": {
+          "name": "payments_contractId_contracts_id_fk",
+          "tableFrom": "payments",
+          "tableTo": "contracts",
+          "columnsFrom": [
+            "contractId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "payments_milestoneId_milestones_id_fk": {
+          "name": "payments_milestoneId_milestones_id_fk",
+          "tableFrom": "payments",
+          "tableTo": "milestones",
+          "columnsFrom": [
+            "milestoneId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "payments_subscriptionId_subscriptions_id_fk": {
+          "name": "payments_subscriptionId_subscriptions_id_fk",
+          "tableFrom": "payments",
+          "tableTo": "subscriptions",
+          "columnsFrom": [
+            "subscriptionId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.settlementOptions": {
+      "name": "settlementOptions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "disputeId": {
+          "name": "disputeId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "proposedBy": {
+          "name": "proposedBy",
+          "type": "settlement_proposer",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "financialTerms": {
+          "name": "financialTerms",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "acceptedByClaimant": {
+          "name": "acceptedByClaimant",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "acceptedByRespondent": {
+          "name": "acceptedByRespondent",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "status": {
+          "name": "status",
+          "type": "settlement_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'proposed'"
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.signatures": {
+      "name": "signatures",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "contractId": {
+          "name": "contractId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider": {
+          "name": "provider",
+          "type": "signature_provider",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'internal'"
+        },
+        "providerEnvelopeId": {
+          "name": "providerEnvelopeId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "providerSignerId": {
+          "name": "providerSignerId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "signature_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "signatureName": {
+          "name": "signatureName",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "signatureImage": {
+          "name": "signatureImage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ipAddress": {
+          "name": "ipAddress",
+          "type": "varchar(45)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "userAgent": {
+          "name": "userAgent",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "signedAt": {
+          "name": "signedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sentAt": {
+          "name": "sentAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "viewedAt": {
+          "name": "viewedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "signatures_contractId_contracts_id_fk": {
+          "name": "signatures_contractId_contracts_id_fk",
+          "tableFrom": "signatures",
+          "tableTo": "contracts",
+          "columnsFrom": [
+            "contractId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "signatures_userId_users_id_fk": {
+          "name": "signatures_userId_users_id_fk",
+          "tableFrom": "signatures",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.subscriptions": {
+      "name": "subscriptions",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "tier": {
+          "name": "tier",
+          "type": "subscription_tier",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'free'"
+        },
+        "status": {
+          "name": "status",
+          "type": "subscription_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'active'"
+        },
+        "stripeSubscriptionId": {
+          "name": "stripeSubscriptionId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stripePriceId": {
+          "name": "stripePriceId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currentPeriodStart": {
+          "name": "currentPeriodStart",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "currentPeriodEnd": {
+          "name": "currentPeriodEnd",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "cancelAtPeriodEnd": {
+          "name": "cancelAtPeriodEnd",
+          "type": "cancel_at_period_end",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'no'"
+        },
+        "trialEndsAt": {
+          "name": "trialEndsAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "subscriptions_userId_users_id_fk": {
+          "name": "subscriptions_userId_users_id_fk",
+          "tableFrom": "subscriptions",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.users": {
+      "name": "users",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "clerkId": {
+          "name": "clerkId",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "email": {
+          "name": "email",
+          "type": "varchar(320)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "loginMethod": {
+          "name": "loginMethod",
+          "type": "varchar(64)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "role": {
+          "name": "role",
+          "type": "role",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'user'"
+        },
+        "userType": {
+          "name": "userType",
+          "type": "user_type",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "businessName": {
+          "name": "businessName",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "phone": {
+          "name": "phone",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "address": {
+          "name": "address",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "profilePhoto": {
+          "name": "profilePhoto",
+          "type": "varchar(500)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "verified": {
+          "name": "verified",
+          "type": "verified",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'no'"
+        },
+        "verificationToken": {
+          "name": "verificationToken",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "companyNumber": {
+          "name": "companyNumber",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "vatNumber": {
+          "name": "vatNumber",
+          "type": "varchar(20)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stripeCustomerId": {
+          "name": "stripeCustomerId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stripeConnectedAccountId": {
+          "name": "stripeConnectedAccountId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        },
+        "lastSignedIn": {
+          "name": "lastSignedIn",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "users_clerk_id_unique": {
+          "name": "users_clerk_id_unique",
+          "columns": [
+            {
+              "expression": "clerkId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "users_email_unique": {
+          "name": "users_email_unique",
+          "columns": [
+            {
+              "expression": "email",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.webhookEvents": {
+      "name": "webhookEvents",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(64)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "provider": {
+          "name": "provider",
+          "type": "webhook_provider",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "eventType": {
+          "name": "eventType",
+          "type": "varchar(100)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "eventId": {
+          "name": "eventId",
+          "type": "varchar(255)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "payload": {
+          "name": "payload",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "status": {
+          "name": "status",
+          "type": "webhook_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'pending'"
+        },
+        "errorMessage": {
+          "name": "errorMessage",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "processedAt": {
+          "name": "processedAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "webhook_events_provider_event_id_unique": {
+          "name": "webhook_events_provider_event_id_unique",
+          "columns": [
+            {
+              "expression": "provider",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "eventId",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {
+    "public.address_verified": {
+      "name": "address_verified",
+      "schema": "public",
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "public.ai_status": {
+      "name": "ai_status",
+      "schema": "public",
+      "values": [
+        "completed",
+        "failed",
+        "revised"
+      ]
+    },
+    "public.cancel_at_period_end": {
+      "name": "cancel_at_period_end",
+      "schema": "public",
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "public.category": {
+      "name": "category",
+      "schema": "public",
+      "values": [
+        "freelance",
+        "home_improvement",
+        "event_services",
+        "trade_services",
+        "other"
+      ]
+    },
+    "public.confidence": {
+      "name": "confidence",
+      "schema": "public",
+      "values": [
+        "high",
+        "medium",
+        "low"
+      ]
+    },
+    "public.contract_status": {
+      "name": "contract_status",
+      "schema": "public",
+      "values": [
+        "draft",
+        "pending_signature",
+        "active",
+        "completed",
+        "disputed",
+        "cancelled"
+      ]
+    },
+    "public.dispute_status": {
+      "name": "dispute_status",
+      "schema": "public",
+      "values": [
+        "open",
+        "under_review",
+        "resolved",
+        "escalated",
+        "closed"
+      ]
+    },
+    "public.entity_type": {
+      "name": "entity_type",
+      "schema": "public",
+      "values": [
+        "contract",
+        "milestone",
+        "dispute",
+        "profile",
+        "verification"
+      ]
+    },
+    "public.escrow_status": {
+      "name": "escrow_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "held",
+        "released",
+        "refunded",
+        "cancelled"
+      ]
+    },
+    "public.is_active": {
+      "name": "is_active",
+      "schema": "public",
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "public.is_read": {
+      "name": "is_read",
+      "schema": "public",
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "public.kyc_provider": {
+      "name": "kyc_provider",
+      "schema": "public",
+      "values": [
+        "stripe_identity",
+        "onfido",
+        "manual"
+      ]
+    },
+    "public.kyc_status": {
+      "name": "kyc_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "processing",
+        "verified",
+        "failed",
+        "expired",
+        "requires_input"
+      ]
+    },
+    "public.litl_request_type": {
+      "name": "litl_request_type",
+      "schema": "public",
+      "values": [
+        "contract_review",
+        "legal_advice",
+        "custom_contract",
+        "dispute_assistance"
+      ]
+    },
+    "public.litl_status": {
+      "name": "litl_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "assigned",
+        "in_progress",
+        "completed",
+        "cancelled"
+      ]
+    },
+    "public.mediation_role": {
+      "name": "mediation_role",
+      "schema": "public",
+      "values": [
+        "claimant",
+        "respondent"
+      ]
+    },
+    "public.milestone_status": {
+      "name": "milestone_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "in_progress",
+        "submitted",
+        "approved",
+        "rejected",
+        "paid"
+      ]
+    },
+    "public.notification_type": {
+      "name": "notification_type",
+      "schema": "public",
+      "values": [
+        "contract",
+        "milestone",
+        "payment",
+        "dispute",
+        "system"
+      ]
+    },
+    "public.party_type": {
+      "name": "party_type",
+      "schema": "public",
+      "values": [
+        "client",
+        "contractor",
+        "individual",
+        "company"
+      ]
+    },
+    "public.payment_status": {
+      "name": "payment_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "processing",
+        "succeeded",
+        "failed",
+        "refunded",
+        "cancelled"
+      ]
+    },
+    "public.payment_type": {
+      "name": "payment_type",
+      "schema": "public",
+      "values": [
+        "subscription",
+        "escrow_deposit",
+        "escrow_release",
+        "escrow_refund",
+        "platform_fee",
+        "litl_fee"
+      ]
+    },
+    "public.role": {
+      "name": "role",
+      "schema": "public",
+      "values": [
+        "user",
+        "admin"
+      ]
+    },
+    "public.settlement_proposer": {
+      "name": "settlement_proposer",
+      "schema": "public",
+      "values": [
+        "ai",
+        "claimant",
+        "respondent"
+      ]
+    },
+    "public.settlement_status": {
+      "name": "settlement_status",
+      "schema": "public",
+      "values": [
+        "proposed",
+        "accepted",
+        "rejected",
+        "expired"
+      ]
+    },
+    "public.signature_provider": {
+      "name": "signature_provider",
+      "schema": "public",
+      "values": [
+        "docuseal",
+        "docusign",
+        "signwell",
+        "internal"
+      ]
+    },
+    "public.signature_status": {
+      "name": "signature_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "sent",
+        "viewed",
+        "signed",
+        "declined",
+        "expired"
+      ]
+    },
+    "public.subscription_status": {
+      "name": "subscription_status",
+      "schema": "public",
+      "values": [
+        "active",
+        "past_due",
+        "cancelled",
+        "paused",
+        "trialing"
+      ]
+    },
+    "public.subscription_tier": {
+      "name": "subscription_tier",
+      "schema": "public",
+      "values": [
+        "free",
+        "starter",
+        "pro",
+        "enterprise"
+      ]
+    },
+    "public.user_feedback": {
+      "name": "user_feedback",
+      "schema": "public",
+      "values": [
+        "positive",
+        "negative",
+        "neutral"
+      ]
+    },
+    "public.user_type": {
+      "name": "user_type",
+      "schema": "public",
+      "values": [
+        "provider",
+        "client",
+        "both"
+      ]
+    },
+    "public.verification_type": {
+      "name": "verification_type",
+      "schema": "public",
+      "values": [
+        "identity",
+        "address",
+        "business"
+      ]
+    },
+    "public.verified": {
+      "name": "verified",
+      "schema": "public",
+      "values": [
+        "yes",
+        "no"
+      ]
+    },
+    "public.webhook_provider": {
+      "name": "webhook_provider",
+      "schema": "public",
+      "values": [
+        "stripe",
+        "docusign",
+        "transpact",
+        "signwell"
+      ]
+    },
+    "public.webhook_status": {
+      "name": "webhook_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "processing",
+        "processed",
+        "failed"
+      ]
+    }
+  },
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

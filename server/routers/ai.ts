@@ -5,6 +5,7 @@ import { aiGenerations, contractTemplates } from '../../drizzle/schema';
 import { eq, desc } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { CHATBOT_MODELS, DEFAULT_CHATBOT_MODEL, type ChatbotModelId } from '../../shared/chatbot-config';
+import { assertAiRateLimit } from '../lib/rate-limit';
 
 // OpenAI API configuration
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
@@ -266,6 +267,7 @@ export const aiRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      assertAiRateLimit(ctx.user.id);
       const generationId = `aigen_${nanoid(16)}`;
 
       const db = await getDb();
@@ -333,6 +335,7 @@ export const aiRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      assertAiRateLimit(ctx.user.id);
       const db = await getDb();
       if (!db) throw new Error('Database not available');
 
@@ -455,6 +458,7 @@ export const aiRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      assertAiRateLimit(ctx.user.id);
       const apiKey = process.env.OPENAI_API_KEY;
 
       if (!apiKey) {
@@ -523,7 +527,8 @@ Format each clause with a title and the clause text.`;
         })).optional(),
       })
     )
-    .mutation(async ({ input }) => {
+    .mutation(async ({ ctx, input }) => {
+      assertAiRateLimit(ctx.user.id);
       const modelCfg = CHATBOT_MODELS[input.modelId];
       const apiKey = process.env.OPENAI_API_KEY;
 

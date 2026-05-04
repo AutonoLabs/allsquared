@@ -10,6 +10,7 @@ import {
   webhookEvents
 } from '../../drizzle/schema';
 import { eq, and, inArray } from 'drizzle-orm';
+import { TRPCError } from '@trpc/server';
 import { nanoid } from 'nanoid';
 import * as transpact from '../lib/transpact-client';
 
@@ -417,7 +418,10 @@ export const escrowRouter = router({
       }
 
       if (escrow[0].status !== 'held') {
-        throw new Error('Escrow funds are not available for refund');
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'Escrow funds are not available for refund',
+        });
       }
 
       // Mark contract as disputed

@@ -1,4 +1,4 @@
-import { boolean, index, integer, pgEnum, pgTable, text, timestamp, varchar } from "drizzle-orm/pg-core";
+import { boolean, index, integer, pgEnum, pgTable, text, timestamp, uniqueIndex, varchar } from "drizzle-orm/pg-core";
 
 // Define enums at the top of the file
 export const roleEnum = pgEnum("role", ["user", "admin"]);
@@ -154,7 +154,10 @@ export const users = pgTable("users", {
   stripeConnectedAccountId: varchar("stripeConnectedAccountId", { length: 255 }),
   createdAt: timestamp("createdAt").defaultNow(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow(),
-});
+}, (table) => [
+  uniqueIndex("users_clerk_id_unique").on(table.clerkId),
+  uniqueIndex("users_email_unique").on(table.email),
+]);
 
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
@@ -173,7 +176,9 @@ export const contractTemplates = pgTable("contractTemplates", {
   templateSlug: varchar("templateSlug", { length: 100 }), // unique identifier like "msa-uk"
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
-});
+}, (table) => [
+  uniqueIndex("contract_templates_slug_unique").on(table.templateSlug),
+]);
 
 export type ContractTemplate = typeof contractTemplates.$inferSelect;
 export type InsertContractTemplate = typeof contractTemplates.$inferInsert;
@@ -181,8 +186,8 @@ export type InsertContractTemplate = typeof contractTemplates.$inferInsert;
 // Contracts between users
 export const contracts = pgTable("contracts", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  templateId: varchar("templateId", { length: 64 }),
-  clientId: varchar("clientId", { length: 64 }).notNull(),
+  templateId: varchar("templateId", { length: 64 }).references(() => contractTemplates.id),
+  clientId: varchar("clientId", { length: 64 }).notNull().references(() => users.id),
   providerId: varchar("providerId", { length: 64 }).notNull(),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
@@ -202,19 +207,18 @@ export const contracts = pgTable("contracts", {
   endDate: timestamp("endDate"),
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
-});
+}, (table) => [
+  index("contracts_client_status_idx").on(table.clientId, table.status),
+  index("contracts_provider_status_idx").on(table.providerId, table.status),
+]);
 
 export type Contract = typeof contracts.$inferSelect;
 export type InsertContract = typeof contracts.$inferInsert;
 
-// Indexes for contracts table
-export const contractsClientIdx = index("contracts_client_status_idx").on(contracts.clientId, contracts.status);
-export const contractsProviderIdx = index("contracts_provider_status_idx").on(contracts.providerId, contracts.status);
-
 // Milestones for each contract
 export const milestones = pgTable("milestones", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  contractId: varchar("contractId", { length: 64 }).notNull(),
+  contractId: varchar("contractId", { length: 64 }).notNull().references(() => contracts.id),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
   amount: varchar("amount", { length: 20 }).notNull(),
@@ -230,10 +234,9 @@ export const milestones = pgTable("milestones", {
   paidAt: timestamp("paidAt"),
   createdAt: timestamp("createdAt").defaultNow(),
   updatedAt: timestamp("updatedAt").defaultNow(),
-});
-
-// Index for milestones table
-export const milestonesContractIdx = index("milestones_contract_idx").on(milestones.contractId);
+}, (table) => [
+  index("milestones_contract_idx").on(table.contractId),
+]);
 
 export type Milestone = typeof milestones.$inferSelect;
 export type InsertMilestone = typeof milestones.$inferInsert;
@@ -241,8 +244,8 @@ export type InsertMilestone = typeof milestones.$inferInsert;
 // Escrow transactions
 export const escrowTransactions = pgTable("escrowTransactions", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  contractId: varchar("contractId", { length: 64 }).notNull(),
-  milestoneId: varchar("milestoneId", { length: 64 }),
+  contractId: varchar("contractId", { length: 64 }).notNull().references(() => contracts.id),
+  milestoneId: varchar("milestoneId", { length: 64 }).references(() => milestones.id),
   amount: varchar("amount", { length: 20 }).notNull(),
   currency: varchar("currency", { length: 3 }).default("GBP").notNull(),
   status: escrowStatusEnum("status").default("pending").notNull(),
@@ -260,9 +263,9 @@ export type InsertEscrowTransaction = typeof escrowTransactions.$inferInsert;
 // Disputes
 export const disputes = pgTable("disputes", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  contractId: varchar("contractId", { length: 64 }).notNull(),
-  milestoneId: varchar("milestoneId", { length: 64 }),
-  raisedBy: varchar("raisedBy", { length: 64 }).notNull(), // userId
+  contractId: varchar("contractId", { length: 64 }).notNull().references(() => contracts.id),
+  milestoneId: varchar("milestoneId", { length: 64 }).references(() => milestones.id),
+  raisedBy: varchar("raisedBy", { length: 64 }).notNull().references(() => users.id),
   reason: text("reason").notNull(),
   evidence: text("evidence"), // JSON array of file URLs
   status: disputeStatusEnum("status").default("open").notNull(),
@@ -278,8 +281,8 @@ export type InsertDispute = typeof disputes.$inferInsert;
 // LITL (Lawyer-in-the-Loop) referrals
 export const litlReferrals = pgTable("litlReferrals", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  userId: varchar("userId", { length: 64 }).notNull(),
-  contractId: varchar("contractId", { length: 64 }),
+  userId: varchar("userId", { length: 64 }).notNull().references(() => users.id),
+  contractId: varchar("contractId", { length: 64 }).references(() => contracts.id),
   requestType: litlRequestTypeEnum("requestType").notNull(),
   description: text("description"),
   status: litlStatusEnum("status").default("pending").notNull(),
@@ -297,7 +300,7 @@ export type InsertLitlReferral = typeof litlReferrals.$inferInsert;
 // Notifications
 export const notifications = pgTable("notifications", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  userId: varchar("userId", { length: 64 }).notNull(),
+  userId: varchar("userId", { length: 64 }).notNull().references(() => users.id),
   title: varchar("title", { length: 255 }).notNull(),
   message: text("message").notNull(),
   type: notificationTypeEnum("type").notNull(),
@@ -314,7 +317,7 @@ export const fileAttachments = pgTable("fileAttachments", {
   id: varchar("id", { length: 64 }).primaryKey(),
   entityType: entityTypeEnum("entityType").notNull(),
   entityId: varchar("entityId", { length: 64 }).notNull(), // ID of the related entity
-  uploadedBy: varchar("uploadedBy", { length: 64 }).notNull(), // userId
+  uploadedBy: varchar("uploadedBy", { length: 64 }).notNull().references(() => users.id),
   fileName: varchar("fileName", { length: 255 }).notNull(),
   fileSize: varchar("fileSize", { length: 20 }).notNull(), // in bytes
   fileType: varchar("fileType", { length: 100 }), // MIME type
@@ -328,7 +331,7 @@ export type InsertFileAttachment = typeof fileAttachments.$inferInsert;
 // Subscriptions for billing
 export const subscriptions = pgTable("subscriptions", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  userId: varchar("userId", { length: 64 }).notNull(),
+  userId: varchar("userId", { length: 64 }).notNull().references(() => users.id),
   tier: subscriptionTierEnum("tier").default("free").notNull(),
   status: subscriptionStatusEnum("status").default("active").notNull(),
   stripeSubscriptionId: varchar("stripeSubscriptionId", { length: 255 }),
@@ -347,10 +350,10 @@ export type InsertSubscription = typeof subscriptions.$inferInsert;
 // Payment transactions history
 export const payments = pgTable("payments", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  userId: varchar("userId", { length: 64 }).notNull(),
-  contractId: varchar("contractId", { length: 64 }),
-  milestoneId: varchar("milestoneId", { length: 64 }),
-  subscriptionId: varchar("subscriptionId", { length: 64 }),
+  userId: varchar("userId", { length: 64 }).notNull().references(() => users.id),
+  contractId: varchar("contractId", { length: 64 }).references(() => contracts.id),
+  milestoneId: varchar("milestoneId", { length: 64 }).references(() => milestones.id),
+  subscriptionId: varchar("subscriptionId", { length: 64 }).references(() => subscriptions.id),
   type: paymentTypeEnum("type").notNull(),
   amount: varchar("amount", { length: 20 }).notNull(), // in smallest currency unit (pence)
   currency: varchar("currency", { length: 3 }).default("GBP").notNull(),
@@ -382,11 +385,10 @@ export const auditLogs = pgTable("auditLogs", {
   userAgent: text("userAgent"),
   metadata: text("metadata"), // Additional context as JSON
   createdAt: timestamp("createdAt").defaultNow(),
-});
-
-// Index for auditLogs table
-export const auditLogsEntityIdx = index("audit_logs_entity_idx").on(auditLogs.entityId, auditLogs.entityType);
-export const auditLogsUserIdx = index("audit_logs_user_idx").on(auditLogs.userId);
+}, (table) => [
+  index("audit_logs_entity_idx").on(table.entityId, table.entityType),
+  index("audit_logs_user_idx").on(table.userId),
+]);
 
 export type AuditLog = typeof auditLogs.$inferSelect;
 export type InsertAuditLog = typeof auditLogs.$inferInsert;
@@ -419,8 +421,8 @@ export type InsertKycVerification = typeof kycVerifications.$inferInsert;
 // E-signature records
 export const signatures = pgTable("signatures", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  contractId: varchar("contractId", { length: 64 }).notNull(),
-  userId: varchar("userId", { length: 64 }).notNull(),
+  contractId: varchar("contractId", { length: 64 }).notNull().references(() => contracts.id),
+  userId: varchar("userId", { length: 64 }).notNull().references(() => users.id),
   provider: signatureProviderEnum("provider").default("internal").notNull(),
   providerEnvelopeId: varchar("providerEnvelopeId", { length: 255 }),
   providerSignerId: varchar("providerSignerId", { length: 255 }),
@@ -451,7 +453,9 @@ export const webhookEvents = pgTable("webhookEvents", {
   errorMessage: text("errorMessage"),
   processedAt: timestamp("processedAt"),
   createdAt: timestamp("createdAt").defaultNow(),
-});
+}, (table) => [
+  uniqueIndex("webhook_events_provider_event_id_unique").on(table.provider, table.eventId),
+]);
 
 export type WebhookEvent = typeof webhookEvents.$inferSelect;
 export type InsertWebhookEvent = typeof webhookEvents.$inferInsert;
@@ -459,9 +463,9 @@ export type InsertWebhookEvent = typeof webhookEvents.$inferInsert;
 // AI contract generation history
 export const aiGenerations = pgTable("aiGenerations", {
   id: varchar("id", { length: 64 }).primaryKey(),
-  userId: varchar("userId", { length: 64 }).notNull(),
-  contractId: varchar("contractId", { length: 64 }),
-  templateId: varchar("templateId", { length: 64 }),
+  userId: varchar("userId", { length: 64 }).notNull().references(() => users.id),
+  contractId: varchar("contractId", { length: 64 }).references(() => contracts.id),
+  templateId: varchar("templateId", { length: 64 }).references(() => contractTemplates.id),
   prompt: text("prompt").notNull(), // User's input/requirements
   generatedContent: text("generatedContent").notNull(), // AI output
   model: varchar("model", { length: 50 }).notNull(), // gpt-4, gpt-4-turbo, etc.

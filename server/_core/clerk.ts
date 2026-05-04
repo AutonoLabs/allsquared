@@ -40,28 +40,36 @@ export async function authenticateClerkRequest(req: Request): Promise<User | nul
       return null;
     }
 
-    console.log('[Auth] Verified clerkUserId:', clerkUserId);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[Auth] Verified clerkUserId:', clerkUserId);
+    }
 
     // Get user from our database
     let user = await db.getUserByClerkId(clerkUserId);
 
     if (!user) {
       // Auto-sync user from Clerk if not in DB
-      console.log('[Auth] User not in DB — fetching from Clerk and syncing');
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[Auth] User not in DB — fetching from Clerk and syncing');
+      }
       try {
         const clerkUser = await clerkClient.users.getUser(clerkUserId);
         const email = clerkUser.emailAddresses?.[0]?.emailAddress || null;
         const name = [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(' ') || null;
         const emailVerified = clerkUser.emailAddresses?.[0]?.verification?.status === 'verified';
         user = await syncClerkUser({ clerkId: clerkUserId, email, name, emailVerified });
-        console.log('[Auth] Auto-synced new user:', user.id);
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('[Auth] Auto-synced new user:', user.id);
+        }
       } catch (syncErr) {
         console.warn('[Auth] Auto-sync failed:', syncErr);
         return null;
       }
     }
 
-    console.log('[Auth] DB user found:', user.id, user.email);
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[Auth] DB user found:', user.id);
+    }
 
     // Update last signed in
     await db.upsertUser({

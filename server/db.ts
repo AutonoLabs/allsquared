@@ -1,4 +1,4 @@
-import { eq, and, or, desc, SQL } from "drizzle-orm";
+import { eq, and, or, desc, SQL, count } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { 
   InsertUser, 
@@ -170,20 +170,54 @@ export async function getUserContracts(userId: string, status?: string) {
   const db = await getDb();
   if (!db) return [];
 
+  const { contracts } = await getUserContractsPage(userId, { status });
+  return contracts;
+}
+
+function buildUserContractsFilter(userId: string, status?: string): SQL {
   const userFilter = or(
     eq(contracts.clientId, userId),
     eq(contracts.providerId, userId)
   );
 
-  const whereClause: SQL = status
+  return status
     ? and(userFilter, eq(contracts.status, status as any))!
     : userFilter!;
+}
 
-  return await db
-    .select()
-    .from(contracts)
-    .where(whereClause)
-    .orderBy(desc(contracts.createdAt));
+export async function getUserContractsPage(
+  userId: string,
+  options: {
+    status?: string;
+    page?: number;
+    limit?: number;
+  } = {}
+) {
+  const db = await getDb();
+  if (!db) return { contracts: [], total: 0 };
+
+  const page = Math.max(1, options.page ?? 1);
+  const limit = Math.min(100, Math.max(1, options.limit ?? 20));
+  const whereClause = buildUserContractsFilter(userId, options.status);
+
+  const [rows, totalRows] = await Promise.all([
+    db
+      .select()
+      .from(contracts)
+      .where(whereClause)
+      .orderBy(desc(contracts.createdAt))
+      .limit(limit)
+      .offset((page - 1) * limit),
+    db
+      .select({ total: count() })
+      .from(contracts)
+      .where(whereClause),
+  ]);
+
+  return {
+    contracts: rows,
+    total: Number(totalRows[0]?.total ?? 0),
+  };
 }
 
 export async function getContract(id: string) {
