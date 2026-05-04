@@ -120,7 +120,8 @@
       "smol-toml": "1.6.1",
       "uuid": "14.0.0",
       "@tootallnate/once": "3.0.1",
-      "esbuild": "0.25.12"
+      "esbuild": "0.25.12",
+      "@vercel/node>path-to-regexp": "6.3.0"
     }
   }
 }
