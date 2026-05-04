@@ -29,6 +29,8 @@ const clerkAppearance = {
     headerTitle: 'text-xl font-bold',
     headerSubtitle: 'text-muted-foreground',
     card: 'shadow-none',
+    socialButtonsBlockButton: 'hidden',
+    dividerRow: 'hidden',
     // Hide branding and dev-mode badges but keep footerAction (sign-in/sign-up toggle)
     footerPages: { display: 'none' },
     badge: { display: 'none' },
