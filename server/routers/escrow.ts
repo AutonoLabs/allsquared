@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { router, protectedProcedure, publicProcedure } from '../_core/trpc';
+import { adminProcedure, protectedProcedure, router } from '../_core/trpc';
 import { getDb, createNotification } from '../db';
 import {
   escrowTransactions,
@@ -467,7 +467,7 @@ export const escrowRouter = router({
     }),
 
   // Process refund (admin or after dispute resolution)
-  processRefund: protectedProcedure
+  processRefund: adminProcedure
     .input(
       z.object({
         escrowId: z.string(),
@@ -557,107 +557,6 @@ export const escrowRouter = router({
       };
     }),
 
-  // Handle Transpact webhook
-  handleWebhook: publicProcedure
-    .input(
-      z.object({
-        eventType: z.string(),
-        eventId: z.string(),
-        data: z.any(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      const db = await getDb();
-      if (!db) throw new Error('Database not available');
-
-      const webhookId = `webhook_${nanoid(16)}`;
-
-      // Store webhook event
-      await db.insert(webhookEvents).values({
-        id: webhookId,
-        provider: 'transpact',
-        eventType: input.eventType,
-        eventId: input.eventId,
-        payload: JSON.stringify(input.data),
-        status: 'processing',
-        createdAt: new Date(),
-      });
-
-      try {
-        const tx = input.data.transaction;
-
-        switch (input.eventType) {
-          case 'transaction.deposited': {
-            // Funds have been deposited into escrow
-            await db
-              .update(escrowTransactions)
-              .set({
-                status: 'held',
-                depositedAt: new Date(),
-                updatedAt: new Date(),
-              })
-              .where(eq(escrowTransactions.escrowReference, tx.id));
-            break;
-          }
-
-          case 'transaction.released': {
-            await db
-              .update(escrowTransactions)
-              .set({
-                status: 'released',
-                releasedAt: new Date(),
-                updatedAt: new Date(),
-              })
-              .where(eq(escrowTransactions.escrowReference, tx.id));
-            break;
-          }
-
-          case 'transaction.refunded': {
-            await db
-              .update(escrowTransactions)
-              .set({
-                status: 'refunded',
-                updatedAt: new Date(),
-              })
-              .where(eq(escrowTransactions.escrowReference, tx.id));
-            break;
-          }
-
-          case 'transaction.cancelled': {
-            await db
-              .update(escrowTransactions)
-              .set({
-                status: 'cancelled',
-                updatedAt: new Date(),
-              })
-              .where(eq(escrowTransactions.escrowReference, tx.id));
-            break;
-          }
-        }
-
-        // Mark webhook as processed
-        await db
-          .update(webhookEvents)
-          .set({
-            status: 'processed',
-            processedAt: new Date(),
-          })
-          .where(eq(webhookEvents.id, webhookId));
-
-        return { success: true };
-      } catch (error) {
-        await db
-          .update(webhookEvents)
-          .set({
-            status: 'failed',
-            errorMessage: error instanceof Error ? error.message : 'Unknown error',
-          })
-          .where(eq(webhookEvents.id, webhookId));
-
-        throw error;
-      }
-    }),
-
   // Get escrow summary for user
   getSummary: protectedProcedure.query(async ({ ctx }) => {
     const db = await getDb();
@@ -720,6 +619,94 @@ export const escrowRouter = router({
     return summary;
   }),
 });
+
+type TranspactWebhookInput = {
+  eventType: string;
+  eventId: string;
+  data: any;
+};
+
+export async function processTranspactWebhook(input: TranspactWebhookInput) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  const webhookId = `webhook_${nanoid(16)}`;
+
+  await db.insert(webhookEvents).values({
+    id: webhookId,
+    provider: 'transpact',
+    eventType: input.eventType,
+    eventId: input.eventId,
+    payload: JSON.stringify(input.data),
+    status: 'processing',
+    createdAt: new Date(),
+  });
+
+  try {
+    const tx = input.data.transaction;
+
+    switch (input.eventType) {
+      case 'transaction.deposited':
+        await db
+          .update(escrowTransactions)
+          .set({
+            status: 'held',
+            depositedAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(eq(escrowTransactions.escrowReference, tx.id));
+        break;
+      case 'transaction.released':
+        await db
+          .update(escrowTransactions)
+          .set({
+            status: 'released',
+            releasedAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(eq(escrowTransactions.escrowReference, tx.id));
+        break;
+      case 'transaction.refunded':
+        await db
+          .update(escrowTransactions)
+          .set({
+            status: 'refunded',
+            updatedAt: new Date(),
+          })
+          .where(eq(escrowTransactions.escrowReference, tx.id));
+        break;
+      case 'transaction.cancelled':
+        await db
+          .update(escrowTransactions)
+          .set({
+            status: 'cancelled',
+            updatedAt: new Date(),
+          })
+          .where(eq(escrowTransactions.escrowReference, tx.id));
+        break;
+    }
+
+    await db
+      .update(webhookEvents)
+      .set({
+        status: 'processed',
+        processedAt: new Date(),
+      })
+      .where(eq(webhookEvents.id, webhookId));
+
+    return { success: true };
+  } catch (error) {
+    await db
+      .update(webhookEvents)
+      .set({
+        status: 'failed',
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      })
+      .where(eq(webhookEvents.id, webhookId));
+
+    throw error;
+  }
+}
 
 // Map Transpact status to our status enum
 function mapTranspactStatus(transpactStatus: string): 'pending' | 'held' | 'released' | 'refunded' | 'cancelled' {

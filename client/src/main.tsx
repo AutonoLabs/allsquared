@@ -5,7 +5,7 @@ import { createRoot } from "react-dom/client";
 import { useRef } from "react";
 import superjson from "superjson";
 import App from "./App";
-import { ClerkAuthProvider } from "./lib/clerk";
+import { ClerkAuthProvider, hasClerkPublishableKey } from "./lib/clerk";
 import { useAuth as useClerkAuth } from "@clerk/clerk-react";
 import "./index.css";
 
@@ -16,11 +16,12 @@ const queryClient = new QueryClient({
 });
 
 // Inner component — lives inside ClerkProvider so useAuth() works
-function AppWithTRPC() {
+function AppWithClerkTRPC() {
   const { getToken } = useClerkAuth();
+  return <AppWithTRPC getToken={getToken} />;
+}
 
-  // Store getToken in a ref that updates every render so headers() always
-  // uses the latest Clerk-provided function (not a stale initial one)
+function AppWithTRPC({ getToken }: { getToken?: () => Promise<string | null> }) {
   const getTokenRef = useRef(getToken);
   getTokenRef.current = getToken;
 
@@ -33,7 +34,7 @@ function AppWithTRPC() {
           transformer: superjson,
           async headers() {
             try {
-              const token = await getTokenRef.current();
+              const token = await getTokenRef.current?.();
               return token ? { Authorization: `Bearer ${token}` } : {};
             } catch {
               return {};
@@ -54,7 +55,11 @@ function AppWithTRPC() {
 }
 
 createRoot(document.getElementById("root")!).render(
-  <ClerkAuthProvider>
+  hasClerkPublishableKey ? (
+    <ClerkAuthProvider>
+      <AppWithClerkTRPC />
+    </ClerkAuthProvider>
+  ) : (
     <AppWithTRPC />
-  </ClerkAuthProvider>
+  )
 );

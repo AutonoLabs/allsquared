@@ -5,6 +5,9 @@ import { createContext } from "./context";
 import { getDb } from "../db";
 import { contractTemplates } from "../../drizzle/schema";
 import { sql } from "drizzle-orm";
+import { processStripeWebhook } from "../routers/payments";
+import { processTranspactWebhook } from "../routers/escrow";
+import { timingSafeEqual, createHmac } from "crypto";
 
 // Create Express app
 const app = express();
@@ -157,6 +160,47 @@ app.get('/api/health', (_req: Request, res: Response) => {
 // WEBHOOK ROUTES (must be before tRPC to use raw body)
 // =============================================================================
 
+function signaturesMatch(expected: string, actual: string): boolean {
+  const expectedBuffer = Buffer.from(expected);
+  const actualBuffer = Buffer.from(actual);
+
+  if (expectedBuffer.length !== actualBuffer.length) {
+    return false;
+  }
+
+  return timingSafeEqual(expectedBuffer, actualBuffer);
+}
+
+function extractProvidedSignature(header: string | string[] | undefined): string | null {
+  const value = Array.isArray(header) ? header[0] : header;
+  if (!value) return null;
+
+  const normalized = value.trim();
+  if (!normalized) return null;
+
+  const parts = normalized.split(',');
+  for (const part of parts) {
+    const trimmed = part.trim();
+    if (!trimmed) continue;
+    const [, candidate] = trimmed.includes('=') ? trimmed.split('=', 2) : [null, trimmed];
+    if (candidate?.trim()) {
+      return candidate.trim();
+    }
+  }
+
+  return normalized;
+}
+
+function verifyHmacSignature(rawBody: Buffer, header: string | string[] | undefined, secret: string): boolean {
+  const providedSignature = extractProvidedSignature(header);
+  if (!providedSignature) return false;
+
+  const hexDigest = createHmac('sha256', secret).update(rawBody).digest('hex');
+  const base64Digest = createHmac('sha256', secret).update(rawBody).digest('base64');
+
+  return signaturesMatch(hexDigest, providedSignature) || signaturesMatch(base64Digest, providedSignature);
+}
+
 // Stripe webhook — verified signature + full event routing
 app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), async (req: Request, res: Response) => {
   const sig = req.headers['stripe-signature'];
@@ -172,7 +216,6 @@ app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), asyn
 
   try {
     // Manual HMAC-SHA256 signature verification (avoids Stripe SDK dependency)
-    const { createHmac } = await import('crypto');
     const rawBody = req.body as Buffer;
     const sigHeader = sig as string;
 
@@ -203,7 +246,7 @@ app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), asyn
       .update(signedPayload, 'utf8')
       .digest('hex');
 
-    if (expectedSig !== v1Sig) {
+    if (!signaturesMatch(expectedSig, v1Sig)) {
       throw new Error('Stripe signature mismatch');
     }
 
@@ -215,13 +258,7 @@ app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), asyn
   }
 
   try {
-    // Route to tRPC handleWebhook procedure
-    // createCaller requires req/res — use mock objects for webhook context
-    const mockReq = req as unknown as Parameters<typeof createContext>[0]['req'];
-    const mockRes = res as unknown as Parameters<typeof createContext>[0]['res'];
-    const ctx = await createContext({ req: mockReq, res: mockRes, info: {} } as any);
-    const caller = appRouter.createCaller(ctx);
-    await (caller as unknown as { payments: { handleWebhook: (input: { eventType: string; eventId: string; data: unknown }) => Promise<unknown> } }).payments.handleWebhook({
+    await processStripeWebhook({
       eventType: event.type,
       eventId: event.id,
       data: event.data,
@@ -237,12 +274,32 @@ app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), asyn
 });
 
 // Transpact webhook
-app.post('/api/webhooks/transpact', express.json(), async (req: Request, res: Response) => {
+app.post('/api/webhooks/transpact', express.raw({ type: '*/*' }), async (req: Request, res: Response) => {
   const signature = req.headers['x-transpact-signature'];
+  const webhookSecret = process.env.TRANSPACT_WEBHOOK_SECRET;
 
   try {
-    // Verify signature in production
-    const event = req.body;
+    const rawBody = req.body as Buffer;
+    if (process.env.NODE_ENV === 'production') {
+      if (!signature || !webhookSecret || !verifyHmacSignature(rawBody, signature, webhookSecret)) {
+        res.status(400).json({ error: 'Webhook signature verification failed' });
+        return;
+      }
+    }
+
+    const event = JSON.parse(rawBody.toString('utf8'));
+    const eventType = typeof event.eventType === 'string' ? event.eventType : event.type;
+    const eventId = typeof event.eventId === 'string' ? event.eventId : event.id;
+
+    if (!eventType) {
+      throw new Error('Missing Transpact event type');
+    }
+
+    await processTranspactWebhook({
+      eventType,
+      eventId: eventId || `transpact_${Date.now()}`,
+      data: event.data ?? event,
+    });
 
     res.json({ received: true });
   } catch (error) {
@@ -307,4 +364,3 @@ if (!process.env.VERCEL) {
 
 // Export for Vercel serverless
 export default app;
-

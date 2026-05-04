@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { router, protectedProcedure, publicProcedure } from '../_core/trpc';
+import { router, protectedProcedure } from '../_core/trpc';
 import { getDb, createNotification, getContract, updateContract } from '../db';
 import { signatures, contracts, webhookEvents, auditLogs } from '../../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
@@ -121,14 +121,30 @@ async function signwellRequest(
 }
 
 // Generate PDF from contract content (simplified)
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 function generateContractPDF(contract: any): string {
   // In production, use a proper PDF generation library like pdf-lib or puppeteer
   // For now, return base64 encoded HTML
+  const safeTitle = escapeHtml(String(contract.title ?? 'Contract'));
+  const safeContractId = escapeHtml(String(contract.id ?? ''));
+  const safeContractContent =
+    typeof contract.contractContent === 'string'
+      ? escapeHtml(contract.contractContent).replace(/\n/g, '<br>')
+      : escapeHtml(JSON.stringify(contract.contractContent ?? {}, null, 2));
+
   const htmlContent = `
     <!DOCTYPE html>
     <html>
     <head>
-      <title>${contract.title}</title>
+      <title>${safeTitle}</title>
       <style>
         body { font-family: Arial, sans-serif; padding: 40px; line-height: 1.6; }
         h1 { color: #333; }
@@ -137,14 +153,12 @@ function generateContractPDF(contract: any): string {
       </style>
     </head>
     <body>
-      <h1>${contract.title}</h1>
-      <p><strong>Contract Reference:</strong> ${contract.id}</p>
+      <h1>${safeTitle}</h1>
+      <p><strong>Contract Reference:</strong> ${safeContractId}</p>
       <p><strong>Date:</strong> ${new Date().toLocaleDateString('en-GB')}</p>
       <hr />
       <div class="content">
-        ${typeof contract.contractContent === 'string'
-          ? contract.contractContent.replace(/\n/g, '<br>')
-          : JSON.stringify(contract.contractContent)}
+        ${safeContractContent}
       </div>
       <div class="signature-block">
         <h3>Signatures</h3>
@@ -773,125 +787,6 @@ export const signaturesRouter = router({
       };
     }),
 
-  // Handle DocuSign webhook
-  handleDocuSignWebhook: publicProcedure
-    .input(
-      z.object({
-        event: z.string(),
-        data: z.any(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      const db = await getDb();
-      if (!db) throw new Error('Database not available');
-
-      const webhookId = `webhook_${nanoid(16)}`;
-
-      await db.insert(webhookEvents).values({
-        id: webhookId,
-        provider: 'docusign',
-        eventType: input.event,
-        payload: JSON.stringify(input.data),
-        status: 'processing',
-        createdAt: new Date(),
-      });
-
-      try {
-        const envelopeId = input.data.envelopeId;
-
-        switch (input.event) {
-          case 'envelope-completed': {
-            // All parties have signed
-            await db
-              .update(signatures)
-              .set({
-                status: 'signed',
-                signedAt: new Date(),
-                updatedAt: new Date(),
-              })
-              .where(eq(signatures.providerEnvelopeId, envelopeId));
-
-            // Update contract
-            const sig = await db
-              .select()
-              .from(signatures)
-              .where(eq(signatures.providerEnvelopeId, envelopeId))
-              .limit(1);
-
-            if (sig[0]) {
-              await updateContract(sig[0].contractId, {
-                status: 'active',
-                updatedAt: new Date(),
-              });
-            }
-            break;
-          }
-
-          case 'recipient-completed': {
-            // Individual signer completed
-            const recipientEmail = input.data.recipientEmail;
-            await db
-              .update(signatures)
-              .set({
-                status: 'signed',
-                signedAt: new Date(),
-                updatedAt: new Date(),
-              })
-              .where(
-                and(
-                  eq(signatures.providerEnvelopeId, envelopeId),
-                  eq(signatures.signatureName, input.data.recipientName || '')
-                )
-              );
-            break;
-          }
-
-          case 'recipient-declined': {
-            await db
-              .update(signatures)
-              .set({
-                status: 'declined',
-                updatedAt: new Date(),
-              })
-              .where(eq(signatures.providerEnvelopeId, envelopeId));
-            break;
-          }
-
-          case 'envelope-voided':
-          case 'envelope-declined': {
-            await db
-              .update(signatures)
-              .set({
-                status: 'declined',
-                updatedAt: new Date(),
-              })
-              .where(eq(signatures.providerEnvelopeId, envelopeId));
-            break;
-          }
-        }
-
-        await db
-          .update(webhookEvents)
-          .set({
-            status: 'processed',
-            processedAt: new Date(),
-          })
-          .where(eq(webhookEvents.id, webhookId));
-
-        return { success: true };
-      } catch (error) {
-        await db
-          .update(webhookEvents)
-          .set({
-            status: 'failed',
-            errorMessage: error instanceof Error ? error.message : 'Unknown error',
-          })
-          .where(eq(webhookEvents.id, webhookId));
-
-        throw error;
-      }
-    }),
-
   // Get signing URL for external providers
   getSigningUrl: protectedProcedure
     .input(
@@ -971,3 +866,103 @@ export const signaturesRouter = router({
       };
     }),
 });
+
+type DocuSignWebhookInput = {
+  event: string;
+  data: any;
+};
+
+export async function processDocuSignWebhook(input: DocuSignWebhookInput) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
+
+  const webhookId = `webhook_${nanoid(16)}`;
+
+  await db.insert(webhookEvents).values({
+    id: webhookId,
+    provider: 'docusign',
+    eventType: input.event,
+    payload: JSON.stringify(input.data),
+    status: 'processing',
+    createdAt: new Date(),
+  });
+
+  try {
+    const envelopeId = input.data.envelopeId;
+
+    switch (input.event) {
+      case 'envelope-completed': {
+        await db
+          .update(signatures)
+          .set({
+            status: 'signed',
+            signedAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(eq(signatures.providerEnvelopeId, envelopeId));
+
+        const sig = await db
+          .select()
+          .from(signatures)
+          .where(eq(signatures.providerEnvelopeId, envelopeId))
+          .limit(1);
+
+        if (sig[0]) {
+          await updateContract(sig[0].contractId, {
+            status: 'active',
+            updatedAt: new Date(),
+          });
+        }
+        break;
+      }
+
+      case 'recipient-completed':
+        await db
+          .update(signatures)
+          .set({
+            status: 'signed',
+            signedAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(
+            and(
+              eq(signatures.providerEnvelopeId, envelopeId),
+              eq(signatures.signatureName, input.data.recipientName || '')
+            )
+          );
+        break;
+
+      case 'recipient-declined':
+      case 'envelope-voided':
+      case 'envelope-declined':
+        await db
+          .update(signatures)
+          .set({
+            status: 'declined',
+            updatedAt: new Date(),
+          })
+          .where(eq(signatures.providerEnvelopeId, envelopeId));
+        break;
+    }
+
+    await db
+      .update(webhookEvents)
+      .set({
+        status: 'processed',
+        processedAt: new Date(),
+      })
+      .where(eq(webhookEvents.id, webhookId));
+
+    return { success: true };
+  } catch (error) {
+    await db
+      .update(webhookEvents)
+      .set({
+        status: 'failed',
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      })
+      .where(eq(webhookEvents.id, webhookId));
+
+    throw error;
+  }
+}

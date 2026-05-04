@@ -1,6 +1,7 @@
 /* ─── M3 Font Import — must precede all other @imports ────────── */
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap');
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "./styles/md3-theme.css";
@@ -593,5 +594,87 @@
   .cl-footer .cl-footerPages,
   [data-localization-key*='badge'] {
     display: none !important;
+  }
+}
+
+@layer utilities {
+  .as25-font-display {
+    font-family: 'Source Serif 4', Georgia, serif;
+  }
+
+  .as25-font-body {
+    font-family: 'Inter Tight', ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .as25-font-mono {
+    font-family: 'JetBrains Mono', 'SF Mono', ui-monospace, monospace;
+  }
+
+  .as25-font-hand {
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .as25-hero-bg {
+    position: relative;
+    isolation: isolate;
+    background: #fafaf7;
+  }
+
+  .as25-hero-bg::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(transparent 95%, rgba(11, 27, 51, 0.04) 95%) 0 0 / 100% 32px,
+      linear-gradient(90deg, transparent 95%, rgba(11, 27, 51, 0.04) 95%) 0 0 / 32px 100%;
+    opacity: 0.5;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .as25-marquee-track {
+    animation: as25-marquee 32s linear infinite;
+  }
+
+  .as25-marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  .as25-caret {
+    animation: as25-caret 1.1s steps(1) infinite;
+  }
+
+  @keyframes as25-marquee {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  @keyframes as25-caret {
+    0%,
+    49% {
+      opacity: 1;
+    }
+
+    50%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .as25-marquee-track {
+      animation: none;
+    }
+
+    .as25-caret {
+      animation: none;
+    }
   }
 }

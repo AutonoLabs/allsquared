@@ -2,11 +2,65 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../_core/trpc";
 import { uploadToR2, getR2DownloadUrl, deleteFromR2, isR2Configured, validateFileType } from "../r2";
 import { getDb } from "../db";
-import { fileAttachments } from "../../drizzle/schema";
+import { contracts, disputes, fileAttachments, milestones, type User } from "../../drizzle/schema";
 import { eq, and } from "drizzle-orm";
 import { nanoid } from "nanoid";
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+
+type FileEntityType = "contract" | "milestone" | "dispute" | "profile" | "verification";
+
+async function isUserPartyToContract(db: Awaited<ReturnType<typeof getDb>>, userId: string, contractId: string): Promise<boolean> {
+  if (!db) return false;
+
+  const contract = await db
+    .select({
+      clientId: contracts.clientId,
+      providerId: contracts.providerId,
+    })
+    .from(contracts)
+    .where(eq(contracts.id, contractId))
+    .limit(1);
+
+  return !!contract[0] && (contract[0].clientId === userId || contract[0].providerId === userId);
+}
+
+async function canAccessEntity(
+  db: Awaited<ReturnType<typeof getDb>>,
+  user: User,
+  entityType: FileEntityType,
+  entityId: string,
+  uploadedBy?: string,
+): Promise<boolean> {
+  if (!db) return false;
+  if (user.role === "admin") return true;
+
+  switch (entityType) {
+    case "contract":
+      return isUserPartyToContract(db, user.id, entityId);
+    case "milestone": {
+      const milestone = await db
+        .select({ contractId: milestones.contractId })
+        .from(milestones)
+        .where(eq(milestones.id, entityId))
+        .limit(1);
+      return milestone[0] ? isUserPartyToContract(db, user.id, milestone[0].contractId) : false;
+    }
+    case "dispute": {
+      const dispute = await db
+        .select({ contractId: disputes.contractId })
+        .from(disputes)
+        .where(eq(disputes.id, entityId))
+        .limit(1);
+      return dispute[0] ? isUserPartyToContract(db, user.id, dispute[0].contractId) : false;
+    }
+    case "profile":
+    case "verification":
+      return entityId === user.id || uploadedBy === user.id;
+    default:
+      return false;
+  }
+}
 
 export const filesRouter = router({
   /**
@@ -38,6 +92,14 @@ export const filesRouter = router({
         throw new Error("File size exceeds maximum allowed size of 50MB");
       }
 
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      const canUpload = await canAccessEntity(db, ctx.user, input.entityType, input.entityId, ctx.user.id);
+      if (!canUpload) {
+        throw new Error("You do not have permission to upload files for this entity");
+      }
+
       const fileBuffer = Buffer.from(input.fileData, "base64");
 
       const folder =
@@ -48,9 +110,6 @@ export const filesRouter = router({
         "contracts";
 
       const fileKey = await uploadToR2(fileBuffer, input.fileName, input.fileType, folder);
-
-      const db = await getDb();
-      if (!db) throw new Error("Database not available");
 
       const fileId = nanoid();
       await db.insert(fileAttachments).values({
@@ -94,7 +153,8 @@ export const filesRouter = router({
 
       const file = files[0];
 
-      if (file.uploadedBy !== ctx.user.id && ctx.user.role !== "admin") {
+      const hasEntityAccess = await canAccessEntity(db, ctx.user, file.entityType as FileEntityType, file.entityId, file.uploadedBy);
+      if (!hasEntityAccess) {
         throw new Error("You do not have permission to access this file");
       }
 
@@ -131,7 +191,8 @@ export const filesRouter = router({
       if (files.length === 0) throw new Error("File not found");
       const file = files[0];
 
-      if (file.uploadedBy !== ctx.user.id && ctx.user.role !== "admin") {
+      const hasEntityAccess = await canAccessEntity(db, ctx.user, file.entityType as FileEntityType, file.entityId, file.uploadedBy);
+      if (!hasEntityAccess || (file.uploadedBy !== ctx.user.id && ctx.user.role !== "admin")) {
         throw new Error("You do not have permission to delete this file");
       }
 
@@ -158,6 +219,11 @@ export const filesRouter = router({
 
       const db = await getDb();
       if (!db) throw new Error("Database not available");
+
+      const hasEntityAccess = await canAccessEntity(db, ctx.user, input.entityType, input.entityId);
+      if (!hasEntityAccess) {
+        throw new Error("You do not have permission to view files for this entity");
+      }
 
       return db
         .select()

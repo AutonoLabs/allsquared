@@ -1,4 +1,5 @@
 import { COOKIE_NAME } from "@shared/const";
+import { TRPCError } from "@trpc/server";
 import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
@@ -18,10 +19,8 @@ import { companiesHouseRouter } from "./routers/companiesHouse";
 import { partyProfilesRouter } from "./routers/partyProfiles";
 import { contractChatRouter } from "./routers/contractChat";
 import { kycRouter } from "./routers/kyc";
-import { updateUser, getUserByClerkId, upsertUser, getUser, getDb } from "./db";
-import { users } from "../drizzle/schema";
+import { updateUser, upsertUser, getUser } from "./db";
 import { z } from "zod";
-import { nanoid } from "nanoid";
 
 export const appRouter = router({
   system: systemRouter,
@@ -36,7 +35,7 @@ export const appRouter = router({
       } as const;
     }),
     // Sync Clerk user to our database
-    syncClerkUser: publicProcedure
+    syncClerkUser: protectedProcedure
       .input(
         z.object({
           clerkId: z.string().min(1),
@@ -45,45 +44,37 @@ export const appRouter = router({
           emailVerified: z.boolean().optional(),
         })
       )
-      .mutation(async ({ input }) => {
-        const { clerkId, email, name } = input;
-        
-        // Check if user already exists
-        let user = await getUserByClerkId(clerkId);
-        
-        const verified = input.emailVerified ? 'yes' as const : undefined;
-
-        if (user) {
-          // Update existing user
-          const updates: Record<string, unknown> = {
-            id: user.id,
-            email,
-            name,
-            lastSignedIn: new Date(),
-          };
-          if (verified) updates.verified = verified;
-          await upsertUser(updates as any);
-          return await getUser(user.id);
+      .mutation(async ({ ctx, input }) => {
+        if (ctx.user.clerkId && ctx.user.clerkId !== input.clerkId) {
+          throw new TRPCError({
+            code: "FORBIDDEN",
+            message: "Authenticated Clerk user does not match the requested user",
+          });
         }
 
-        // Create new user with admin role if first user or matches owner email
-        const userId = `clerk_${nanoid(16)}`;
-        const db = await getDb();
-        const existingUsers = db ? await db.select({ id: users.id }).from(users).limit(1) : [];
-        const isFirstUser = existingUsers.length === 0;
-
-        await upsertUser({
-          id: userId,
-          clerkId,
-          email,
-          name,
-          loginMethod: 'clerk',
-          role: isFirstUser ? 'admin' : 'user',
-          verified: verified || 'no',
+        const updates: Record<string, unknown> = {
+          id: ctx.user.id,
+          clerkId: ctx.user.clerkId ?? input.clerkId,
+          email: input.email,
+          name: input.name,
           lastSignedIn: new Date(),
-        });
+        };
 
-        return await getUser(userId);
+        if (input.emailVerified) {
+          updates.verified = 'yes';
+        }
+
+        await upsertUser(updates as any);
+
+        const user = await getUser(ctx.user.id);
+        if (!user) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to load synced user",
+          });
+        }
+
+        return user;
       }),
     updateProfile: protectedProcedure
       .input(

@@ -24,6 +24,18 @@ import {
   Banknote,
 } from "lucide-react";
 
+type ContractSignature = {
+  userId?: string;
+  name: string;
+  signedAt: string;
+};
+
+type ContractContent = {
+  content?: string;
+  variables?: unknown[];
+  signatures?: ContractSignature[];
+};
+
 export default function ContractDetail() {
   const [, params] = useRoute("/dashboard/contracts/:id");
   const [, setLocation] = useLocation();
@@ -114,10 +126,10 @@ export default function ContractDetail() {
     );
   }
 
-  const contractContent = (() => {
+  const contractContent: ContractContent = (() => {
     if (!contract.contractContent) return {};
     const raw = contract.contractContent as string;
-    return safeJsonParse(raw, { content: raw, variables: [] });
+    return safeJsonParse<ContractContent>(raw, { content: raw, variables: [] });
   })();
   const signatures = contractContent.signatures || [];
 
@@ -230,7 +242,7 @@ export default function ContractDetail() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {signatures.map((sig: any) => (
+                  {signatures.map((sig) => (
                     <div key={sig.userId || sig.name} className="flex items-center gap-3 p-3 rounded-lg border bg-emerald-50/50 border-emerald-200 dark:bg-emerald-950/20 dark:border-emerald-900">
                       <CheckCircle2 className="h-5 w-5 text-emerald-600 shrink-0" />
                       <div>

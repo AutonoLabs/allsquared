@@ -360,21 +360,19 @@ export default function NewContractBuilder() {
 
   // ── Render Functions ────────────────────────────────────────────
 
-  // ── M3 Party Form ───────────────────────────────────────────────
+  // ── Party Form ──────────────────────────────────────────────────
 
   function renderPartyForm(party: PartyInfo, setParty: (p: PartyInfo) => void, label: string, accent: string) {
     return (
-      <div className="m3-card-outlined overflow-hidden">
-        {/* Card header — accent top border */}
+      <div className="overflow-hidden rounded-[18px] border border-[#c7d0e0] bg-white shadow-[0_10px_30px_rgba(11,27,51,0.06)]">
         <div className={`h-1 w-full ${accent}`} />
         <div className="p-5">
           <div className="mb-5">
-            <h3 className="m3-title-lg font-semibold">{label}</h3>
-            <p className="m3-body-sm text-muted-foreground mt-0.5">Enter details or search Companies House</p>
+            <h3 className="as25-font-display text-2xl font-normal tracking-[-0.03em] text-[#0b1b33]">{label}</h3>
+            <p className="mt-1 text-sm text-[#2d466f]">Enter details or search Companies House</p>
           </div>
 
-          {/* M3 segmented button — individual / company */}
-          <div className="mb-5 flex w-fit items-center gap-0.5 rounded-full border border-border bg-muted/50 p-0.5">
+          <div className="mb-5 flex w-fit items-center gap-0.5 rounded-[10px] border border-[#c7d0e0] bg-[#fafaf7] p-0.5">
             {[
               { value: "individual" as const, Icon: User,      label: "Individual" },
               { value: "company"    as const, Icon: Building2, label: "Company"    },
@@ -383,10 +381,10 @@ export default function NewContractBuilder() {
                 key={value}
                 type="button"
                 onClick={() => setParty({ ...party, type: value })}
-                className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
+                className={`flex items-center gap-1.5 rounded-[8px] px-4 py-1.5 text-sm font-medium transition-all ${
                   party.type === value
-                    ? "bg-background text-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
+                    ? "bg-[#0b1b33] text-white shadow-sm"
+                    : "text-[#2d466f] hover:text-[#0b1b33]"
                 }`}
               >
                 <Icon className="h-3.5 w-3.5" />
@@ -412,7 +410,7 @@ export default function NewContractBuilder() {
             />
           ) : (
             <div className="mb-4 space-y-1.5">
-              <Label className="m3-label-md text-muted-foreground">Full Name</Label>
+              <Label className="as25-font-mono text-xs uppercase tracking-[0.14em] text-[#2d466f]">Full Name</Label>
               <Input
                 value={party.name}
                 onChange={(e) => setParty({ ...party, name: e.target.value })}
@@ -425,7 +423,7 @@ export default function NewContractBuilder() {
           {/* Contact */}
           <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
             <div className="space-y-1.5">
-              <Label className="m3-label-md text-muted-foreground">Email</Label>
+              <Label className="as25-font-mono text-xs uppercase tracking-[0.14em] text-[#2d466f]">Email</Label>
               <Input
                 type="email"
                 value={party.email}
@@ -435,7 +433,7 @@ export default function NewContractBuilder() {
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="m3-label-md text-muted-foreground">Phone</Label>
+              <Label className="as25-font-mono text-xs uppercase tracking-[0.14em] text-[#2d466f]">Phone</Label>
               <Input
                 type="tel"
                 value={party.phone}
@@ -448,10 +446,10 @@ export default function NewContractBuilder() {
 
           {/* Address */}
           <div className="mt-3 space-y-1.5">
-            <Label className="m3-label-md text-muted-foreground">Address</Label>
+            <Label className="as25-font-mono text-xs uppercase tracking-[0.14em] text-[#2d466f]">Address</Label>
             {party.address ? (
-              <div className="flex items-start gap-2 rounded-lg bg-muted/60 p-3 text-sm">
-                <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-emerald-500" />
+              <div className="flex items-start gap-2 rounded-lg bg-[#eef6f1] p-3 text-sm text-[#0b1b33]">
+                <Check className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#1f6b3f]" />
                 <span className="flex-1">{party.address}</span>
                 <button
                   type="button"
@@ -511,13 +509,12 @@ export default function NewContractBuilder() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="m3-headline-sm font-bold">Create a new contract</h1>
-          <p className="mt-1 text-muted-foreground">Enter details for both parties</p>
+          <h1 className="as25-font-display text-4xl font-normal tracking-[-0.04em] text-[#0b1b33]">Create a new contract</h1>
+          <p className="mt-2 text-[#2d466f]">Enter details for both parties</p>
         </div>
 
-        {/* Contract title — M3 filled input feel */}
         <div className="space-y-1.5">
-          <Label className="m3-label-md text-muted-foreground">Contract Title</Label>
+          <Label className="as25-font-mono text-xs uppercase tracking-[0.14em] text-[#2d466f]">Contract Title</Label>
           <Input
             value={contractTitle}
             onChange={(e) => setContractTitle(e.target.value)}
@@ -526,10 +523,9 @@ export default function NewContractBuilder() {
           />
         </div>
 
-        {/* Party cards — two-panel M3 layout */}
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
-          {renderPartyForm(partyA, setPartyA, "Party A — You", "bg-gradient-to-r from-[#0F172A] to-[#6D28D9]")}
-          {renderPartyForm(partyB, setPartyB, "Party B — Counterparty", "bg-gradient-to-r from-[#6D28D9] to-[#A78BFA]")}
+          {renderPartyForm(partyA, setPartyA, "Party A — You", "bg-gradient-to-r from-[#0b1b33] to-[#1f6b3f]")}
+          {renderPartyForm(partyB, setPartyB, "Party B — Counterparty", "bg-gradient-to-r from-[#1f6b3f] to-[#d7b46a]")}
         </div>
       </div>
     );
@@ -541,8 +537,8 @@ export default function NewContractBuilder() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="m3-headline-sm font-bold">Choose contract modules</h1>
-          <p className="mt-1 text-muted-foreground">Toggle on the sections you need</p>
+          <h1 className="as25-font-display text-4xl font-normal tracking-[-0.04em] text-[#0b1b33]">Choose contract modules</h1>
+          <p className="mt-2 text-[#2d466f]">Toggle on the sections you need</p>
         </div>
 
         <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
@@ -553,21 +549,19 @@ export default function NewContractBuilder() {
               onClick={() => toggleModule(mod.id)}
               className={`group relative rounded-2xl border p-4 text-left transition-all duration-200 ${
                 mod.enabled
-                  ? "border-[#6D28D9]/30 bg-[#F1F0FF] shadow-sm"
-                  : "border-border bg-card hover:border-[#6D28D9]/20 hover:bg-muted/40"
+                  ? "border-[#1f6b3f] bg-[#eef6f1] shadow-sm"
+                  : "border-[#c7d0e0] bg-white hover:border-[#1f6b3f]/40 hover:bg-[#fafaf7]"
               }`}
             >
-              {/* M3 state layer */}
               <div className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 transition-opacity group-hover:opacity-[0.04] bg-foreground" />
 
               <div className="flex items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  {/* M3 icon container */}
                   <div
                     className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl transition-colors ${
                       mod.enabled
-                        ? "bg-[#6D28D9] text-white"
-                        : "bg-muted text-muted-foreground group-hover:bg-muted/80"
+                        ? "bg-[#1f6b3f] text-white"
+                        : "bg-[#f2f1eb] text-[#2d466f] group-hover:bg-[#eef6f1]"
                     }`}
                   >
                     {mod.icon === "FileText" && <FileText className="h-5 w-5" />}
@@ -578,13 +572,12 @@ export default function NewContractBuilder() {
                     {mod.icon === "X"        && <X        className="h-5 w-5" />}
                   </div>
                   <div>
-                    <p className={`m3-label-lg font-semibold ${mod.enabled ? "text-[#4C1D95]" : "text-foreground"}`}>
+                    <p className={`font-semibold ${mod.enabled ? "text-[#0b1b33]" : "text-[#0b1b33]"}`}>
                       {mod.name}
                     </p>
-                    <p className="m3-body-sm text-muted-foreground">{mod.description}</p>
+                    <p className="text-sm text-[#2d466f]">{mod.description}</p>
                   </div>
                 </div>
-                {/* M3 Switch — prevent double-toggle via stopPropagation */}
                 <div onClick={(e) => e.stopPropagation()}>
                   <Switch
                     checked={mod.enabled}
@@ -608,10 +601,9 @@ export default function NewContractBuilder() {
     return (
       <div className="space-y-6">
         <div>
-          <h1 className="m3-headline-sm font-bold">{currentModule.name}</h1>
-          <p className="mt-1 text-muted-foreground">{currentModule.description}</p>
+          <h1 className="as25-font-display text-4xl font-normal tracking-[-0.04em] text-[#0b1b33]">{currentModule.name}</h1>
+          <p className="mt-2 text-[#2d466f]">{currentModule.description}</p>
 
-          {/* M3 module chip tabs */}
           <div className="mt-4 flex flex-wrap gap-2">
             {enabledModules.map((m, i) => (
               <button
@@ -620,8 +612,8 @@ export default function NewContractBuilder() {
                 onClick={() => setActiveModuleIdx(i)}
                 className={`rounded-full px-3.5 py-1 text-xs font-medium transition-all ${
                   i === activeModuleIdx
-                    ? "bg-[#0F172A] text-white shadow-sm"
-                    : "bg-muted text-muted-foreground hover:bg-muted/70"
+                    ? "bg-[#0b1b33] text-white shadow-sm"
+                    : "bg-[#f2f1eb] text-[#2d466f] hover:bg-[#eef6f1] hover:text-[#0b1b33]"
                 }`}
               >
                 {m.name}
@@ -630,11 +622,10 @@ export default function NewContractBuilder() {
           </div>
         </div>
 
-        {/* M3 question form card */}
-        <div className="m3-card-outlined rounded-2xl p-6 space-y-5">
+        <div className="space-y-5 rounded-[18px] border border-[#c7d0e0] bg-white p-6 shadow-[0_10px_30px_rgba(11,27,51,0.06)]">
           {currentModule.questions.map((q) => (
             <div key={q.id} className="space-y-2">
-              <Label className="m3-label-lg text-foreground">{q.question}</Label>
+              <Label className="font-semibold text-[#0b1b33]">{q.question}</Label>
 
               {q.type === "text" && (
                 <Textarea
@@ -668,10 +659,10 @@ export default function NewContractBuilder() {
                       key={opt}
                       type="button"
                       onClick={() => updateAnswer(currentModule.id, q.id, opt)}
-                      className={`m3-state-layer flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
+                      className={`flex items-center gap-1.5 rounded-full border px-4 py-2 text-sm font-medium transition-all ${
                         q.answer === opt
-                          ? "border-[#6D28D9] bg-[#F1F0FF] text-[#4C1D95] shadow-sm"
-                          : "border-border hover:border-[#6D28D9]/40 hover:bg-muted/60"
+                          ? "border-[#1f6b3f] bg-[#eef6f1] text-[#0b1b33] shadow-sm"
+                          : "border-[#c7d0e0] text-[#2d466f] hover:border-[#1f6b3f]/40 hover:bg-[#fafaf7]"
                       }`}
                     >
                       {q.answer === opt && <Check className="h-3 w-3" />}
@@ -698,35 +689,33 @@ export default function NewContractBuilder() {
   function renderStep3() {
     return (
       <div className="space-y-6">
-        {/* M3 success state */}
         <div className="text-center">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-            <Check className="h-8 w-8 text-emerald-600" />
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#eef6f1]">
+            <Check className="h-8 w-8 text-[#1f6b3f]" />
           </div>
-          <h1 className="m3-headline-sm font-bold">Contract ready</h1>
-          <p className="mt-1 text-muted-foreground">{contractTitle || "Untitled Contract"}</p>
+          <h1 className="as25-font-display text-4xl font-normal tracking-[-0.04em] text-[#0b1b33]">Contract ready</h1>
+          <p className="mt-2 text-[#2d466f]">{contractTitle || "Untitled Contract"}</p>
         </div>
 
-        {/* M3 summary card */}
-        <div className="m3-card-outlined rounded-2xl p-6 space-y-4">
+        <div className="space-y-4 rounded-[18px] border border-[#c7d0e0] bg-white p-6 shadow-[0_10px_30px_rgba(11,27,51,0.06)]">
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <p className="m3-label-md text-muted-foreground">Party A</p>
+              <p className="as25-font-mono text-xs uppercase tracking-[0.14em] text-[#2d466f]">Party A</p>
               <p className="mt-0.5 font-medium">{partyA.name || "Not set"}</p>
             </div>
             <div>
-              <p className="m3-label-md text-muted-foreground">Party B</p>
+              <p className="as25-font-mono text-xs uppercase tracking-[0.14em] text-[#2d466f]">Party B</p>
               <p className="mt-0.5 font-medium">{partyB.name || "Not set"}</p>
             </div>
           </div>
-          <Separator className="m3-divider" />
+          <Separator className="bg-[#c7d0e0]" />
           <div>
-            <p className="m3-label-md text-muted-foreground mb-2">Modules included</p>
+            <p className="as25-font-mono mb-2 text-xs uppercase tracking-[0.14em] text-[#2d466f]">Modules included</p>
             <div className="flex flex-wrap gap-2">
               {enabledModules.map((m) => (
                 <span
                   key={m.id}
-                  className="inline-flex items-center gap-1 rounded-full bg-[#F1F0FF] px-3 py-1 text-xs font-medium text-[#4C1D95]"
+                  className="inline-flex items-center gap-1 rounded-full bg-[#eef6f1] px-3 py-1 text-xs font-medium text-[#0b1b33]"
                 >
                   <Check className="h-3 w-3" />
                   {m.name}
@@ -736,12 +725,11 @@ export default function NewContractBuilder() {
           </div>
         </div>
 
-        {/* M3 action buttons */}
         <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
           <Button
             variant="outline"
             size="lg"
-            className="rounded-[1.75rem]"
+            className="rounded-[8px]"
             onClick={handleSaveDraft}
             disabled={saving}
           >
@@ -750,7 +738,7 @@ export default function NewContractBuilder() {
           </Button>
           <Button
             size="lg"
-            className="rounded-[1.75rem] bg-[#6D28D9] text-white hover:bg-[#5B21B6]"
+            className="rounded-[8px] bg-[#1f6b3f] text-white hover:bg-[#2a8554]"
           >
             <Send className="mr-2 h-4 w-4" />
             Save & Send for Signature
@@ -760,25 +748,25 @@ export default function NewContractBuilder() {
     );
   }
 
-  // ── Chat Panel — M3 side panel ───────────────────────────────────
+  // ── Chat Panel ──────────────────────────────────────────────────
 
   function renderChatPanel() {
     const activeModel = CHATBOT_MODEL_LIST.find((m) => m.id === chatModel) || CHATBOT_MODEL_LIST[0];
 
     return (
       <div
-        className={`fixed right-0 top-0 z-40 flex h-full w-80 flex-col border-l border-border bg-background shadow-[var(--shadow-elevation-3)] transition-transform duration-300 ${
+        className={`fixed right-0 top-0 z-40 flex h-full w-80 flex-col border-l border-[#c7d0e0] bg-white shadow-[0_18px_60px_rgba(11,27,51,0.16)] transition-transform duration-300 ${
           showChat ? "translate-x-0" : "translate-x-full"
         }`}
       >
         {/* Panel header */}
         <div className="flex items-center justify-between border-b px-4 py-3.5">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#6D28D9]">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1f6b3f]">
               <Bot className="h-4 w-4 text-white" />
             </div>
             <div>
-              <span className="m3-title-sm font-semibold block leading-tight">Contract Assistant</span>
+              <span className="block text-sm font-semibold leading-tight text-[#0b1b33]">Contract Assistant</span>
             </div>
           </div>
           <button
@@ -814,7 +802,7 @@ export default function NewContractBuilder() {
                   onClick={() => { setChatModel(m.id as ChatbotModelId); setShowModelPicker(false); }}
                   className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs transition-colors ${
                     chatModel === m.id
-                      ? "bg-[#F1F0FF] text-[#4C1D95] font-semibold"
+                      ? "bg-[#eef6f1] text-[#0b1b33] font-semibold"
                       : "text-foreground hover:bg-muted/60"
                   }`}
                 >
@@ -871,7 +859,7 @@ export default function NewContractBuilder() {
             />
             <Button
               size="sm"
-              className="h-9 w-9 flex-shrink-0 rounded-full bg-[#6D28D9] p-0 text-white hover:bg-[#5B21B6]"
+              className="h-9 w-9 flex-shrink-0 rounded-full bg-[#1f6b3f] p-0 text-white hover:bg-[#2a8554]"
               onClick={sendChat}
               disabled={!chatInput.trim() || chatLoading}
             >
@@ -888,36 +876,34 @@ export default function NewContractBuilder() {
   const steps = ["Parties", "Modules", "Details", "Review"];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[#fafaf7]">
 
-      {/* M3 sticky top bar — progress + nav */}
-      <div className="sticky top-0 z-30 border-b bg-background/90 backdrop-blur-md">
+      <div className="sticky top-0 z-30 border-b border-[#c7d0e0] bg-[#fafaf7]/92 backdrop-blur-md">
         <div className="mx-auto max-w-4xl px-4 py-3">
           <div className="mb-2.5 flex items-center justify-between">
-            <span className="m3-label-md text-muted-foreground">
-              Step {step + 1} of {steps.length}: <span className="font-semibold text-foreground">{steps[step]}</span>
+            <span className="as25-font-mono text-xs uppercase tracking-[0.14em] text-[#2d466f]">
+              Step {step + 1} of {steps.length}: <span className="font-semibold text-[#0b1b33]">{steps[step]}</span>
             </span>
             <button
               type="button"
               onClick={() => setShowChat(!showChat)}
-              className="flex items-center gap-1.5 rounded-full border border-border bg-background px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm transition-colors hover:text-foreground"
+              className="flex items-center gap-1.5 rounded-full border border-[#c7d0e0] bg-white px-3 py-1 text-xs font-medium text-[#2d466f] shadow-sm transition-colors hover:text-[#0b1b33]"
             >
               <MessageSquare className="h-3.5 w-3.5" />
               {showChat ? "Hide" : "Show"} Assistant
             </button>
           </div>
 
-          {/* M3 progress bar — linear indicator */}
           <div className="flex gap-1">
             {steps.map((_, i) => (
               <div
                 key={i}
                 className={`h-1 flex-1 rounded-full transition-all duration-300 ${
                   i < step
-                    ? "bg-[#6D28D9]"
+                    ? "bg-[#1f6b3f]"
                     : i === step
-                    ? "bg-[#A78BFA]"
-                    : "bg-muted"
+                    ? "bg-[#d7b46a]"
+                    : "bg-[#e3e0d6]"
                 }`}
               />
             ))}
@@ -935,9 +921,8 @@ export default function NewContractBuilder() {
         {step === 3 && renderStep3()}
       </div>
 
-      {/* M3 sticky bottom navigation */}
       {step < 3 && (
-        <div className="sticky bottom-0 border-t bg-background/90 backdrop-blur-md">
+        <div className="sticky bottom-0 border-t border-[#c7d0e0] bg-[#fafaf7]/92 backdrop-blur-md">
           <div
             className={`mx-auto flex max-w-4xl items-center justify-between px-4 py-3.5 transition-all duration-300 ${
               showChat ? "pr-[21rem]" : ""
@@ -945,7 +930,7 @@ export default function NewContractBuilder() {
           >
             <Button
               variant="ghost"
-              className="rounded-full"
+              className="rounded-[8px]"
               onClick={() => (step > 0 ? setStep(step - 1) : setLocation("/dashboard/contracts"))}
             >
               <ArrowLeft className="mr-2 h-4 w-4" />
@@ -955,7 +940,7 @@ export default function NewContractBuilder() {
             <Button
               variant="outline"
               size="sm"
-              className="rounded-full"
+              className="rounded-[8px]"
               onClick={handleSaveDraft}
               disabled={saving}
             >
@@ -964,7 +949,7 @@ export default function NewContractBuilder() {
             </Button>
 
             <Button
-              className="rounded-full bg-[#6D28D9] text-white hover:bg-[#5B21B6]"
+              className="rounded-[8px] bg-[#1f6b3f] text-white hover:bg-[#2a8554]"
               onClick={() => setStep(step + 1)}
             >
               Next
@@ -974,7 +959,6 @@ export default function NewContractBuilder() {
         </div>
       )}
 
-      {/* M3 Chat side panel */}
       {renderChatPanel()}
     </div>
   );

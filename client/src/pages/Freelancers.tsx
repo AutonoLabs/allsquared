@@ -1,283 +1,131 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link } from "wouter";
-import {
-  Shield,
-  Clock,
-  FileCheck,
-  AlertTriangle,
-  CheckCircle,
-  ArrowRight,
-  Briefcase,
-  Palette,
-  PenTool,
-  Camera,
-  TrendingUp,
-  MessageSquare,
-  Wrench,
-  Calendar,
-} from "lucide-react";
+import { FinalCtaSection } from "@/components/marketing/HomeSections";
+import { MarketingPageHero } from "@/components/marketing/MarketingPageHero";
+import { MarketingSection } from "@/components/marketing/MarketingSection";
+import { pricingPlans, steps } from "@/components/marketing/homeContent";
+import { useMarketingCta } from "@/hooks/useMarketingCta";
+
+const freelancerProblems = [
+  "You finish the work and the money enters a fresh round of internal approvals.",
+  "The client says the invoice is fine, then disappears into month-end and finance backlog.",
+  "A scope conversation becomes a payment conversation because nothing was structured tightly enough upfront.",
+  "You spend more energy keeping the release alive than doing the work that earned it.",
+];
+
+const freelancerOutcomes = [
+  "The contract is written before anyone starts improvising around the deal.",
+  "The funds are ring-fenced before you commit serious time or materials.",
+  "The release depends on proof and a defined review window, not vague goodwill.",
+  "You stop teaching clients that slow payment is something you will simply absorb.",
+];
 
 export default function Freelancers() {
-  const painPoints = [
-    "Clients who vanish after seeing the final work",
-    '"Just one more revision" that turns into ten',
-    "Chasing invoices instead of doing what you love",
-    "The fear of asking for deposits upfront",
-    "Disputes with no paper trail",
-  ];
-
-  const benefits = [
-    {
-      icon: Clock,
-      title: "Never Chase Payments Again",
-      description:
-        "When clients fund the escrow before work begins, you know the money exists. No more unpaid invoices.",
-    },
-    {
-      icon: FileCheck,
-      title: "Clear Scope = No Scope Creep",
-      description:
-        "Our AI helps you define exactly what's included. Everything else is a change order.",
-    },
-    {
-      icon: Briefcase,
-      title: "Professional Image, Zero Effort",
-      description:
-        "Send contracts that make you look established and trustworthy—even if you're just starting out.",
-    },
-    {
-      icon: Shield,
-      title: "Protection When Things Go Wrong",
-      description:
-        "If a client disputes unfairly, you have evidence and access to mediation. The funds stay protected until resolved.",
-    },
-  ];
-
-  const categories = [
-    { icon: Palette, name: "Web Design & Development" },
-    { icon: PenTool, name: "Graphic Design & Branding" },
-    { icon: MessageSquare, name: "Writing & Content Creation" },
-    { icon: Camera, name: "Photography & Videography" },
-    { icon: TrendingUp, name: "Marketing & Social Media" },
-    { icon: Briefcase, name: "Consulting & Coaching" },
-    { icon: Wrench, name: "Home Renovation & Trades" },
-    { icon: Calendar, name: "Event Planning & Services" },
-  ];
-
-  const testimonials = [
-    {
-      quote:
-        "Finally, a platform that protects both sides. I no longer worry about scope creep or late payments.",
-      author: "Sarah K.",
-      role: "Freelance Designer",
-    },
-    {
-      quote:
-        "After a client tried to dispute completed work, AllSquared's mediation saved me thousands.",
-      author: "Mike T.",
-      role: "Web Developer",
-    },
-  ];
+  const { handleGetStarted } = useMarketingCta();
 
   return (
-    <div className="flex flex-col">
-      {/* Hero Section */}
-      <section className="min-h-screen md:min-h-0 py-12 md:py-20 bg-gradient-to-b from-primary/5 to-background flex items-center">
-        <div className="container w-full">
-          <div className="mx-auto max-w-3xl text-center space-y-6">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-              Get Paid What You're Worth.
-              <br />
-              <span className="text-primary">On Time. Every Time.</span>
-            </h1>
-            <p className="text-lg text-muted-foreground md:text-xl">
-              Professional contracts, secure payments, and protection from scope
-              creep—all in one platform designed for UK freelancers.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" asChild>
-                <Link href="/contact">
-                  Start Getting Protected
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link href="/how-it-works">See How It Works</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+    <div className="overflow-hidden bg-[#fafaf7] text-[#0b1b33]">
+      <MarketingPageHero
+        badge="For freelancers, consultants, and independent specialists"
+        kicker="Freelancers"
+        title="You did the work. The money should not become another project."
+        accent="another project."
+        description="AllSquared is built for people who win serious work on trust, then get stuck in the dead space between delivery and payment."
+        primaryAction={{ label: "Protect my next deal", onClick: handleGetStarted }}
+        secondaryAction={{ label: "See how it works", href: "/how-it-works" }}
+        highlights={[
+          "Contract before scope drift",
+          "Escrow before delivery risk",
+          "Release tied to proof",
+        ]}
+      />
 
-      {/* Pain Points */}
-      <section className="py-10 md:py-20">
-        <div className="container">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-bold tracking-tight text-center mb-4">
-              Sound Familiar?
-            </h2>
-            <p className="text-lg text-muted-foreground text-center mb-12">
-              These problems cost UK freelancers millions every year.
-            </p>
-            <div className="space-y-4">
-              {painPoints.map((point, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-4 p-4 rounded-lg border bg-muted/50"
-                >
-                  <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0" />
-                  <span>{point}</span>
+      <MarketingSection
+        numeral="I"
+        kicker="The current problem"
+        title="Freelancers do too much unpaid collections work."
+        accent="unpaid collections work."
+        tone="white"
+      >
+        <div className="mt-14 grid gap-4">
+          {freelancerProblems.map((problem) => (
+            <div
+              key={problem}
+              className="rounded-[14px] border border-[#e2e0d6] bg-white px-6 py-5 text-[15px] leading-7 text-[#0b1b33]"
+            >
+              {problem}
+            </div>
+          ))}
+        </div>
+      </MarketingSection>
+
+      <MarketingSection
+        numeral="II"
+        kicker="What changes"
+        title="The whole flow becomes cleaner before the job begins."
+        accent="cleaner"
+      >
+        <div className="mt-14 grid gap-5 lg:grid-cols-2 xl:grid-cols-4">
+          {steps.map((step) => {
+            const Icon = step.icon;
+
+            return (
+              <article key={step.number} className="rounded-[14px] border border-[#e2e0d6] bg-white px-7 py-8">
+                <div className="as25-font-mono text-[10.5px] uppercase tracking-[0.16em] text-[#1f6b3f]">
+                  {step.number}
                 </div>
-              ))}
-            </div>
-            <div className="mt-12 p-6 rounded-lg bg-primary/5 border border-primary/20">
-              <p className="text-center text-lg font-medium">
-                AllSquared eliminates these problems with secure escrow, clear
-                milestones, and contracts that protect your work.
-              </p>
-            </div>
-          </div>
+                <div className="mt-5 grid h-11 w-11 place-items-center rounded-[8px] border border-[#c7d0e0] bg-[#fafaf7] text-[#0b1b33]">
+                  <Icon className="h-5 w-5" strokeWidth={1.5} />
+                </div>
+                <h3 className="as25-font-display mt-5 text-[24px] font-normal leading-[1.15] tracking-[-0.01em] text-[#0b1b33]">
+                  {step.title}
+                </h3>
+                <p className="mt-4 text-[14.5px] leading-7 text-[#2d466f]">{step.body}</p>
+              </article>
+            );
+          })}
         </div>
-      </section>
 
-      {/* Benefits */}
-      <section className="py-10 md:py-20 bg-muted/50">
-        <div className="container">
-          <div className="mx-auto max-w-3xl text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-              How AllSquared Protects You
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Built specifically for freelancers who are tired of getting burned.
-            </p>
-          </div>
-          <div className="grid gap-8 md:grid-cols-2 max-w-5xl mx-auto">
-            {benefits.map((benefit) => (
-              <Card key={benefit.title}>
-                <CardHeader>
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                      <benefit.icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <CardTitle className="text-xl">{benefit.title}</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">{benefit.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+        <div className="mt-10 grid gap-4">
+          {freelancerOutcomes.map((outcome) => (
+            <div
+              key={outcome}
+              className="rounded-[14px] border border-[#e2e0d6] bg-[#f2f1eb] px-6 py-5 text-[15px] leading-7 text-[#0b1b33]"
+            >
+              {outcome}
+            </div>
+          ))}
         </div>
-      </section>
+      </MarketingSection>
 
-      {/* Statistics */}
-      <section className="py-10 md:py-20">
-        <div className="container">
-          <div className="mx-auto max-w-5xl">
-            <div className="grid gap-8 md:grid-cols-3 text-center">
-              <div className="space-y-2">
-                <p className="text-4xl font-bold text-primary">62%</p>
-                <p className="text-lg font-medium">
-                  of freelancers have experienced late or non-payment
-                </p>
+      <MarketingSection
+        numeral="III"
+        kicker="Best fit"
+        title="Two routes most independents start with."
+        accent="start with."
+        tone="white"
+      >
+        <div className="mt-14 grid gap-5 xl:grid-cols-2">
+          {pricingPlans.slice(0, 2).map((plan) => (
+            <article key={plan.name} className="rounded-[14px] border border-[#e2e0d6] bg-white p-8">
+              <div className="as25-font-display text-[24px] font-normal text-[#0b1b33]">{plan.name}</div>
+              <div className="as25-font-display mt-5 text-[56px] leading-none tracking-[-0.04em] text-[#0b1b33]">
+                {plan.price}
+                <small className="ml-2 text-[16px] italic text-[#6b7e9e]">{plan.suffix}</small>
               </div>
-              <div className="space-y-2">
-                <p className="text-4xl font-bold text-primary">30+ days</p>
-                <p className="text-lg font-medium">
-                  average time spent chasing overdue invoices
-                </p>
-              </div>
-              <div className="space-y-2">
-                <p className="text-4xl font-bold text-primary">£5,400</p>
-                <p className="text-lg font-medium">
-                  average lost annually to bad clients
-                </p>
-              </div>
-            </div>
-          </div>
+              <p className="mt-4 text-[14px] leading-6 text-[#2d466f]">{plan.description}</p>
+              <ul className="mt-6 space-y-3 border-t border-[#e2e0d6] pt-5 text-[13.5px] leading-6 text-[#0b1b33]">
+                {plan.items.map((item) => (
+                  <li key={item} className="flex gap-3">
+                    <span className="text-[#1f6b3f]">+</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </article>
+          ))}
         </div>
-      </section>
+      </MarketingSection>
 
-      {/* Use Cases */}
-      <section className="py-10 md:py-20 bg-muted/50">
-        <div className="container">
-          <div className="mx-auto max-w-3xl text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-              Built for Your Work
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Templates and workflows designed for how freelancers actually work.
-            </p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4 max-w-5xl mx-auto">
-            {categories.map((category) => (
-              <div
-                key={category.name}
-                className="flex items-center gap-3 p-4 rounded-lg border bg-background"
-              >
-                <category.icon className="h-5 w-5 text-primary flex-shrink-0" />
-                <span className="text-sm font-medium">{category.name}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-10 md:py-20">
-        <div className="container">
-          <div className="mx-auto max-w-4xl">
-            <h2 className="text-3xl font-bold tracking-tight text-center mb-12">
-              What Freelancers Say
-            </h2>
-            <div className="grid gap-8 md:grid-cols-2">
-              {testimonials.map((testimonial) => (
-                <Card key={testimonial.author}>
-                  <CardContent className="pt-6">
-                    <div className="flex flex-col h-full">
-                      <p className="text-lg italic flex-1">"{testimonial.quote}"</p>
-                      <div className="mt-6 flex items-center gap-2">
-                        <CheckCircle className="h-5 w-5 text-green-500" />
-                        <div>
-                          <p className="font-semibold">{testimonial.author}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {testimonial.role}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-10 md:py-20 bg-primary/5">
-        <div className="container">
-          <div className="mx-auto max-w-3xl text-center space-y-8">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Ready to Protect Your Income?
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Join thousands of UK freelancers who no longer worry about getting
-              paid.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" asChild>
-                <Link href="/contact">Create Your First Contract Free</Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link href="/pricing">View Pricing</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <FinalCtaSection onGetStarted={handleGetStarted} />
     </div>
   );
 }

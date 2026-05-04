@@ -155,6 +155,7 @@ AI arbitration, credit scores, template marketplace, cross-protocol
 ## 📚 Documentation
 
 - [Architecture](/docs/architecture.md) — Technical architecture deep-dive
+- [Production Ownership](/docs/PRODUCTION-OWNERSHIP.md) — Canonical repo, domain, and deployment ownership
 - [Dual Strategy](/docs/dual-strategy.md) — Classic + Protocol strategy
 - [Protocol Whitepaper](/docs/protocol-whitepaper.md) — Protocol technical spec
 - [Business Plan](/docs/business-plan.md) — Full business plan
@@ -171,8 +172,9 @@ AI arbitration, credit scores, template marketplace, cross-protocol
 
 ## 📞 Contact
 
-- Website: [allsquared.uk](https://allsquared.uk)
-- Email: [hello@allsquared.uk](mailto:hello@allsquared.uk)
+- Website: [allsquared.io](https://allsquared.io)
+- App: [app.allsquared.io](https://app.allsquared.io)
+- Email: [hello@allsquared.io](mailto:hello@allsquared.io)
 - Twitter: [@AllSquaredUK](https://twitter.com/AllSquaredUK)
 
 ---

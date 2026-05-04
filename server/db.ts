@@ -376,14 +376,22 @@ export async function createNotification(notification: InsertNotification) {
   return notification;
 }
 
-export async function markNotificationAsRead(id: string) {
+export async function markNotificationAsRead(id: string, userId: string) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
-  
-  await db
+
+  const updated = await db
     .update(notifications)
     .set({ isRead: "yes" })
-    .where(eq(notifications.id, id));
+    .where(
+      and(
+        eq(notifications.id, id),
+        eq(notifications.userId, userId)
+      )
+    )
+    .returning({ id: notifications.id });
+
+  return updated.length > 0;
 }
 
 export async function markAllNotificationsAsRead(userId: string) {

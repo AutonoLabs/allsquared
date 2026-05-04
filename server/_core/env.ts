@@ -5,7 +5,7 @@ import dotenv from "dotenv";
 dotenv.config();
 
 // Define environment schema - Clerk-based auth
-const EnvSchema = z.object({
+const BaseEnvSchema = z.object({
   // Clerk authentication
   CLERK_SECRET_KEY: z.string().min(1).optional(),
   VITE_CLERK_PUBLISHABLE_KEY: z.string().min(1).optional(),
@@ -33,27 +33,37 @@ const EnvSchema = z.object({
   // Stripe (optional for payments)
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_PUBLISHABLE_KEY: z.string().optional(),
-  
+  STRIPE_WEBHOOK_SECRET: z.string().optional(),
+
+  // Webhook verification
+  TRANSPACT_WEBHOOK_SECRET: z.string().optional(),
+  DOCUSIGN_WEBHOOK_SECRET: z.string().optional(),
 });
 
-// Parse and validate environment variables (soft fail for missing vars)
-let envVars: z.infer<typeof EnvSchema>;
-try {
-  envVars = EnvSchema.parse(process.env);
-} catch (error) {
-  console.warn("[Env] Some environment variables are missing or invalid. Running with defaults.");
-  envVars = {
-    NODE_ENV: "development",
-    VITE_APP_TITLE: "AllSquared",
-    VITE_APP_LOGO: "/logo.png",
-  } as z.infer<typeof EnvSchema>;
+const ProductionEnvSchema = BaseEnvSchema.extend({
+  CLERK_SECRET_KEY: z.string().min(1),
+  DATABASE_URL: z.string().url(),
+  JWT_SECRET: z.string().min(1),
+});
+
+const baseEnvVars = BaseEnvSchema.parse(process.env);
+const envVars =
+  baseEnvVars.NODE_ENV === "production"
+    ? ProductionEnvSchema.parse(process.env)
+    : baseEnvVars;
+
+const cookieSecret =
+  envVars.JWT_SECRET ?? "dev-secret-change-in-production";
+
+if (envVars.NODE_ENV === "production" && cookieSecret === "dev-secret-change-in-production") {
+  throw new Error("[Env] JWT_SECRET must be configured in production");
 }
 
 // Export in original format for compatibility
 export const ENV = {
   clerkSecretKey: envVars.CLERK_SECRET_KEY ?? "",
   databaseUrl: envVars.DATABASE_URL ?? "",
-  cookieSecret: envVars.JWT_SECRET ?? "dev-secret-change-in-production",
+  cookieSecret,
   isProduction: envVars.NODE_ENV === "production",
   appTitle: envVars.VITE_APP_TITLE,
   appLogo: envVars.VITE_APP_LOGO,
@@ -66,5 +76,7 @@ export const ENV = {
   
   // Stripe
   stripeSecretKey: envVars.STRIPE_SECRET_KEY,
-  
+  stripeWebhookSecret: envVars.STRIPE_WEBHOOK_SECRET,
+  transpactWebhookSecret: envVars.TRANSPACT_WEBHOOK_SECRET,
+  docusignWebhookSecret: envVars.DOCUSIGN_WEBHOOK_SECRET,
 };

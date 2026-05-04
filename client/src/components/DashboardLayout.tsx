@@ -1,5 +1,5 @@
 import { useAuth } from "@/hooks/useAuth";
-import { SignUp } from "@/lib/clerk";
+import { hasClerkPublishableKey, SignIn, SignUp } from "@/lib/clerk";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -23,9 +23,8 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { MD3NavigationBar } from "@/components/md3/NavigationBar";
-import { MD3TopAppBar } from "@/components/md3/TopAppBar";
-import { APP_LOGO, APP_TITLE } from "@/const";
+import { AllSquaredWordmark } from "@/components/marketing/AllSquaredWordmark";
+import { APP_TITLE } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, FileCode, UserCircle, Shield, AlertTriangle, CheckSquare, BarChart3, ScrollText, CreditCard, Settings, Menu } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
@@ -180,46 +179,34 @@ function DashboardLayoutContent({
 
   return (
     <>
-      {/* Desktop: MD3 Navigation Drawer (sidebar) */}
       <div className="relative" ref={sidebarRef}>
         <Sidebar
           collapsible="icon"
-          className="border-r-0 bg-[var(--md-sys-color-surface-container-low)]"
+          className="border-r border-[#c7d0e0] bg-[#f2f1eb]"
           disableTransition={isResizing}
         >
-          <SidebarHeader className="h-16 justify-center">
+          <SidebarHeader className="h-20 justify-center border-b border-[#c7d0e0] px-3">
             <div className="flex items-center gap-3 pl-2 group-data-[collapsible=icon]:px-0 transition-all w-full">
               {isCollapsed ? (
                 <div className="relative h-8 w-8 shrink-0 group">
-                  <img
-                    src={APP_LOGO}
-                    className="h-8 w-8 rounded-[var(--md-sys-shape-medium)] object-cover ring-1 ring-[var(--md-sys-color-outline-variant)]"
-                    alt="Logo"
-                  />
+                  <div className="grid h-8 w-8 place-items-center rounded-[4px] border border-[#0b1b33] bg-[#fafaf7] text-[10px] font-semibold text-[#0b1b33]">
+                    AS
+                  </div>
                   <button
                     onClick={toggleSidebar}
-                    className="absolute inset-0 flex items-center justify-center bg-[var(--md-sys-color-secondary-container)] rounded-[var(--md-sys-shape-medium)] ring-1 ring-[var(--md-sys-color-outline-variant)] opacity-0 group-hover:opacity-100 transition-opacity focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--md-sys-color-primary)]"
+                    className="absolute inset-0 flex items-center justify-center rounded-[4px] border border-[#c7d0e0] bg-white opacity-0 transition-opacity hover:bg-[#fafaf7] group-hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f6b3f]"
                   >
-                    <PanelLeft className="h-4 w-4 text-[var(--md-sys-color-on-surface)]" />
+                    <PanelLeft className="h-4 w-4 text-[#0b1b33]" />
                   </button>
                 </div>
               ) : (
                 <>
-                  <div className="flex items-center gap-3 min-w-0">
-                    <img
-                      src={APP_LOGO}
-                      className="h-8 w-8 rounded-[var(--md-sys-shape-medium)] object-cover ring-1 ring-[var(--md-sys-color-outline-variant)] shrink-0"
-                      alt="Logo"
-                    />
-                    <span className="font-semibold tracking-tight truncate text-[var(--md-sys-color-on-surface)]">
-                      {APP_TITLE}
-                    </span>
-                  </div>
+                  <AllSquaredWordmark className="min-w-0" />
                   <button
                     onClick={toggleSidebar}
-                    className="ml-auto h-8 w-8 flex items-center justify-center hover:bg-[var(--md-sys-color-on-surface)]/[0.08] rounded-[var(--md-sys-shape-full)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--md-sys-color-primary)] shrink-0"
+                    className="ml-auto flex h-8 w-8 shrink-0 items-center justify-center rounded-[8px] text-[#2d466f] transition-colors hover:bg-white hover:text-[#0b1b33] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f6b3f]"
                   >
-                    <PanelLeft className="h-4 w-4 text-[var(--md-sys-color-on-surface-variant)]" />
+                    <PanelLeft className="h-4 w-4" />
                   </button>
                 </>
               )}
@@ -236,16 +223,16 @@ function DashboardLayoutContent({
                       isActive={isActive}
                       onClick={() => setLocation(item.path)}
                       tooltip={item.label}
-                      className={`h-14 transition-all font-normal rounded-[var(--md-sys-shape-full)] ${
+                      className={`h-11 rounded-[8px] font-normal transition-all ${
                         isActive
-                          ? "bg-[var(--md-sys-color-secondary-container)] text-[var(--md-sys-color-on-secondary-container)]"
-                          : "hover:bg-[var(--md-sys-color-on-surface)]/[0.08]"
+                          ? "bg-[#0b1b33] text-white"
+                          : "text-[#2d466f] hover:bg-white hover:text-[#0b1b33]"
                       }`}
                     >
                       <item.icon
-                        className={`h-6 w-6 ${isActive ? "text-[var(--md-sys-color-on-secondary-container)]" : "text-[var(--md-sys-color-on-surface-variant)]"}`}
+                        className={`h-5 w-5 ${isActive ? "text-white" : "text-[#6b7e9e]"}`}
                       />
-                      <span className="text-sm font-medium tracking-[0.006em]">{item.label}</span>
+                      <span className="text-sm font-medium">{item.label}</span>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
@@ -254,9 +241,11 @@ function DashboardLayoutContent({
 
             {user?.role === 'admin' && (
               <>
-                <SidebarSeparator className="my-2 bg-[var(--md-sys-color-outline-variant)]" />
+                <SidebarSeparator className="my-3 bg-[#c7d0e0]" />
                 <SidebarGroup>
-                  <SidebarGroupLabel className="text-[var(--md-sys-color-on-surface-variant)] text-xs font-medium tracking-[0.031em] uppercase">Admin</SidebarGroupLabel>
+                  <SidebarGroupLabel className="as25-font-mono text-[10.5px] font-medium uppercase tracking-[0.16em] text-[#6b7e9e]">
+                    Admin
+                  </SidebarGroupLabel>
                   <SidebarMenu className="px-3">
                     {adminMenuItems.map(item => {
                       const isActive = location === item.path || location.startsWith(item.path + '/');
@@ -266,16 +255,16 @@ function DashboardLayoutContent({
                             isActive={isActive}
                             onClick={() => setLocation(item.path)}
                             tooltip={item.label}
-                            className={`h-14 transition-all font-normal rounded-[var(--md-sys-shape-full)] ${
+                            className={`h-11 rounded-[8px] font-normal transition-all ${
                               isActive
-                                ? "bg-[var(--md-sys-color-secondary-container)] text-[var(--md-sys-color-on-secondary-container)]"
-                                : "hover:bg-[var(--md-sys-color-on-surface)]/[0.08]"
+                                ? "bg-[#0b1b33] text-white"
+                                : "text-[#2d466f] hover:bg-white hover:text-[#0b1b33]"
                             }`}
                           >
                             <item.icon
-                              className={`h-6 w-6 ${isActive ? "text-[var(--md-sys-color-on-secondary-container)]" : "text-[var(--md-sys-color-on-surface-variant)]"}`}
+                              className={`h-5 w-5 ${isActive ? "text-white" : "text-[#6b7e9e]"}`}
                             />
-                            <span className="text-sm font-medium tracking-[0.006em]">{item.label}</span>
+                            <span className="text-sm font-medium">{item.label}</span>
                           </SidebarMenuButton>
                         </SidebarMenuItem>
                       );
@@ -289,26 +278,26 @@ function DashboardLayoutContent({
           <SidebarFooter className="p-3">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="flex items-center gap-3 rounded-[var(--md-sys-shape-full)] px-2 py-2 hover:bg-[var(--md-sys-color-on-surface)]/[0.08] transition-colors w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--md-sys-color-primary)]">
-                  <Avatar className="h-9 w-9 border border-[var(--md-sys-color-outline-variant)] shrink-0">
-                    <AvatarFallback className="text-xs font-medium bg-[var(--md-sys-color-primary-container)] text-[var(--md-sys-color-on-primary-container)]">
+                <button className="flex w-full items-center gap-3 rounded-[8px] px-2 py-2 text-left transition-colors hover:bg-white group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-[#1f6b3f]">
+                  <Avatar className="h-9 w-9 shrink-0 border border-[#c7d0e0]">
+                    <AvatarFallback className="bg-[#e5f1ea] text-xs font-medium text-[#1f6b3f]">
                       {user?.name?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex-1 min-w-0 group-data-[collapsible=icon]:hidden">
-                    <p className="text-sm font-medium truncate leading-none text-[var(--md-sys-color-on-surface)]">
+                    <p className="truncate text-sm font-medium leading-none text-[#0b1b33]">
                       {user?.name || "-"}
                     </p>
-                    <p className="text-xs truncate mt-1.5 text-[var(--md-sys-color-on-surface-variant)]">
+                    <p className="mt-1.5 truncate text-xs text-[#6b7e9e]">
                       {user?.email || "-"}
                     </p>
                   </div>
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 rounded-[var(--md-sys-shape-extra-small)] bg-[var(--md-sys-color-surface-container)]">
+              <DropdownMenuContent align="end" className="w-48 rounded-[8px] border-[#c7d0e0] bg-white">
                 <DropdownMenuItem
                   onClick={logout}
-                  className="cursor-pointer text-[var(--md-sys-color-error)] focus:text-[var(--md-sys-color-error)]"
+                  className="cursor-pointer text-[#a8392b] focus:text-[#a8392b]"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Sign out</span>
@@ -318,7 +307,7 @@ function DashboardLayoutContent({
           </SidebarFooter>
         </Sidebar>
         <div
-          className={`absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-[var(--md-sys-color-primary)]/20 transition-colors ${isCollapsed ? "hidden" : ""}`}
+          className={`absolute right-0 top-0 h-full w-1 cursor-col-resize transition-colors hover:bg-[#1f6b3f]/20 ${isCollapsed ? "hidden" : ""}`}
           onMouseDown={() => {
             if (isCollapsed) return;
             setIsResizing(true);
@@ -327,27 +316,40 @@ function DashboardLayoutContent({
         />
       </div>
 
-      <SidebarInset className="bg-[var(--md-sys-color-surface)]">
-        {/* Mobile: MD3 Top App Bar */}
+      <SidebarInset className="bg-[#fafaf7]">
         {isMobile && (
-          <MD3TopAppBar
-            variant="small"
-            title={activeMenuItem?.label ?? APP_TITLE}
-            leadingIcon={<Menu className="size-6" />}
-            elevated
-          />
+          <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-[#c7d0e0] bg-[#fafaf7]/95 px-4 backdrop-blur-xl">
+            <SidebarTrigger className="rounded-[8px] text-[#0b1b33] hover:bg-white">
+              <Menu className="size-5" />
+            </SidebarTrigger>
+            <div className="truncate text-sm font-semibold text-[#0b1b33]">
+              {activeMenuItem?.label ?? APP_TITLE}
+            </div>
+          </header>
         )}
 
-        <main className="flex-1 p-4 pb-24 md:pb-4">{children}</main>
+        <main className="flex-1 p-4 pb-24 md:p-6 md:pb-6">{children}</main>
 
-        {/* Mobile: MD3 Bottom Navigation Bar */}
         {isMobile && (
-          <div className="fixed bottom-0 left-0 right-0 z-40">
-            <MD3NavigationBar
-              items={mobileNavItems}
-              value={location}
-              onChange={(value) => setLocation(value)}
-            />
+          <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#c7d0e0] bg-[#fafaf7]/95 px-2 py-2 backdrop-blur-xl">
+            <div className="grid grid-cols-4 gap-1">
+              {mobileNavItems.map((item) => {
+                const isActive = location === item.value;
+                return (
+                  <button
+                    key={item.value}
+                    type="button"
+                    onClick={() => setLocation(item.value)}
+                    className={`flex h-12 flex-col items-center justify-center rounded-[8px] text-[10px] font-medium ${
+                      isActive ? "bg-[#0b1b33] text-white" : "text-[#2d466f] hover:bg-white"
+                    }`}
+                  >
+                    {item.icon}
+                    <span className="mt-0.5">{item.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         )}
       </SidebarInset>
@@ -356,36 +358,75 @@ function DashboardLayoutContent({
 }
 
 function AuthScreen() {
+  const [mode, setMode] = useState<"sign-in" | "sign-up">("sign-up");
+  const isSignUp = mode === "sign-up";
+
   return (
-    <div className="flex items-center justify-center min-h-screen bg-[var(--md-sys-color-surface)]">
-      <div className="flex flex-col items-center gap-8 p-8 max-w-md w-full">
+    <div className="as25-hero-bg flex min-h-screen items-center justify-center bg-[#fafaf7]">
+      <div className="flex w-full max-w-md flex-col items-center gap-8 p-8">
         <div className="flex flex-col items-center gap-6">
-          <div className="relative group">
-            <div className="relative">
-              <img
-                src={APP_LOGO}
-                alt={APP_TITLE}
-                className="h-20 w-20 rounded-[var(--md-sys-shape-extra-large)] object-cover shadow-[var(--md-sys-elevation-2)]"
-              />
-            </div>
-          </div>
+          <AllSquaredWordmark />
           <div className="text-center space-y-2">
-            <h1 className="text-2xl font-bold tracking-tight text-[var(--md-sys-color-on-surface)]">{APP_TITLE}</h1>
-            <p className="text-sm text-[var(--md-sys-color-on-surface-variant)]">
-              Create your account to get started
+            <h1 className="as25-font-display text-3xl font-normal text-[#0b1b33]">{APP_TITLE}</h1>
+            <p className="text-sm text-[#2d466f]">
+              {isSignUp ? "Create your account to get started" : "Sign in to continue"}
             </p>
           </div>
         </div>
-        <SignUp
-          routing="hash"
-          signInUrl="/dashboard"
-          appearance={{
-            elements: {
-              rootBox: "w-full",
-              card: "shadow-none border-0",
-            },
-          }}
-        />
+        <div className="flex w-full rounded-[10px] border border-[#c7d0e0] bg-white p-1">
+          <button
+            type="button"
+            onClick={() => setMode("sign-up")}
+            className={`flex-1 rounded-[8px] px-3 py-2 text-sm font-semibold ${
+              isSignUp ? "bg-[#1f6b3f] text-white" : "text-[#2d466f] hover:bg-[#fafaf7]"
+            }`}
+          >
+            Sign up
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("sign-in")}
+            className={`flex-1 rounded-[8px] px-3 py-2 text-sm font-semibold ${
+              !isSignUp ? "bg-[#1f6b3f] text-white" : "text-[#2d466f] hover:bg-[#fafaf7]"
+            }`}
+          >
+            Sign in
+          </button>
+        </div>
+        {!hasClerkPublishableKey ? (
+          <div className="w-full rounded-[18px] border border-[#d7b46a] bg-white p-5 text-left">
+            <p className="as25-font-mono text-xs font-semibold uppercase tracking-[0.18em] text-[#b45309]">
+              Auth configuration missing
+            </p>
+            <p className="mt-3 text-sm leading-6 text-[#2d466f]">
+              Set `VITE_CLERK_PUBLISHABLE_KEY` for this environment. The app cannot sign users in or create accounts without Clerk.
+            </p>
+          </div>
+        ) : isSignUp ? (
+          <SignUp
+            routing="hash"
+            signInUrl="/sign-in"
+            afterSignUpUrl="/dashboard/contracts/new"
+            appearance={{
+              elements: {
+                rootBox: "w-full",
+                card: "shadow-none border-0 bg-transparent",
+              },
+            }}
+          />
+        ) : (
+          <SignIn
+            routing="hash"
+            signUpUrl="/sign-up?redirect=%2Fdashboard%2Fcontracts%2Fnew"
+            afterSignInUrl="/dashboard/contracts/new"
+            appearance={{
+              elements: {
+                rootBox: "w-full",
+                card: "shadow-none border-0 bg-transparent",
+              },
+            }}
+          />
+        )}
       </div>
     </div>
   );

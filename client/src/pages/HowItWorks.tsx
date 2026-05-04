@@ -1,306 +1,160 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import {
-  ArrowRight,
-  CheckCircle2,
-  FileText,
-  FileSignature,
-  MessageSquare,
-  Shield,
-  TrendingUp,
-  Clock,
-  Zap,
-  Target,
-  Users,
-  Award,
-} from "lucide-react";
-import { Link } from "wouter";
-import { motion } from "framer-motion";
+import { FinalCtaSection } from "@/components/marketing/HomeSections";
+import { MarketingPageHero } from "@/components/marketing/MarketingPageHero";
+import { MarketingSection } from "@/components/marketing/MarketingSection";
+import { matrixRows, steps } from "@/components/marketing/homeContent";
+import { useMarketingCta } from "@/hooks/useMarketingCta";
 
-const fadeInUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6  } },
-};
+function matrixCellClass(value: string, isUs = false) {
+  if (isUs) return "bg-[rgba(31,107,63,0.05)] text-center font-semibold text-[#0b1b33]";
+  if (value === "No" || value === "Not offered") return "text-[#a8392b]";
+  if (value === "Partial" || value === "Signing only") return "text-[#8a6a1e]";
+  return "text-[#6b7e9e]";
+}
 
-const staggerContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.15 } },
-};
+const reviewRules = [
+  {
+    title: "Proof first",
+    body: "Every milestone asks for evidence that fits the work: photos, sign-off notes, commits, timesheets, files, or handover packs.",
+  },
+  {
+    title: "72-hour review window",
+    body: "The client has a defined period to approve or flag a real issue. That keeps review serious without turning it into another vague promise.",
+  },
+  {
+    title: "Silence becomes approval",
+    body: "If nothing is disputed in time, the release proceeds. The whole point is to stop good work dying in someone's inbox.",
+  },
+];
 
 export default function HowItWorks() {
-  const steps = [
-    {
-      number: "01",
-      title: "Generate Contract",
-      description:
-        "Answer a few simple questions about your project. Our AI generates a professional, legally-sound contract tailored to your needs.",
-      icon: FileText,
-      bgColor: "bg-blue-500/10",
-      iconColor: "text-blue-600",
-      ringColor: "ring-blue-500/20",
-    },
-    {
-      number: "02",
-      title: "Sign Digitally",
-      description:
-        "Both parties review and sign the contract electronically. All signatures are legally binding and securely stored.",
-      icon: FileSignature,
-      bgColor: "bg-violet-500/10",
-      iconColor: "text-violet-600",
-      ringColor: "ring-violet-500/20",
-    },
-    {
-      number: "03",
-      title: "Secure Payment",
-      description:
-        "Client deposits funds into FCA-backed escrow. Your money is protected until milestones are completed.",
-      icon: Shield,
-      bgColor: "bg-emerald-500/10",
-      iconColor: "text-emerald-600",
-      ringColor: "ring-emerald-500/20",
-    },
-    {
-      number: "04",
-      title: "Deliver Work",
-      description:
-        "Service provider completes work according to agreed milestones. Track progress in real-time through the platform.",
-      icon: TrendingUp,
-      bgColor: "bg-orange-500/10",
-      iconColor: "text-orange-600",
-      ringColor: "ring-orange-500/20",
-    },
-    {
-      number: "05",
-      title: "Release Funds",
-      description:
-        "Once milestones are approved, funds are automatically released from escrow. Fast, secure, and transparent.",
-      icon: CheckCircle2,
-      bgColor: "bg-teal-500/10",
-      iconColor: "text-teal-600",
-      ringColor: "ring-teal-500/20",
-    },
-    {
-      number: "06",
-      title: "Resolve Disputes",
-      description:
-        "If issues arise, our AI-assisted mediation helps resolve conflicts. Optional lawyer referrals available.",
-      icon: MessageSquare,
-      bgColor: "bg-rose-500/10",
-      iconColor: "text-rose-600",
-      ringColor: "ring-rose-500/20",
-    },
-  ];
-
-  const benefits = [
-    {
-      icon: Clock,
-      title: "Save Time",
-      description:
-        "Generate contracts in minutes, not hours. No legal jargon or complex templates.",
-      bgColor: "bg-blue-500/10",
-      iconColor: "text-blue-600",
-    },
-    {
-      icon: Shield,
-      title: "Reduce Risk",
-      description:
-        "FCA-backed escrow protects your payments. No more chasing invoices or worrying about non-payment.",
-      bgColor: "bg-emerald-500/10",
-      iconColor: "text-emerald-600",
-    },
-    {
-      icon: Target,
-      title: "Stay Organized",
-      description:
-        "Track all your contracts and milestones in one place. Never lose track of project status.",
-      bgColor: "bg-orange-500/10",
-      iconColor: "text-orange-600",
-    },
-    {
-      icon: Users,
-      title: "Build Trust",
-      description:
-        "Professional contracts and secure payments build confidence with clients.",
-      bgColor: "bg-violet-500/10",
-      iconColor: "text-violet-600",
-    },
-    {
-      icon: Zap,
-      title: "Resolve Faster",
-      description:
-        "AI-assisted dispute resolution helps solve conflicts quickly and fairly.",
-      bgColor: "bg-amber-500/10",
-      iconColor: "text-amber-600",
-    },
-    {
-      icon: Award,
-      title: "Scale Easily",
-      description:
-        "From one project to hundreds, AllSquared grows with your business.",
-      bgColor: "bg-teal-500/10",
-      iconColor: "text-teal-600",
-    },
-  ];
+  const { handleGetStarted } = useMarketingCta();
 
   return (
-    <div className="flex flex-col">
-      {/* Hero */}
-      <section className="min-h-screen md:min-h-0 py-12 md:py-20 bg-gradient-to-b from-primary/5 via-primary/3 to-background flex items-center">
-        <div className="container w-full">
-          <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-            className="mx-auto max-w-3xl text-center space-y-6"
-          >
-            <motion.h1
-              variants={fadeInUp}
-              className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl"
-            >
-              How AllSquared Works
-            </motion.h1>
-            <motion.p
-              variants={fadeInUp}
-              className="text-lg text-muted-foreground md:text-xl"
-            >
-              Six simple steps to secure, professional service contracts. From
-              generation to payment, we've got you covered.
-            </motion.p>
-          </motion.div>
+    <div className="overflow-hidden bg-[#fafaf7] text-[#0b1b33]">
+      <MarketingPageHero
+        badge="Contract / escrow / verification / release"
+        kicker="How it works"
+        title="The money moves when the work is proved."
+        accent="proved."
+        description="AllSquared replaces invoice chasing with a tighter loop: draft the agreement, fund the deal, prove the milestone, release the money. Same-day when approved, structured when disputed."
+        primaryAction={{ label: "Draft my first contract", onClick: handleGetStarted }}
+        secondaryAction={{ label: "See pricing", href: "/pricing" }}
+        highlights={[
+          "Milestone-by-milestone release",
+          "72-hour approval window",
+          "Built for serious UK B2B work",
+        ]}
+      />
+
+      <MarketingSection
+        id="method"
+        numeral="I"
+        kicker="The method"
+        title="Four moves. Everyone knows what happens next."
+        accent="Everyone knows"
+        description="This is the operating model. No mystery, no vague admin loop, and no separate contract, escrow, and proof tools stitched together after the fact."
+      >
+        <div className="mt-14 grid border-y border-[#c7d0e0] md:grid-cols-2 xl:grid-cols-4">
+          {steps.map((step, index) => {
+            const Icon = step.icon;
+            const parts = step.title.split(step.accent);
+
+            return (
+              <article
+                key={step.number}
+                className={`flex flex-col gap-4 bg-[#fafaf7] px-7 py-10 ${
+                  index < steps.length - 1 ? "border-b border-[#c7d0e0] xl:border-b-0 xl:border-r" : ""
+                } ${index === 1 ? "md:border-r-0 xl:border-r" : ""}`}
+              >
+                <div className="as25-font-mono flex items-center justify-between text-[10.5px] uppercase tracking-[0.16em] text-[#6b7e9e]">
+                  <span>Stage</span>
+                  <span className="text-[#1f6b3f]">{step.number}</span>
+                </div>
+                <div className="grid h-11 w-11 place-items-center rounded-[8px] border border-[#c7d0e0] bg-white text-[#0b1b33]">
+                  <Icon className="h-5 w-5" strokeWidth={1.5} />
+                </div>
+                <h2 className="as25-font-display text-[24px] font-normal leading-[1.18] tracking-[-0.01em] text-[#0b1b33]">
+                  {parts[0]}
+                  <span className="italic text-[#2d466f]">{step.accent}</span>
+                  {parts[1] ?? ""}
+                </h2>
+                <p className="text-[14.5px] leading-7 text-[#2d466f]">{step.body}</p>
+              </article>
+            );
+          })}
         </div>
-      </section>
+      </MarketingSection>
 
-      {/* Steps */}
-      <section className="py-10 md:py-20">
-        <div className="container">
-          <div className="grid gap-12 lg:gap-16">
-            {steps.map((step, index) => {
-              const Icon = step.icon;
-              const isEven = index % 2 === 0;
-
-              return (
-                <motion.div
-                  key={step.number}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, amount: 0.2 }}
-                  variants={fadeInUp}
-                  className={`grid gap-8 lg:grid-cols-2 lg:gap-16 items-center ${
-                    isEven ? "" : "lg:grid-flow-dense"
-                  }`}
-                >
-                  <div
-                    className={`space-y-4 ${isEven ? "" : "lg:col-start-2"}`}
-                  >
-                    <div className="inline-flex items-center gap-4">
-                      <span className="text-5xl font-bold text-muted-foreground/20">
-                        {step.number}
-                      </span>
-                      <div
-                        className={`inline-flex h-14 w-14 items-center justify-center rounded-xl ${step.bgColor} ring-2 ${step.ringColor}`}
-                      >
-                        <Icon className={`h-7 w-7 ${step.iconColor}`} />
-                      </div>
-                    </div>
-                    <h2 className="text-3xl font-bold tracking-tight">
-                      {step.title}
-                    </h2>
-                    <p className="text-lg text-muted-foreground">
-                      {step.description}
-                    </p>
-                  </div>
-                  <Card className={`${isEven ? "lg:col-start-2" : ""} border-0 shadow-sm`}>
-                    <CardContent className="p-8">
-                      <div className={`aspect-video rounded-xl flex items-center justify-center ${step.bgColor}`}>
-                        <Icon className={`h-24 w-24 ${step.iconColor} opacity-70`} />
-                      </div>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              );
-            })}
-          </div>
+      <MarketingSection
+        numeral="II"
+        kicker="Approval logic"
+        title="A project only works when approval has teeth."
+        accent="has teeth."
+        description="Approval has to be fair to the client and final enough for the supplier to trust it. That is why the release rules are explicit."
+        tone="white"
+      >
+        <div className="mt-14 grid gap-5 lg:grid-cols-3">
+          {reviewRules.map((rule) => (
+            <article key={rule.title} className="rounded-[14px] border border-[#e2e0d6] bg-white px-7 py-8">
+              <div className="as25-font-mono text-[10.5px] uppercase tracking-[0.16em] text-[#1f6b3f]">
+                Release rule
+              </div>
+              <h3 className="as25-font-display mt-4 text-[24px] font-normal leading-[1.15] tracking-[-0.01em] text-[#0b1b33]">
+                {rule.title}
+              </h3>
+              <p className="mt-4 text-[14.5px] leading-7 text-[#2d466f]">{rule.body}</p>
+            </article>
+          ))}
         </div>
-      </section>
+      </MarketingSection>
 
-      {/* Benefits */}
-      <section className="py-10 md:py-20 bg-gradient-to-b from-muted/50 to-background">
-        <div className="container">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={fadeInUp}
-            className="mx-auto max-w-3xl text-center mb-12"
-          >
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-              Why Choose AllSquared?
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              The only platform that integrates everything you need for secure
-              service contracts.
-            </p>
-          </motion.div>
-
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.1 }}
-            variants={staggerContainer}
-            className="grid gap-6 md:grid-cols-2 lg:grid-cols-3"
-          >
-            {benefits.map((benefit) => {
-              const Icon = benefit.icon;
-              return (
-                <motion.div key={benefit.title} variants={fadeInUp}>
-                  <Card className="h-full border-0 shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
-                    <CardContent className="pt-6">
-                      <div className={`mb-4 inline-flex h-12 w-12 items-center justify-center rounded-xl ${benefit.bgColor}`}>
-                        <Icon className={`h-6 w-6 ${benefit.iconColor}`} />
-                      </div>
-                      <h3 className="mb-2 text-xl font-semibold">
-                        {benefit.title}
-                      </h3>
-                      <p className="text-muted-foreground">{benefit.description}</p>
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              );
-            })}
-          </motion.div>
+      <MarketingSection
+        id="comparison"
+        numeral="III"
+        kicker="Comparison"
+        title="Still better than invoices, reminders, and crossed fingers."
+        accent="crossed fingers."
+      >
+        <div className="mt-14 overflow-hidden rounded-[10px] border border-[#e2e0d6] bg-white">
+          <table className="w-full table-fixed border-collapse text-left text-[14px]">
+            <thead>
+              <tr className="bg-[#f2f1eb]">
+                <th className="px-5 py-4 text-[10.5px] uppercase tracking-[0.14em] text-[#6b7e9e]"> </th>
+                <th className="px-5 py-4 text-[10.5px] uppercase tracking-[0.14em] text-[#6b7e9e]">DIY</th>
+                <th className="hidden px-5 py-4 text-[10.5px] uppercase tracking-[0.14em] text-[#6b7e9e] md:table-cell">
+                  Platforms
+                </th>
+                <th className="hidden px-5 py-4 text-[10.5px] uppercase tracking-[0.14em] text-[#6b7e9e] lg:table-cell">
+                  Contract tools
+                </th>
+                <th className="bg-[#0b1b33] px-5 py-4 text-center text-[10.5px] uppercase tracking-[0.14em] text-white">
+                  AllSquared
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {matrixRows.map((row) => (
+                <tr key={row[0]} className="border-t border-[#e2e0d6]">
+                  <td className="as25-font-display px-5 py-5 text-[18px] font-normal leading-6 text-[#0b1b33]">
+                    {row[0]}
+                  </td>
+                  <td className={`px-5 py-5 ${matrixCellClass(row[1])}`}>{row[1]}</td>
+                  <td className={`hidden px-5 py-5 md:table-cell ${matrixCellClass(row[2])}`}>{row[2]}</td>
+                  <td className={`hidden px-5 py-5 lg:table-cell ${matrixCellClass(row[3])}`}>{row[3]}</td>
+                  <td className={`px-5 py-5 ${matrixCellClass(row[4], true)}`}>{row[4]}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      </section>
 
-      {/* CTA */}
-      <section className="py-10 md:py-20">
-        <div className="container">
-          <motion.div
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            variants={fadeInUp}
-            className="mx-auto max-w-3xl text-center space-y-8"
-          >
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Ready to Get Started?
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Join the waitlist and be among the first to experience secure,
-              professional service contracts.
-            </p>
-            <div className="flex flex-col gap-4 sm:flex-row sm:justify-center">
-              <Button size="lg" className="shadow-md hover:shadow-lg hover:scale-[1.02] transition-all duration-200" asChild>
-                <Link href="/contact">
-                  Join Waitlist <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" className="hover:scale-[1.02] transition-all duration-200" asChild>
-                <Link href="/features">Explore Features</Link>
-              </Button>
-            </div>
-          </motion.div>
-        </div>
-      </section>
+        <p className="as25-font-display mt-8 max-w-[700px] text-[18px] leading-8 text-[#2d466f]">
+          The point is not prettier admin. It is a cleaner commercial structure: contract, money,
+          proof, and dispute logic in one place.
+        </p>
+      </MarketingSection>
+
+      <FinalCtaSection onGetStarted={handleGetStarted} />
     </div>
   );
 }

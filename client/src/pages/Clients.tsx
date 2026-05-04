@@ -1,297 +1,128 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Link } from "wouter";
-import {
-  Shield,
-  AlertTriangle,
-  CheckCircle,
-  ArrowRight,
-  Eye,
-  FileCheck,
-  Scale,
-  Wallet,
-} from "lucide-react";
+import { FinalCtaSection } from "@/components/marketing/HomeSections";
+import { MarketingPageHero } from "@/components/marketing/MarketingPageHero";
+import { MarketingSection } from "@/components/marketing/MarketingSection";
+import { useMarketingCta } from "@/hooks/useMarketingCta";
+
+const clientProtections = [
+  {
+    title: "Your money is ring-fenced",
+    body: "The funds go into regulated escrow rather than straight into a supplier's operating account.",
+  },
+  {
+    title: "Approval stays with you",
+    body: "Each milestone release depends on proof you can review, not on blind trust or vague payment timing.",
+  },
+  {
+    title: "The contract is clear first",
+    body: "Success criteria, scope boundaries, stage values, and dispute routes are set before the work begins.",
+  },
+];
+
+const clientProcess = [
+  {
+    title: "Agree the job",
+    body: "Set the scope, milestones, approvals, and release logic in plain English before any serious commitment is made.",
+  },
+  {
+    title: "Fund the escrow",
+    body: "Your supplier can see the job is funded, but the money remains ring-fenced until the agreed conditions are met.",
+  },
+  {
+    title: "Review real proof",
+    body: "Photos, files, commits, sign-off notes, and deliverables provide a clearer basis for approval than trust alone.",
+  },
+  {
+    title: "Release what is earned",
+    body: "When the milestone is right, approve and release. When it is not, the dispute logic already exists.",
+  },
+];
+
+const supplierBenefits = [
+  "Good suppliers close faster when the client can see the funds are real.",
+  "Defined approval windows reduce pointless waiting on both sides.",
+  "A strong process attracts better counterparties than loose deposit culture does.",
+];
 
 export default function Clients() {
-  const painPoints = [
-    "Paying deposits that disappear",
-    "Work that doesn't match what was promised",
-    "No way to hold contractors accountable",
-    "Surprise costs and scope changes",
-    "Being stuck with substandard results",
-  ];
-
-  const benefits = [
-    {
-      icon: Wallet,
-      title: "Your Money Stays Protected",
-      description:
-        "Funds only release when you approve each milestone. You're never paying for work you haven't seen.",
-    },
-    {
-      icon: FileCheck,
-      title: "Clear Deliverables Upfront",
-      description:
-        "Know exactly what you're getting before you commit. Milestones define success criteria.",
-    },
-    {
-      icon: Eye,
-      title: "Quality Assurance Built In",
-      description:
-        "If work doesn't meet agreed standards, you can request revisions before releasing payment.",
-    },
-    {
-      icon: Scale,
-      title: "Fair Dispute Resolution",
-      description:
-        "When things go wrong, our mediation process finds fair solutions—without expensive lawyers.",
-    },
-  ];
-
-  const howItWorks = [
-    {
-      step: 1,
-      title: "Post Your Project",
-      description:
-        "Describe what you need. Our AI helps create a clear contract with defined milestones and deliverables.",
-    },
-    {
-      step: 2,
-      title: "Deposit to Escrow",
-      description:
-        "Your payment is held securely by our FCA-regulated escrow partner. The contractor can see it's funded.",
-    },
-    {
-      step: 3,
-      title: "Review Each Milestone",
-      description:
-        "As work is delivered, review and approve each milestone. Request changes if needed.",
-    },
-    {
-      step: 4,
-      title: "Release Payment",
-      description:
-        "Once satisfied, approve the milestone to release payment. Only pay for work that meets your standards.",
-    },
-  ];
-
-  const testimonials = [
-    {
-      quote:
-        "The milestone system means I only pay for work I've approved. It's transformed how I hire contractors.",
-      author: "James M.",
-      role: "Small Business Owner",
-    },
-    {
-      quote:
-        "I used to dread hiring freelancers because I'd been burned so many times. AllSquared changed that.",
-      author: "Lisa R.",
-      role: "Marketing Director",
-    },
-  ];
+  const { handleGetStarted, goToPath } = useMarketingCta();
 
   return (
-    <div className="flex flex-col">
-      {/* Hero Section */}
-      <section className="min-h-screen md:min-h-0 py-12 md:py-20 bg-gradient-to-b from-primary/5 to-background flex items-center">
-        <div className="container w-full">
-          <div className="mx-auto max-w-3xl text-center space-y-6">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-              Hire with Confidence.
-              <br />
-              <span className="text-primary">Pay for Results.</span>
-            </h1>
-            <p className="text-lg text-muted-foreground md:text-xl">
-              AllSquared protects your deposits, ensures quality work, and gives
-              you recourse when things go wrong.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" asChild>
-                <Link href="/contact">
-                  Post Your First Project
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link href="/how-it-works">See How It Works</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+    <div className="overflow-hidden bg-[#fafaf7] text-[#0b1b33]">
+      <MarketingPageHero
+        badge="For clients commissioning serious work"
+        kicker="Clients"
+        title="Pay for real progress, not hopeful promises."
+        accent="hopeful promises."
+        description="AllSquared gives commissioning clients a safer way to buy project work: a proper contract, ring-fenced funds, visible milestone proof, and clearer recourse when something slips."
+        primaryAction={{ label: "Talk through a deal", onClick: () => goToPath("/contact") }}
+        secondaryAction={{ label: "See the process", href: "/how-it-works" }}
+        highlights={[
+          "Escrow instead of unsecured deposits",
+          "Milestone approvals with evidence",
+          "Clearer contract before spend",
+        ]}
+      />
 
-      {/* Pain Points */}
-      <section className="py-10 md:py-20">
-        <div className="container">
-          <div className="mx-auto max-w-3xl">
-            <h2 className="text-3xl font-bold tracking-tight text-center mb-4">
-              Tired of Getting Burned?
-            </h2>
-            <p className="text-lg text-muted-foreground text-center mb-12">
-              34% of clients have paid deposits that were never returned.
-            </p>
-            <div className="space-y-4">
-              {painPoints.map((point, index) => (
-                <div
-                  key={index}
-                  className="flex items-center gap-4 p-4 rounded-lg border bg-muted/50"
-                >
-                  <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0" />
-                  <span>{point}</span>
-                </div>
-              ))}
-            </div>
-            <div className="mt-12 p-6 rounded-lg bg-primary/5 border border-primary/20">
-              <p className="text-center text-lg font-medium">
-                AllSquared holds your payment in escrow and only releases it when
-                you approve the work. Clear milestones mean you pay as you go.
-              </p>
-            </div>
-          </div>
+      <MarketingSection
+        numeral="I"
+        kicker="Protection"
+        title="Three reasons clients trust the structure more."
+        accent="trust the structure more."
+        tone="white"
+      >
+        <div className="mt-14 grid gap-5 xl:grid-cols-3">
+          {clientProtections.map((item) => (
+            <article key={item.title} className="rounded-[14px] border border-[#e2e0d6] bg-white px-7 py-8">
+              <h2 className="as25-font-display text-[24px] font-normal leading-[1.15] tracking-[-0.01em] text-[#0b1b33]">
+                {item.title}
+              </h2>
+              <p className="mt-4 text-[14.5px] leading-7 text-[#2d466f]">{item.body}</p>
+            </article>
+          ))}
         </div>
-      </section>
+      </MarketingSection>
 
-      {/* Benefits */}
-      <section className="py-10 md:py-20 bg-muted/50">
-        <div className="container">
-          <div className="mx-auto max-w-3xl text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-              How AllSquared Protects You
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Every feature designed to give you confidence when hiring.
-            </p>
-          </div>
-          <div className="grid gap-8 md:grid-cols-2 max-w-5xl mx-auto">
-            {benefits.map((benefit) => (
-              <Card key={benefit.title}>
-                <CardHeader>
-                  <div className="flex items-center gap-4">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                      <benefit.icon className="h-6 w-6 text-primary" />
-                    </div>
-                    <CardTitle className="text-xl">{benefit.title}</CardTitle>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-muted-foreground">{benefit.description}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="py-10 md:py-20">
-        <div className="container">
-          <div className="mx-auto max-w-3xl text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-              Simple, Protected Process
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              From posting to payment, we've got you covered.
-            </p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 max-w-6xl mx-auto">
-            {howItWorks.map((item) => (
-              <div key={item.step} className="space-y-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground font-bold text-lg">
-                  {item.step}
-                </div>
-                <h3 className="font-semibold text-lg">{item.title}</h3>
-                <p className="text-sm text-muted-foreground">{item.description}</p>
+      <MarketingSection
+        numeral="II"
+        kicker="Process"
+        title="What commissioning work looks like inside AllSquared."
+        accent="inside AllSquared."
+      >
+        <div className="mt-14 grid gap-5 lg:grid-cols-2 xl:grid-cols-4">
+          {clientProcess.map((item, index) => (
+            <article key={item.title} className="rounded-[14px] border border-[#e2e0d6] bg-white px-7 py-8">
+              <div className="as25-font-display text-[42px] italic leading-none text-[#2d466f]">
+                {index + 1}
               </div>
-            ))}
-          </div>
+              <h3 className="as25-font-display mt-5 text-[24px] font-normal leading-[1.15] tracking-[-0.01em] text-[#0b1b33]">
+                {item.title}
+              </h3>
+              <p className="mt-4 text-[14.5px] leading-7 text-[#2d466f]">{item.body}</p>
+            </article>
+          ))}
         </div>
-      </section>
+      </MarketingSection>
 
-      {/* Trust Signals */}
-      <section className="py-10 md:py-20 bg-muted/50">
-        <div className="container">
-          <div className="mx-auto max-w-3xl text-center mb-12">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl mb-4">
-              Built on Trust and Security
-            </h2>
-          </div>
-          <div className="grid gap-6 md:grid-cols-4 max-w-4xl mx-auto">
-            <div className="flex flex-col items-center text-center p-4">
-              <Shield className="h-10 w-10 text-primary mb-3" />
-              <p className="font-semibold">FCA-Regulated Escrow</p>
-              <p className="text-sm text-muted-foreground">Transpact (Ref: 546279)</p>
+      <MarketingSection
+        numeral="III"
+        kicker="Why suppliers like it too"
+        title="Better protection for the client also makes good suppliers easier to hire."
+        accent="easier to hire."
+        tone="white"
+      >
+        <div className="mt-14 space-y-4">
+          {supplierBenefits.map((benefit) => (
+            <div
+              key={benefit}
+              className="rounded-[14px] border border-[#e2e0d6] bg-white px-6 py-5 text-[15px] leading-7 text-[#0b1b33]"
+            >
+              {benefit}
             </div>
-            <div className="flex flex-col items-center text-center p-4">
-              <Shield className="h-10 w-10 text-primary mb-3" />
-              <p className="font-semibold">Bank-Level Encryption</p>
-              <p className="text-sm text-muted-foreground">256-bit SSL security</p>
-            </div>
-            <div className="flex flex-col items-center text-center p-4">
-              <Shield className="h-10 w-10 text-primary mb-3" />
-              <p className="font-semibold">SRA-Regulated Network</p>
-              <p className="text-sm text-muted-foreground">Qualified solicitors</p>
-            </div>
-            <div className="flex flex-col items-center text-center p-4">
-              <Shield className="h-10 w-10 text-primary mb-3" />
-              <p className="font-semibold">UK-Based Company</p>
-              <p className="text-sm text-muted-foreground">Regulated and compliant</p>
-            </div>
-          </div>
+          ))}
         </div>
-      </section>
+      </MarketingSection>
 
-      {/* Testimonials */}
-      <section className="py-10 md:py-20">
-        <div className="container">
-          <div className="mx-auto max-w-4xl">
-            <h2 className="text-3xl font-bold tracking-tight text-center mb-12">
-              What Clients Say
-            </h2>
-            <div className="grid gap-8 md:grid-cols-2">
-              {testimonials.map((testimonial) => (
-                <Card key={testimonial.author}>
-                  <CardContent className="pt-6">
-                    <div className="flex flex-col h-full">
-                      <p className="text-lg italic flex-1">"{testimonial.quote}"</p>
-                      <div className="mt-6 flex items-center gap-2">
-                        <CheckCircle className="h-5 w-5 text-green-500" />
-                        <div>
-                          <p className="font-semibold">{testimonial.author}</p>
-                          <p className="text-sm text-muted-foreground">
-                            {testimonial.role}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-10 md:py-20 bg-primary/5">
-        <div className="container">
-          <div className="mx-auto max-w-3xl text-center space-y-8">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              Ready to Hire with Confidence?
-            </h2>
-            <p className="text-lg text-muted-foreground">
-              Post your project and start working with protected payments today.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" asChild>
-                <Link href="/contact">Create Your First Contract Free</Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link href="/pricing">View Pricing</Link>
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      <FinalCtaSection onGetStarted={handleGetStarted} />
     </div>
   );
 }

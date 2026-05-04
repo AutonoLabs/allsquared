@@ -2,12 +2,14 @@
 
 This guide covers deploying AllSquared to production on Vercel.
 
+`AutonoLabs/allsquared-app` is the canonical source repository for both the marketing website and authenticated application. The old `AutonoLabs/allsquared-website` repo is a brand-reference archive only; do not deploy it to production.
+
 ## Prerequisites
 
 - Vercel account
 - GitHub repository access
 - Production database (TiDB Cloud or PlanetScale recommended)
-- Domain names configured (allsquared.uk)
+- Domain names configured (`allsquared.io`, `www.allsquared.io`, `app.allsquared.io`; optional UK aliases)
 
 ## Step 1: Database Setup
 
@@ -32,7 +34,7 @@ This guide covers deploying AllSquared to production on Vercel.
 
 1. Go to [vercel.com](https://vercel.com)
 2. Click "Add New Project"
-3. Import `Nakamoto-Labs/allsquared` from GitHub
+3. Import `AutonoLabs/allsquared-app` from GitHub
 4. Select the repository
 
 ### 2.2 Configure Build Settings
@@ -92,8 +94,8 @@ After first deployment, push the database schema:
 
 ```bash
 # Clone the repository locally
-git clone https://github.com/Nakamoto-Labs/allsquared.git
-cd allsquared
+git clone https://github.com/AutonoLabs/allsquared-app.git
+cd allsquared-app
 
 # Install dependencies
 pnpm install
@@ -111,9 +113,10 @@ pnpm db:push
 
 1. Go to Project Settings → Domains
 2. Add domains:
-   - `www.allsquared.uk` (marketing website)
-   - `app.allsquared.uk` (application dashboard)
-   - `allsquared.uk` (redirect to www)
+   - `allsquared.io` (marketing website)
+   - `www.allsquared.io` (marketing website alias)
+   - `app.allsquared.io` (application dashboard alias)
+   - `allsquared.uk`, `www.allsquared.uk`, and `app.allsquared.uk` if retained as UK aliases
 
 ### 4.2 Configure DNS
 
@@ -141,8 +144,9 @@ Vercel automatically provisions SSL certificates. Wait 24-48 hours for DNS propa
 
 ### 5.1 Verify Deployment
 
-- [ ] Marketing website loads at `https://www.allsquared.uk`
-- [ ] Dashboard loads at `https://app.allsquared.uk`
+- [ ] Marketing website loads at `https://allsquared.io`
+- [ ] Marketing website alias loads at `https://www.allsquared.io`
+- [ ] Dashboard alias loads at `https://app.allsquared.io`
 - [ ] Authentication works (sign in/sign up)
 - [ ] Database connection works
 - [ ] All pages load without errors
@@ -288,10 +292,9 @@ Vercel Edge Network provides global CDN automatically.
 
 For deployment issues:
 - Vercel Support: https://vercel.com/support
-- GitHub Issues: https://github.com/Nakamoto-Labs/allsquared/issues
-- Email: dev@allsquared.uk
+- GitHub Issues: https://github.com/AutonoLabs/allsquared-app/issues
+- Email: hello@allsquared.io
 
 ---
 
-**Last Updated**: 2025-01-28
-
+**Last Updated**: 2026-05-04

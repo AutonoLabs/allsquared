@@ -575,174 +575,166 @@ export const paymentsRouter = router({
     }
   }),
 
-  // Handle Stripe webhook (called from webhook endpoint)
-  handleWebhook: publicProcedure
-    .input(
-      z.object({
-        eventType: z.string(),
-        eventId: z.string(),
-        data: z.any(),
-      })
-    )
-    .mutation(async ({ input }) => {
-      const db = await getDb();
-      if (!db) throw new Error('Database not available');
+});
 
-      const webhookId = `webhook_${nanoid(16)}`;
+type StripeWebhookInput = {
+  eventType: string;
+  eventId: string;
+  data: any;
+};
 
-      // Store webhook event
-      await db.insert(webhookEvents).values({
-        id: webhookId,
-        provider: 'stripe',
-        eventType: input.eventType,
-        eventId: input.eventId,
-        payload: JSON.stringify(input.data),
-        status: 'processing',
-        createdAt: new Date(),
-      });
+export async function processStripeWebhook(input: StripeWebhookInput) {
+  const db = await getDb();
+  if (!db) throw new Error('Database not available');
 
-      try {
-        // Process based on event type
-        switch (input.eventType) {
-          case 'checkout.session.completed': {
-            const session = input.data.object;
-            if (session.mode === 'subscription') {
-              // Handle subscription creation
-              const subscriptionId = `sub_${nanoid(16)}`;
-              await db.insert(subscriptions).values({
-                id: subscriptionId,
-                userId: session.metadata.userId,
-                tier: session.metadata.tier,
-                status: 'active',
-                stripeSubscriptionId: session.subscription,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-              });
-            }
-            break;
-          }
+  const webhookId = `webhook_${nanoid(16)}`;
 
-          case 'customer.subscription.updated': {
-            const subscription = input.data.object;
-            await db
-              .update(subscriptions)
-              .set({
-                status: subscription.status === 'active' ? 'active' : 'past_due',
-                currentPeriodStart: new Date(subscription.current_period_start * 1000),
-                currentPeriodEnd: new Date(subscription.current_period_end * 1000),
-                cancelAtPeriodEnd: subscription.cancel_at_period_end ? 'yes' : 'no',
-                updatedAt: new Date(),
-              })
-              .where(eq(subscriptions.stripeSubscriptionId, subscription.id));
-            break;
-          }
+  await db.insert(webhookEvents).values({
+    id: webhookId,
+    provider: 'stripe',
+    eventType: input.eventType,
+    eventId: input.eventId,
+    payload: JSON.stringify(input.data),
+    status: 'processing',
+    createdAt: new Date(),
+  });
 
-          case 'customer.subscription.deleted': {
-            const subscription = input.data.object;
-            await db
-              .update(subscriptions)
-              .set({
-                status: 'cancelled',
-                tier: 'free',
-                updatedAt: new Date(),
-              })
-              .where(eq(subscriptions.stripeSubscriptionId, subscription.id));
-            break;
-          }
-
-          case 'payment_intent.succeeded': {
-            const paymentIntent = input.data.object;
-            await db
-              .update(payments)
-              .set({
-                status: 'succeeded',
-                stripeChargeId: paymentIntent.latest_charge,
-                processedAt: new Date(),
-                updatedAt: new Date(),
-              })
-              .where(eq(payments.stripePaymentIntentId, paymentIntent.id));
-            break;
-          }
-
-          case 'payment_intent.payment_failed': {
-            const paymentIntent = input.data.object;
-            await db
-              .update(payments)
-              .set({
-                status: 'failed',
-                failureReason: paymentIntent.last_payment_error?.message,
-                updatedAt: new Date(),
-              })
-              .where(eq(payments.stripePaymentIntentId, paymentIntent.id));
-            break;
-          }
-
-          case 'invoice.payment_succeeded': {
-            const invoice = input.data.object;
-            if (invoice.subscription) {
-              // Update subscription status to active on successful payment
-              await db
-                .update(subscriptions)
-                .set({
-                  status: 'active',
-                  updatedAt: new Date(),
-                })
-                .where(eq(subscriptions.stripeSubscriptionId, invoice.subscription));
-            }
-            // Record the payment
-            const invoicePaymentId = `pay_${nanoid(16)}`;
-            await db.insert(payments).values({
-              id: invoicePaymentId,
-              userId: invoice.metadata?.userId || 'unknown',
-              type: 'subscription',
-              amount: String(invoice.amount_paid),
-              currency: (invoice.currency || 'gbp').toUpperCase(),
-              status: 'succeeded',
-              stripePaymentIntentId: invoice.payment_intent,
-              description: `Invoice ${invoice.number || invoice.id}`,
-              processedAt: new Date(),
-              createdAt: new Date(),
-              updatedAt: new Date(),
-            });
-            break;
-          }
-
-          case 'invoice.payment_failed': {
-            const invoice = input.data.object;
-            if (invoice.subscription) {
-              await db
-                .update(subscriptions)
-                .set({
-                  status: 'past_due',
-                  updatedAt: new Date(),
-                })
-                .where(eq(subscriptions.stripeSubscriptionId, invoice.subscription));
-            }
-            break;
-          }
+  try {
+    switch (input.eventType) {
+      case 'checkout.session.completed': {
+        const session = input.data.object;
+        if (session.mode === 'subscription') {
+          const subscriptionId = `sub_${nanoid(16)}`;
+          await db.insert(subscriptions).values({
+            id: subscriptionId,
+            userId: session.metadata.userId,
+            tier: session.metadata.tier,
+            status: 'active',
+            stripeSubscriptionId: session.subscription,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
         }
+        break;
+      }
 
-        // Mark webhook as processed
+      case 'customer.subscription.updated': {
+        const subscription = input.data.object;
         await db
-          .update(webhookEvents)
+          .update(subscriptions)
           .set({
-            status: 'processed',
-            processedAt: new Date(),
+            status: subscription.status === 'active' ? 'active' : 'past_due',
+            currentPeriodStart: new Date(subscription.current_period_start * 1000),
+            currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            cancelAtPeriodEnd: subscription.cancel_at_period_end ? 'yes' : 'no',
+            updatedAt: new Date(),
           })
-          .where(eq(webhookEvents.id, webhookId));
+          .where(eq(subscriptions.stripeSubscriptionId, subscription.id));
+        break;
+      }
 
-        return { success: true };
-      } catch (error) {
-        // Mark webhook as failed
+      case 'customer.subscription.deleted': {
+        const subscription = input.data.object;
         await db
-          .update(webhookEvents)
+          .update(subscriptions)
+          .set({
+            status: 'cancelled',
+            tier: 'free',
+            updatedAt: new Date(),
+          })
+          .where(eq(subscriptions.stripeSubscriptionId, subscription.id));
+        break;
+      }
+
+      case 'payment_intent.succeeded': {
+        const paymentIntent = input.data.object;
+        await db
+          .update(payments)
+          .set({
+            status: 'succeeded',
+            stripeChargeId: paymentIntent.latest_charge,
+            processedAt: new Date(),
+            updatedAt: new Date(),
+          })
+          .where(eq(payments.stripePaymentIntentId, paymentIntent.id));
+        break;
+      }
+
+      case 'payment_intent.payment_failed': {
+        const paymentIntent = input.data.object;
+        await db
+          .update(payments)
           .set({
             status: 'failed',
-            errorMessage: error instanceof Error ? error.message : 'Unknown error',
+            failureReason: paymentIntent.last_payment_error?.message,
+            updatedAt: new Date(),
           })
-          .where(eq(webhookEvents.id, webhookId));
-
-        throw error;
+          .where(eq(payments.stripePaymentIntentId, paymentIntent.id));
+        break;
       }
-    }),
-});
+
+      case 'invoice.payment_succeeded': {
+        const invoice = input.data.object;
+        if (invoice.subscription) {
+          await db
+            .update(subscriptions)
+            .set({
+              status: 'active',
+              updatedAt: new Date(),
+            })
+            .where(eq(subscriptions.stripeSubscriptionId, invoice.subscription));
+        }
+
+        const invoicePaymentId = `pay_${nanoid(16)}`;
+        await db.insert(payments).values({
+          id: invoicePaymentId,
+          userId: invoice.metadata?.userId || 'unknown',
+          type: 'subscription',
+          amount: String(invoice.amount_paid),
+          currency: (invoice.currency || 'gbp').toUpperCase(),
+          status: 'succeeded',
+          stripePaymentIntentId: invoice.payment_intent,
+          description: `Invoice ${invoice.number || invoice.id}`,
+          processedAt: new Date(),
+          createdAt: new Date(),
+          updatedAt: new Date(),
+        });
+        break;
+      }
+
+      case 'invoice.payment_failed': {
+        const invoice = input.data.object;
+        if (invoice.subscription) {
+          await db
+            .update(subscriptions)
+            .set({
+              status: 'past_due',
+              updatedAt: new Date(),
+            })
+            .where(eq(subscriptions.stripeSubscriptionId, invoice.subscription));
+        }
+        break;
+      }
+    }
+
+    await db
+      .update(webhookEvents)
+      .set({
+        status: 'processed',
+        processedAt: new Date(),
+      })
+      .where(eq(webhookEvents.id, webhookId));
+
+    return { success: true };
+  } catch (error) {
+    await db
+      .update(webhookEvents)
+      .set({
+        status: 'failed',
+        errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      })
+      .where(eq(webhookEvents.id, webhookId));
+
+    throw error;
+  }
+}

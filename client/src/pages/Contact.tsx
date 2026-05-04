@@ -1,5 +1,6 @@
+import { MarketingPageHero } from "@/components/marketing/MarketingPageHero";
+import { MarketingSection } from "@/components/marketing/MarketingSection";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -10,11 +11,28 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { useMarketingCta } from "@/hooks/useMarketingCta";
 import { Mail, MapPin, Phone } from "lucide-react";
-import { useState } from "react";
+import { type FormEvent, useState } from "react";
 import { toast } from "sonner";
 
+const contactTracks = [
+  {
+    title: "Founding cohort",
+    body: "You want to run the product on live deals early and are happy to give grounded product feedback.",
+  },
+  {
+    title: "High-value project fit",
+    body: "You already know the deal is large enough or awkward enough that invoice-chasing would be a real risk event.",
+  },
+  {
+    title: "Legal-services query",
+    body: "You need a contract review, bespoke draft, or dispute conversation and want to understand the handoff first.",
+  },
+];
+
 export default function Contact() {
+  const { handleGetStarted } = useMarketingCta();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -22,205 +40,173 @@ export default function Contact() {
     message: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // TODO: Implement actual form submission
-    toast.success("Thank you for joining the waitlist! We'll be in touch soon.");
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+    toast.success("Thanks. We've got your note and we'll follow up shortly.");
     setFormData({ name: "", email: "", userType: "", message: "" });
-  };
+  }
 
   return (
-    <div className="flex flex-col">
-      {/* Hero */}
-      <section className="py-16 md:py-24 bg-gradient-to-b from-primary/5 to-background">
-        <div className="container">
-          <div className="mx-auto max-w-3xl text-center space-y-6">
-            <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-              Join the Waitlist
-            </h1>
-            <p className="text-lg text-muted-foreground md:text-xl">
-              Be among the first to experience secure, professional service
-              contracts. Sign up for early access today.
+    <div className="overflow-hidden bg-[#fafaf7] text-[#0b1b33]">
+      <MarketingPageHero
+        badge="Talk to the team"
+        kicker="Contact"
+        title="If you have a real deal in mind, start there."
+        accent="start there."
+        description="The best introductions are concrete: the kind of work, the deal size, where trust tends to break down, and whether you need core platform flow or additional legal support."
+        primaryAction={{ label: "Draft a contract instead", onClick: handleGetStarted }}
+        highlights={[
+          "London-based team",
+          "High-value UK project focus",
+          "Founding cohort conversations welcome",
+        ]}
+      />
+
+      <MarketingSection
+        numeral="I"
+        kicker="Get in touch"
+        title="Tell us enough to make the first reply useful."
+        accent="first reply useful."
+        tone="white"
+      >
+        <div className="mt-14 grid gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="rounded-[14px] border border-[#e2e0d6] bg-white p-8">
+            <h2 className="as25-font-display text-[30px] font-normal leading-[1.1] tracking-[-0.02em] text-[#0b1b33]">
+              Contact form
+            </h2>
+            <p className="mt-3 max-w-[540px] text-[14.5px] leading-7 text-[#2d466f]">
+              This is for early access, platform-fit conversations, legal-services questions, and
+              serious project inquiries.
             </p>
+
+            <form onSubmit={handleSubmit} className="mt-8 space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="name">Full name</Label>
+                <Input
+                  id="name"
+                  placeholder="John Smith"
+                  value={formData.name}
+                  onChange={(event) => setFormData({ ...formData, name: event.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email address</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="john@example.com"
+                  value={formData.email}
+                  onChange={(event) => setFormData({ ...formData, email: event.target.value })}
+                  required
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="userType">I am a...</Label>
+                <Select
+                  value={formData.userType}
+                  onValueChange={(value) => setFormData({ ...formData, userType: value })}
+                >
+                  <SelectTrigger id="userType">
+                    <SelectValue placeholder="Select your role" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="freelancer">Freelancer / consultant</SelectItem>
+                    <SelectItem value="contractor">Contractor / tradesperson</SelectItem>
+                    <SelectItem value="client">Client / service buyer</SelectItem>
+                    <SelectItem value="agency">Agency / business</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="message">Message</Label>
+                <Textarea
+                  id="message"
+                  placeholder="Tell us about the kind of deal, the problem you're solving, or the legal support you need."
+                  rows={5}
+                  value={formData.message}
+                  onChange={(event) => setFormData({ ...formData, message: event.target.value })}
+                />
+              </div>
+
+              <Button className="w-full rounded-[8px] bg-[#1f6b3f] text-white hover:bg-[#2a8554]" type="submit" size="lg">
+                Send enquiry
+              </Button>
+            </form>
           </div>
-        </div>
-      </section>
 
-      {/* Contact Form */}
-      <section className="py-16 md:py-24">
-        <div className="container">
-          <div className="grid gap-12 lg:grid-cols-2 lg:gap-16">
-            {/* Form */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl">Get Early Access</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-6">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
-                    <Input
-                      id="name"
-                      placeholder="John Smith"
-                      value={formData.name}
-                      onChange={(e) =>
-                        setFormData({ ...formData, name: e.target.value })
-                      }
-                      required
-                    />
+          <div className="space-y-5">
+            <div className="rounded-[14px] border border-[#e2e0d6] bg-white p-7">
+              <div className="flex items-start gap-4">
+                <div className="grid h-11 w-11 place-items-center rounded-[8px] border border-[#c7d0e0] bg-[#fafaf7] text-[#0b1b33]">
+                  <Mail className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="as25-font-mono text-[10.5px] uppercase tracking-[0.16em] text-[#6b7e9e]">
+                    Email
                   </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="john@example.com"
-                      value={formData.email}
-                      onChange={(e) =>
-                        setFormData({ ...formData, email: e.target.value })
-                      }
-                      required
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="userType">I am a...</Label>
-                    <Select
-                      value={formData.userType}
-                      onValueChange={(value) =>
-                        setFormData({ ...formData, userType: value })
-                      }
-                      required
-                    >
-                      <SelectTrigger id="userType">
-                        <SelectValue placeholder="Select your role" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="freelancer">
-                          Freelancer / Consultant
-                        </SelectItem>
-                        <SelectItem value="contractor">
-                          Contractor / Tradesperson
-                        </SelectItem>
-                        <SelectItem value="client">
-                          Client / Service Buyer
-                        </SelectItem>
-                        <SelectItem value="agency">
-                          Agency / Business
-                        </SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="message">
-                      Message (Optional)
-                    </Label>
-                    <Textarea
-                      id="message"
-                      placeholder="Tell us about your use case or any questions you have..."
-                      rows={4}
-                      value={formData.message}
-                      onChange={(e) =>
-                        setFormData({ ...formData, message: e.target.value })
-                      }
-                    />
-                  </div>
-
-                  <Button type="submit" className="w-full" size="lg">
-                    Join Waitlist
-                  </Button>
-
-                  <p className="text-xs text-muted-foreground text-center">
-                    By joining, you agree to receive updates about AllSquared.
-                    You can unsubscribe at any time.
-                  </p>
-                </form>
-              </CardContent>
-            </Card>
-
-            {/* Contact Info */}
-            <div className="space-y-8">
-              <div>
-                <h2 className="text-2xl font-bold mb-4">Get in Touch</h2>
-                <p className="text-muted-foreground mb-6">
-                  Have questions? We'd love to hear from you. Send us a message
-                  and we'll respond as soon as possible.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start gap-4">
-                      <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 flex-shrink-0">
-                        <Mail className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold mb-1">Email</h3>
-                        <a
-                          href="mailto:hello@allsquared.uk"
-                          className="text-muted-foreground hover:text-primary transition-colors"
-                        >
-                          hello@allsquared.uk
-                        </a>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start gap-4">
-                      <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-secondary/10 flex-shrink-0">
-                        <Phone className="h-5 w-5 text-secondary" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold mb-1">Phone</h3>
-                        <p className="text-muted-foreground">
-                          Coming soon
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-
-                <Card>
-                  <CardContent className="pt-6">
-                    <div className="flex items-start gap-4">
-                      <div className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-accent/10 flex-shrink-0">
-                        <MapPin className="h-5 w-5 text-accent" />
-                      </div>
-                      <div>
-                        <h3 className="font-semibold mb-1">Office</h3>
-                        <p className="text-muted-foreground">
-                          London, United Kingdom
-                        </p>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-
-              <div className="bg-muted/50 rounded-lg p-6">
-                <h3 className="font-semibold mb-2">For Investors</h3>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Interested in learning more about our seed round? We're
-                  seeking £750,000 to launch and scale.
-                </p>
-                <Button variant="outline" asChild>
-                  <a href="mailto:hello@allsquared.uk?subject=Investment Inquiry">
-                    Contact Us
+                  <a
+                    href="mailto:hello@allsquared.uk"
+                    className="as25-font-display mt-2 block text-[24px] font-normal leading-[1.15] text-[#0b1b33]"
+                  >
+                    hello@allsquared.uk
                   </a>
-                </Button>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[14px] border border-[#e2e0d6] bg-white p-7">
+              <div className="flex items-start gap-4">
+                <div className="grid h-11 w-11 place-items-center rounded-[8px] border border-[#c7d0e0] bg-[#fafaf7] text-[#0b1b33]">
+                  <Phone className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="as25-font-mono text-[10.5px] uppercase tracking-[0.16em] text-[#6b7e9e]">
+                    Phone
+                  </div>
+                  <p className="mt-2 text-[14.5px] leading-7 text-[#2d466f]">Introductions are currently handled by email first.</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[14px] border border-[#e2e0d6] bg-white p-7">
+              <div className="flex items-start gap-4">
+                <div className="grid h-11 w-11 place-items-center rounded-[8px] border border-[#c7d0e0] bg-[#fafaf7] text-[#0b1b33]">
+                  <MapPin className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="as25-font-mono text-[10.5px] uppercase tracking-[0.16em] text-[#6b7e9e]">
+                    Base
+                  </div>
+                  <p className="mt-2 text-[14.5px] leading-7 text-[#2d466f]">London, United Kingdom.</p>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </section>
+      </MarketingSection>
+
+      <MarketingSection
+        numeral="II"
+        kicker="What to include"
+        title="Three kinds of conversation that help immediately."
+        accent="help immediately."
+      >
+        <div className="mt-14 grid gap-5 xl:grid-cols-3">
+          {contactTracks.map((track) => (
+            <article key={track.title} className="rounded-[14px] border border-[#e2e0d6] bg-white px-7 py-8">
+              <h3 className="as25-font-display text-[24px] font-normal leading-[1.15] tracking-[-0.01em] text-[#0b1b33]">
+                {track.title}
+              </h3>
+              <p className="mt-4 text-[14.5px] leading-7 text-[#2d466f]">{track.body}</p>
+            </article>
+          ))}
+        </div>
+      </MarketingSection>
     </div>
   );
 }
-

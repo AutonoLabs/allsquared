@@ -2,6 +2,7 @@ import { ClerkProvider, SignIn, SignUp, SignedIn, SignedOut, UserButton } from '
 import { type ReactNode } from 'react';
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+export const hasClerkPublishableKey = Boolean(PUBLISHABLE_KEY);
 
 if (!PUBLISHABLE_KEY) {
   console.warn('Missing VITE_CLERK_PUBLISHABLE_KEY - auth will not work');
@@ -17,12 +18,14 @@ const clerkAppearance = {
     socialButtonsVariant: 'iconButton' as const,
   },
   variables: {
-    colorPrimary: '#6D28D9',
-    colorBackground: '#ffffff',
+    colorPrimary: '#1f6b3f',
+    colorBackground: '#fafaf7',
+    colorText: '#0b1b33',
+    colorTextSecondary: '#2d466f',
     borderRadius: '0.5rem',
   },
   elements: {
-    formButtonPrimary: 'bg-[#6D28D9] hover:bg-[#5B21B6]',
+    formButtonPrimary: 'bg-[#1f6b3f] hover:bg-[#2a8554]',
     headerTitle: 'text-xl font-bold',
     headerSubtitle: 'text-muted-foreground',
     card: 'shadow-none',
@@ -42,8 +45,8 @@ export function ClerkAuthProvider({ children }: ClerkAuthProviderProps) {
     <ClerkProvider
       publishableKey={PUBLISHABLE_KEY}
       appearance={clerkAppearance}
-      signInUrl="/dashboard"
-      signUpUrl="/dashboard"
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
     >
       {children}
     </ClerkProvider>

@@ -36,9 +36,11 @@ const About = lazyRetry(() => import("./pages/About"));
 const Contact = lazyRetry(() => import("./pages/Contact"));
 const Terms = lazyRetry(() => import("./pages/Terms"));
 const Privacy = lazyRetry(() => import("./pages/Privacy"));
+const CookiePolicy = lazyRetry(() => import("./pages/CookiePolicy"));
 const Freelancers = lazyRetry(() => import("./pages/Freelancers"));
 const Clients = lazyRetry(() => import("./pages/Clients"));
 const LegalServices = lazyRetry(() => import("./pages/LegalServices"));
+const AuthPage = lazyRetry(() => import("./pages/Auth"));
 
 const Dashboard = lazyRetry(() => import("./pages/Dashboard"));
 const Contracts = lazyRetry(() => import("./pages/Contracts"));
@@ -66,8 +68,8 @@ function PageSpinner() {
   return (
     <div className="flex min-h-[60vh] items-center justify-center">
       <div className="flex flex-col items-center gap-3">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-        <span className="text-sm text-muted-foreground">Loading...</span>
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#1f6b3f] border-t-transparent" />
+        <span className="as25-font-mono text-xs uppercase tracking-[0.18em] text-[#2d466f]">Loading</span>
       </div>
     </div>
   );
@@ -103,7 +105,7 @@ function NavigationLoadingBar() {
   return (
     <div className="fixed top-0 left-0 right-0 z-[100] h-0.5">
       <div
-        className="h-full bg-gradient-to-r from-primary via-secondary to-primary transition-all duration-300 ease-out"
+        className="h-full bg-gradient-to-r from-[#1f6b3f] via-[#d7b46a] to-[#1f6b3f] transition-all duration-300 ease-out"
         style={{ width: `${progress}%` }}
       />
     </div>
@@ -230,10 +232,17 @@ function Router() {
                   <Route path={"/how-it-works"} component={HowItWorks} />
                   <Route path={"/features"} component={Features} />
                   <Route path={"/pricing"} component={Pricing} />
+                  <Route path={"/sign-in"}>
+                    <AuthPage mode="sign-in" />
+                  </Route>
+                  <Route path={"/sign-up"}>
+                    <AuthPage mode="sign-up" />
+                  </Route>
                   <Route path={"/about"} component={About} />
                   <Route path={"/contact"} component={Contact} />
                   <Route path={"/terms"} component={Terms} />
                   <Route path={"/privacy"} component={Privacy} />
+                  <Route path={"/cookies"} component={CookiePolicy} />
                   <Route path={"/freelancers"} component={Freelancers} />
                   <Route path={"/clients"} component={Clients} />
                   <Route path={"/legal-services"} component={LegalServices} />

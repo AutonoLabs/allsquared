@@ -1,108 +1,114 @@
-import { APP_LOGO, APP_TITLE } from "@/const";
+import { AllSquaredWordmark } from "@/components/marketing/AllSquaredWordmark";
 import { Link } from "wouter";
-import { Shield, Mail, Twitter, Linkedin, Github } from "lucide-react";
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-border/60 bg-background">
-      <div className="container py-14 md:py-18">
-        <div className="grid grid-cols-1 gap-10 md:grid-cols-4">
-          {/* Brand */}
-          <div className="space-y-5 md:col-span-1">
-            <Link href="/" className="flex items-center gap-3 group">
-              <img src={APP_LOGO} alt={APP_TITLE} className="h-8 w-auto transition-transform group-hover:scale-105" />
-              <span className="font-heading font-bold text-lg tracking-tight">{APP_TITLE}</span>
-            </Link>
-            <p className="text-sm text-muted-foreground leading-relaxed">
-              Secure service contracts and escrow payments for the UK's freelance economy.
+    <footer className="border-t border-[#c7d0e0] bg-[#f2f1eb] text-[#2d466f]">
+      <div className="mx-auto w-full max-w-[1240px] px-5 py-16 md:px-8 md:py-20 lg:px-10">
+        <div className="grid grid-cols-1 gap-12 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
+          <div className="space-y-5">
+            <AllSquaredWordmark />
+            <p className="max-w-[320px] text-sm leading-6 text-[#2d466f]">
+              One platform for the contract, the escrow, the verified payments, and the dispute safety
+              net. Built in London for serious UK professionals moving serious money.
             </p>
-            <div className="inline-flex items-center gap-2 rounded-lg bg-primary/5 px-3 py-1.5 text-xs text-primary font-medium">
-              <Shield className="h-3.5 w-3.5" />
-              <span>FCA-Regulated Escrow</span>
-            </div>
-            <div className="flex items-center gap-1 pt-1">
-              <a href="https://x.com/allsquared_io" target="_blank" rel="noopener" className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-xl hover:bg-primary/5">
-                <Twitter className="h-4 w-4" />
-                <span className="sr-only">Twitter</span>
-              </a>
-              <a href="https://linkedin.com/company/allsquared" target="_blank" rel="noopener" className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-xl hover:bg-primary/5">
-                <Linkedin className="h-4 w-4" />
-                <span className="sr-only">LinkedIn</span>
-              </a>
-              <a href="https://github.com/AutonoLabs/allsquared" target="_blank" rel="noopener" className="text-muted-foreground hover:text-primary transition-colors p-2 rounded-xl hover:bg-primary/5">
-                <Github className="h-4 w-4" />
-                <span className="sr-only">GitHub</span>
-              </a>
-            </div>
           </div>
 
-          {/* Product */}
           <div>
-            <h3 className="font-heading mb-4 text-sm font-semibold uppercase tracking-wider text-foreground/40">Product</h3>
+            <h3 className="as25-font-mono mb-5 text-[10.5px] uppercase tracking-[0.2em] text-[#1f6b3f]">
+              Platform
+            </h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/how-it-works" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/how-it-works" className="transition-colors hover:text-[#0b1b33]">
                   How It Works
                 </Link>
               </li>
               <li>
-                <Link href="/features" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/features" className="transition-colors hover:text-[#0b1b33]">
                   Features
                 </Link>
               </li>
               <li>
-                <Link href="/pricing" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/legal-services" className="transition-colors hover:text-[#0b1b33]">
+                  Legal Services
+                </Link>
+              </li>
+              <li>
+                <Link href="/pricing" className="transition-colors hover:text-[#0b1b33]">
                   Pricing
                 </Link>
               </li>
               <li>
-                <Link href="/freelancers" className="text-muted-foreground hover:text-primary transition-colors">
-                  For Freelancers
-                </Link>
-              </li>
-              <li>
-                <Link href="/clients" className="text-muted-foreground hover:text-primary transition-colors">
-                  For Clients
+                <Link href="/dashboard" className="transition-colors hover:text-[#0b1b33]">
+                  Dashboard
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Company */}
           <div>
-            <h3 className="font-heading mb-4 text-sm font-semibold uppercase tracking-wider text-foreground/40">Company</h3>
+            <h3 className="as25-font-mono mb-5 text-[10.5px] uppercase tracking-[0.2em] text-[#1f6b3f]">
+              Built For
+            </h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/about" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/freelancers" className="transition-colors hover:text-[#0b1b33]">
+                  Commercial trades & fit-out
+                </Link>
+              </li>
+              <li>
+                <Link href="/freelancers" className="transition-colors hover:text-[#0b1b33]">
+                  Agencies & studios
+                </Link>
+              </li>
+              <li>
+                <Link href="/freelancers" className="transition-colors hover:text-[#0b1b33]">
+                  Events & productions
+                </Link>
+              </li>
+              <li>
+                <Link href="/freelancers" className="transition-colors hover:text-[#0b1b33]">
+                  Main contractors
+                </Link>
+              </li>
+              <li>
+                <Link href="/clients" className="transition-colors hover:text-[#0b1b33]">
+                  Clients commissioning work
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="as25-font-mono mb-5 text-[10.5px] uppercase tracking-[0.2em] text-[#1f6b3f]">
+              Company
+            </h3>
+            <ul className="space-y-3 text-sm">
+              <li>
+                <Link href="/about" className="transition-colors hover:text-[#0b1b33]">
                   About
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/legal-services" className="transition-colors hover:text-[#0b1b33]">
+                  Regulatory & compliance
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="transition-colors hover:text-[#0b1b33]">
                   Contact
                 </Link>
               </li>
               <li>
-                <Link href="/legal-services" className="text-muted-foreground hover:text-primary transition-colors">
-                  Legal Services
-                </Link>
-              </li>
-            </ul>
-          </div>
-
-          {/* Legal */}
-          <div>
-            <h3 className="font-heading mb-4 text-sm font-semibold uppercase tracking-wider text-foreground/40">Legal</h3>
-            <ul className="space-y-3 text-sm">
-              <li>
-                <Link href="/terms" className="text-muted-foreground hover:text-primary transition-colors">
-                  Terms of Service
+                <Link href="/terms" className="transition-colors hover:text-[#0b1b33]">
+                  Terms
                 </Link>
               </li>
               <li>
-                <Link href="/privacy" className="text-muted-foreground hover:text-primary transition-colors">
+                <Link href="/privacy" className="transition-colors hover:text-[#0b1b33]">
                   Privacy Policy
                 </Link>
               </li>
@@ -110,16 +116,31 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-14 border-t border-border/60 pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-muted-foreground">
-            &copy; {currentYear} {APP_TITLE}. All rights reserved.
-          </p>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <Link href="/contact" className="hover:text-primary transition-colors flex items-center gap-1.5">
-              <Mail className="h-4 w-4" />
-              Get in Touch
-            </Link>
+        <div className="mt-14 flex flex-col gap-6 border-t border-[#c7d0e0] pt-8">
+          <div className="as25-font-mono flex flex-col gap-3 text-[11px] uppercase tracking-[0.1em] text-[#6b7e9e] md:flex-row md:items-center md:justify-between">
+            <p>© AllSquared Ltd · {currentYear} · London</p>
+            <div className="flex gap-6">
+              <Link href="/terms" className="hover:text-[#0b1b33]">
+                Terms
+              </Link>
+              <Link href="/privacy" className="hover:text-[#0b1b33]">
+                Privacy
+              </Link>
+              <Link href="/cookies" className="hover:text-[#0b1b33]">
+                Cookies
+              </Link>
+            </div>
           </div>
+          <p className="max-w-[920px] text-xs leading-6 text-[#6b7e9e]">
+            Statistics cited: Federation of Small Businesses late-payment research, 2023–2024
+            (52% B2B late payment; c.50,000 SMEs closing annually); FSB &amp; Xero Small Business
+            Index, 2024 (c.£22,000 average owed in overdue invoices); QuickBooks UK SME late-payment
+            research, 2023 (56 million hours lost annually). AllSquared is a trading name of
+            AllSquared Ltd, registered in England &amp; Wales. Escrow services are provided by
+            Transpact, an FCA-authorised payment institution, under client-money rules. AllSquared
+            is not a law firm; when you book a legal service we connect you with independent
+            SRA-regulated solicitors who advise directly under their own professional terms.
+          </p>
         </div>
       </div>
     </footer>

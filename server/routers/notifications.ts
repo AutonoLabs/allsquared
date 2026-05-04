@@ -36,7 +36,10 @@ export const notificationsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      await markNotificationAsRead(input.id);
+      const updated = await markNotificationAsRead(input.id, ctx.user.id);
+      if (!updated) {
+        throw new Error('Notification not found');
+      }
       return { success: true };
     }),
 
@@ -53,4 +56,3 @@ export const notificationsRouter = router({
     return { count };
   }),
 });
-

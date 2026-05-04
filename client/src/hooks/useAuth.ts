@@ -2,6 +2,7 @@ import { useUser, useClerk, useAuth as useClerkAuth } from '@clerk/clerk-react';
 import { trpc } from '@/lib/trpc';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MeQueryResult } from '@/lib/trpc-types';
+import { hasClerkPublishableKey } from '@/lib/clerk';
 
 type UseAuthOptions = {
   redirectOnUnauthenticated?: boolean;
@@ -11,6 +12,18 @@ type UseAuthOptions = {
 const LOADING_TIMEOUT_MS = 5000;
 
 export function useAuth(options?: UseAuthOptions) {
+  if (!hasClerkPublishableKey) {
+    return {
+      user: null,
+      loading: false,
+      error: null,
+      isAuthenticated: false,
+      refresh: () => {},
+      logout: async () => {},
+      getToken: async () => null,
+    };
+  }
+
   const { redirectOnUnauthenticated = false } = options ?? {};
   const { user: clerkUser, isLoaded, isSignedIn } = useUser();
   const { signOut, openSignIn } = useClerk();
