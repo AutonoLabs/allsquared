@@ -76,6 +76,8 @@ export default function AuthPage({ mode }: AuthPageProps) {
                 elements: {
                   rootBox: "w-full",
                   card: "w-full shadow-none border-0 bg-transparent",
+                  socialButtonsBlockButton__github: "hidden",
+                  socialButtonsIconButton__github: "hidden",
                 },
               }}
             />
@@ -88,6 +90,8 @@ export default function AuthPage({ mode }: AuthPageProps) {
                 elements: {
                   rootBox: "w-full",
                   card: "w-full shadow-none border-0 bg-transparent",
+                  socialButtonsBlockButton__github: "hidden",
+                  socialButtonsIconButton__github: "hidden",
                 },
               }}
             />

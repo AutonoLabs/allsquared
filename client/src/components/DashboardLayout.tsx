@@ -411,6 +411,8 @@ function AuthScreen() {
               elements: {
                 rootBox: "w-full",
                 card: "shadow-none border-0 bg-transparent",
+                socialButtonsBlockButton__github: "hidden",
+                socialButtonsIconButton__github: "hidden",
               },
             }}
           />
@@ -423,6 +425,8 @@ function AuthScreen() {
               elements: {
                 rootBox: "w-full",
                 card: "shadow-none border-0 bg-transparent",
+                socialButtonsBlockButton__github: "hidden",
+                socialButtonsIconButton__github: "hidden",
               },
             }}
           />
