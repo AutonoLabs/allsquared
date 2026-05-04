@@ -26,11 +26,24 @@ export default defineConfig(({ mode }) => {
       emptyOutDir: true,
       rollupOptions: {
         output: {
-          manualChunks: {
-            'vendor-react': ['react', 'react-dom'],
-            'vendor-clerk': ['@clerk/clerk-react'],
-            'vendor-ui': ['lucide-react', 'framer-motion'],
-            'vendor-trpc': ['@trpc/client', '@trpc/react-query', '@tanstack/react-query'],
+          manualChunks(id) {
+            if (id.includes("node_modules/react") || id.includes("node_modules/react-dom")) {
+              return "vendor-react";
+            }
+            if (id.includes("node_modules/@clerk/react") || id.includes("node_modules/@clerk/shared")) {
+              return "vendor-clerk";
+            }
+            if (id.includes("node_modules/lucide-react") || id.includes("node_modules/framer-motion")) {
+              return "vendor-ui";
+            }
+            if (
+              id.includes("node_modules/@trpc/client") ||
+              id.includes("node_modules/@trpc/react-query") ||
+              id.includes("node_modules/@tanstack/react-query")
+            ) {
+              return "vendor-trpc";
+            }
+            return undefined;
           },
         },
       },

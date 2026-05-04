@@ -1,7 +1,6 @@
 import { AllSquaredWordmark } from "@/components/marketing/AllSquaredWordmark";
 import { Button } from "@/components/ui/button";
 import { hasClerkPublishableKey, SignIn, SignUp } from "@/lib/clerk";
-import { ArrowRight } from "lucide-react";
 import { Link } from "wouter";
 
 type AuthPageProps = {
@@ -26,22 +25,25 @@ export default function AuthPage({ mode }: AuthPageProps) {
           <AllSquaredWordmark />
           <div className="space-y-5">
             <p className="as25-font-mono text-xs font-semibold uppercase tracking-[0.22em] text-[#1f6b3f]">
-              {isSignUp ? "Create account" : "Welcome back"}
+              {isSignUp ? "Sign up" : "Sign in"}
             </p>
             <h1 className="as25-font-display max-w-xl text-5xl font-normal leading-[0.95] tracking-[-0.04em] text-[#0b1b33] md:text-6xl">
-              {isSignUp ? "Draft your first contract in a protected workspace." : "Sign in to continue your contracts."}
+              {isSignUp ? "Create your AllSquared account." : "Welcome back to AllSquared."}
             </h1>
             <p className="max-w-lg text-lg leading-8 text-[#2d466f]">
-              AllSquared uses Clerk for authentication. After auth, you will land in the app with contract drafting, escrow, evidence, and signature tools in one place.
+              Use your account to access contracts, escrow, evidence, and signature tools in one workspace.
             </p>
           </div>
-          <div className="flex flex-wrap gap-3">
-            <Button className="rounded-[8px] bg-[#1f6b3f] px-5 text-white hover:bg-[#2a8554]" asChild>
-              <Link href={isSignUp ? "/sign-in" : `/sign-up?redirect=${encodeURIComponent(redirectPath)}`}>
-                {isSignUp ? "Already have an account" : "Create an account"}
-                <ArrowRight className="ml-2 h-4 w-4" />
+          <div className="space-y-4">
+            <p className="text-sm text-[#2d466f]">
+              {isSignUp ? "Already have an account?" : "New to AllSquared?"}{" "}
+              <Link
+                href={isSignUp ? `/sign-in?redirect=${encodeURIComponent(redirectPath)}` : `/sign-up?redirect=${encodeURIComponent(redirectPath)}`}
+                className="font-semibold text-[#1f6b3f] underline-offset-4 hover:underline"
+              >
+                {isSignUp ? "Sign in" : "Create an account"}
               </Link>
-            </Button>
+            </p>
             <Button
               variant="outline"
               className="rounded-[8px] border-[#c7d0e0] bg-[#fafaf7] text-[#0b1b33] hover:bg-white"

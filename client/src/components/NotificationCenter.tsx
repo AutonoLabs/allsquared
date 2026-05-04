@@ -11,7 +11,7 @@ import { Bell, Check, FileText, AlertCircle, Info } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { formatDistanceToNow } from "date-fns";
-import { useUser } from "@clerk/clerk-react";
+import { useUser } from "@clerk/react";
 
 export default function NotificationCenter() {
   const { isSignedIn } = useUser();
@@ -115,4 +115,3 @@ export default function NotificationCenter() {
     </DropdownMenu>
   );
 }
-

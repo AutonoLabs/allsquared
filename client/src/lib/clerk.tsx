@@ -1,4 +1,4 @@
-import { ClerkProvider, SignIn, SignUp, SignedIn, SignedOut, UserButton } from '@clerk/clerk-react';
+import { ClerkProvider, SignIn, SignUp, UserButton } from '@clerk/react';
 import { type ReactNode } from 'react';
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -53,4 +53,4 @@ export function ClerkAuthProvider({ children }: ClerkAuthProviderProps) {
   );
 }
 
-export { SignIn, SignUp, SignedIn, SignedOut, UserButton };
+export { SignIn, SignUp, UserButton };

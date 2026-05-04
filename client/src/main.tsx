@@ -6,7 +6,7 @@ import { useRef } from "react";
 import superjson from "superjson";
 import App from "./App";
 import { ClerkAuthProvider, hasClerkPublishableKey } from "./lib/clerk";
-import { useAuth as useClerkAuth } from "@clerk/clerk-react";
+import { useAuth as useClerkAuth } from "@clerk/react";
 import "./index.css";
 
 const queryClient = new QueryClient({

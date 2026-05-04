@@ -1,4 +1,4 @@
-import { useUser, useClerk, useAuth as useClerkAuth } from '@clerk/clerk-react';
+import { useUser, useClerk, useAuth as useClerkAuth } from '@clerk/react';
 import { trpc } from '@/lib/trpc';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { MeQueryResult } from '@/lib/trpc-types';

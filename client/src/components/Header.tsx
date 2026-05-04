@@ -3,8 +3,8 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { useUser } from "@clerk/clerk-react";
-import { hasClerkPublishableKey } from "@/lib/clerk";
+import { useUser } from "@clerk/react";
+import { hasClerkPublishableKey, UserButton } from "@/lib/clerk";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -12,7 +12,6 @@ export default function Header() {
   const [location] = useLocation();
   const clerkUser = hasClerkPublishableKey ? useUser() : { isSignedIn: false };
   const { isSignedIn } = clerkUser;
-  const draftHref = isSignedIn ? "/dashboard/contracts/new" : "/sign-up?redirect=%2Fdashboard%2Fcontracts%2Fnew";
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -51,24 +50,39 @@ export default function Header() {
         </div>
 
         <div className="hidden md:flex md:items-center md:gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            className="rounded-[8px] border border-[#c7d0e0] bg-transparent px-5 py-5 text-[#0b1b33] hover:border-[#0b1b33] hover:bg-[rgba(11,27,51,0.03)]"
-            asChild
-          >
-            <Link href="/sign-in">Sign In</Link>
-          </Button>
-          <Button
-            size="sm"
-            className="rounded-[8px] bg-[#1f6b3f] px-5 py-5 text-white shadow-none hover:bg-[#2a8554]"
-            asChild
-          >
-            <Link href={draftHref}>
-              {isSignedIn ? "Go to dashboard" : "Draft a contract"}
-              <ArrowRight className="ml-1 h-4 w-4" />
-            </Link>
-          </Button>
+          {isSignedIn ? (
+            <>
+              <Button
+                size="sm"
+                className="rounded-[8px] bg-[#1f6b3f] px-5 py-5 text-white shadow-none hover:bg-[#2a8554]"
+                asChild
+              >
+                <Link href="/dashboard">Dashboard</Link>
+              </Button>
+              <UserButton />
+            </>
+          ) : (
+            <>
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-[8px] border border-[#c7d0e0] bg-transparent px-5 py-5 text-[#0b1b33] hover:border-[#0b1b33] hover:bg-[rgba(11,27,51,0.03)]"
+                asChild
+              >
+                <Link href="/sign-in">Sign in</Link>
+              </Button>
+              <Button
+                size="sm"
+                className="rounded-[8px] bg-[#1f6b3f] px-5 py-5 text-white shadow-none hover:bg-[#2a8554]"
+                asChild
+              >
+                <Link href="/sign-up">
+                  Get started
+                  <ArrowRight className="ml-1 h-4 w-4" />
+                </Link>
+              </Button>
+            </>
+          )}
         </div>
 
         <button
@@ -100,18 +114,28 @@ export default function Header() {
               </Link>
             ))}
             <div className="mt-2 space-y-2 border-t border-[#c7d0e0] pt-4">
-              <Button
-                variant="outline"
-                className="w-full rounded-[8px] border-[#c7d0e0] bg-transparent text-[#0b1b33]"
-                asChild
-              >
-                <Link href="/sign-in" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
-              </Button>
-              <Button className="w-full rounded-[8px] bg-[#1f6b3f] text-white hover:bg-[#2a8554]" asChild>
-                <Link href={draftHref} onClick={() => setMobileMenuOpen(false)}>
-                  {isSignedIn ? "Go to dashboard" : "Draft a contract"}
-                </Link>
-              </Button>
+              {isSignedIn ? (
+                <Button className="w-full rounded-[8px] bg-[#1f6b3f] text-white hover:bg-[#2a8554]" asChild>
+                  <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
+                    Dashboard
+                  </Link>
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    variant="outline"
+                    className="w-full rounded-[8px] border-[#c7d0e0] bg-transparent text-[#0b1b33]"
+                    asChild
+                  >
+                    <Link href="/sign-in" onClick={() => setMobileMenuOpen(false)}>Sign in</Link>
+                  </Button>
+                  <Button className="w-full rounded-[8px] bg-[#1f6b3f] text-white hover:bg-[#2a8554]" asChild>
+                    <Link href="/sign-up" onClick={() => setMobileMenuOpen(false)}>
+                      Get started
+                    </Link>
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         </div>
