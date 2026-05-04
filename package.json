@@ -108,9 +108,6 @@
     "vitest": "^4.1.5"
   },
   "packageManager": "pnpm@10.27.0",
-  "engines": {
-    "node": ">=20"
-  },
   "pnpm": {
     "overrides": {
       "tailwindcss>nanoid": "3.3.7",

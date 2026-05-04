@@ -2,12 +2,6 @@
   "version": 2,
   "buildCommand": "pnpm build",
   "outputDirectory": "dist/public",
-  "installCommand": "pnpm install --prod=false",
-  "build": {
-    "env": {
-      "NODE_VERSION": "22"
-    }
-  },
   "headers": [
     {
       "source": "/(.*)",
