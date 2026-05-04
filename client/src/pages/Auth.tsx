@@ -69,7 +69,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
             <SignUp
               routing="hash"
               signInUrl="/sign-in"
-              afterSignUpUrl={redirectPath}
+              fallbackRedirectUrl={redirectPath}
               appearance={{
                 elements: {
                   rootBox: "w-full",
@@ -81,7 +81,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
             <SignIn
               routing="hash"
               signUpUrl={`/sign-up?redirect=${encodeURIComponent(redirectPath)}`}
-              afterSignInUrl={redirectPath}
+              fallbackRedirectUrl={redirectPath}
               appearance={{
                 elements: {
                   rootBox: "w-full",

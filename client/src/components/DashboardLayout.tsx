@@ -406,7 +406,7 @@ function AuthScreen() {
           <SignUp
             routing="hash"
             signInUrl="/sign-in"
-            afterSignUpUrl="/dashboard/contracts/new"
+            fallbackRedirectUrl="/dashboard/contracts/new"
             appearance={{
               elements: {
                 rootBox: "w-full",
@@ -418,7 +418,7 @@ function AuthScreen() {
           <SignIn
             routing="hash"
             signUpUrl="/sign-up?redirect=%2Fdashboard%2Fcontracts%2Fnew"
-            afterSignInUrl="/dashboard/contracts/new"
+            fallbackRedirectUrl="/dashboard/contracts/new"
             appearance={{
               elements: {
                 rootBox: "w-full",
