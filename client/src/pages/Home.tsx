@@ -1,5 +1,4 @@
 import {
-  BlogCarouselSection,
   ComparisonSection,
   FaqSection,
   FinalCtaSection,
@@ -10,7 +9,6 @@ import {
   PricingSection,
   ProblemSection,
   ProfessionTicker,
-  ProjectsPreviewSection,
   ProofSection,
 } from "@/components/marketing/HomeSections";
 import { useMarketingCta } from "@/hooks/useMarketingCta";
@@ -34,8 +32,6 @@ export default function Home() {
       <HowItWorksSection />
       <ComparisonSection />
       <PersonasSection />
-      <ProjectsPreviewSection />
-      <BlogCarouselSection />
       <ProofSection onGetStarted={handleGetStarted} />
       <LegalServicesSection onGetStarted={handleGetStarted} />
       <PricingSection onGetStarted={handleGetStarted} />

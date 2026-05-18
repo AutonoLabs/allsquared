@@ -27,18 +27,13 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/projects" className="transition-colors hover:text-[#0b1b33]">
-                  Projects
-                </Link>
-              </li>
-              <li>
-                <Link href="/blog" className="transition-colors hover:text-[#0b1b33]">
-                  Journal
-                </Link>
-              </li>
-              <li>
                 <Link href="/features" className="transition-colors hover:text-[#0b1b33]">
                   Features
+                </Link>
+              </li>
+              <li>
+                <Link href="/legal-services" className="transition-colors hover:text-[#0b1b33]">
+                  Legal Services
                 </Link>
               </li>
               <li>

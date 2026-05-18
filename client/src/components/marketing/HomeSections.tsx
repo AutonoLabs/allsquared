@@ -13,7 +13,6 @@ import {
   whenToUse,
 } from "@/components/marketing/homeContent";
 import { MarketingCtaButton, MarketingLinkButton } from "@/components/marketing/MarketingCtas";
-import { articleCards, projectCards } from "@/components/marketing/projectContent";
 import { SectionHeading } from "@/components/marketing/SectionHeading";
 import { containerVariants, itemVariants } from "@/lib/motion";
 import { motion, useReducedMotion } from "framer-motion";
@@ -46,7 +45,7 @@ export function HeroSection({ onGetStarted }: SectionProps) {
               className="as25-font-mono inline-flex items-center gap-2 rounded-full border border-[#e2e0d6] bg-white px-4 py-2 text-[11px] uppercase tracking-[0.16em] text-[#2d466f]"
             >
               <span className="inline-flex h-[7px] w-[7px] rounded-full bg-[#2a8554] shadow-[0_0_0_3px_rgba(229,241,234,1)]" />
-              FCA-authorised escrow · UK based · global team
+              FCA-authorised escrow · SRA-regulated solicitor network
             </motion.div>
 
             <h1 className="as25-font-display mt-8 max-w-[760px] text-[44px] font-normal leading-[1.02] tracking-[-0.03em] text-[#0b1b33] md:text-[78px]">
@@ -98,7 +97,7 @@ export function HeroSection({ onGetStarted }: SectionProps) {
             </motion.div>
 
             <motion.div variants={itemVariants} className="mt-10 flex flex-wrap gap-4 text-[10.5px] uppercase tracking-[0.12em] text-[#2d466f]">
-              {["UK based · global team", "FCA-regulated escrow", "SRA-regulated solicitor network", "UK client-money rules"].map((item) => (
+              {["FCA-regulated escrow", "SRA-regulated solicitor network", "UK client-money rules"].map((item) => (
                 <span key={item} className="as25-font-mono inline-flex items-center gap-2">
                   <span className="h-[6px] w-[6px] rounded-full bg-[#2a8554]" />
                   {item}
@@ -430,132 +429,12 @@ export function PersonasSection() {
   );
 }
 
-export function ProjectsPreviewSection() {
-  return (
-    <section id="projects" className="border-b border-[#c7d0e0] bg-white py-24 md:py-32">
-      <div className={marketingShell}>
-        <SectionHeading
-          numeral="V"
-          kicker="Projects"
-          title="Ventures and products now sit under one clearer portfolio."
-          accent="one clearer portfolio."
-          description="AllSquared is UK based with a global team. The projects portfolio brings products, ventures, and research into the same visual language: proof, trust, and serious work."
-        />
-
-        <div className="mt-14 grid gap-5 lg:grid-cols-3">
-          {projectCards.map((project) => (
-            <article
-              key={project.slug}
-              className="group relative overflow-hidden rounded-[18px] border border-[#e2e0d6] bg-[#fafaf7] p-6 transition-all hover:-translate-y-[2px] hover:border-[#c7d0e0] hover:shadow-[0_18px_42px_-24px_rgba(11,27,51,0.16)]"
-            >
-              <div className="absolute right-5 top-5 as25-font-display text-[72px] italic leading-none text-[#c7d0e0]/55 transition-colors group-hover:text-[#2d466f]/30">
-                {project.mark}
-              </div>
-              <div className="relative">
-                <div className="as25-font-mono text-[10.5px] uppercase tracking-[0.18em] text-[#1f6b3f]">
-                  {project.eyebrow}
-                </div>
-                <h3 className="as25-font-display mt-4 text-[30px] font-normal leading-[1.08] tracking-[-0.02em] text-[#0b1b33]">
-                  {project.name}
-                </h3>
-                <p className="mt-5 min-h-[132px] text-[14.5px] leading-7 text-[#2d466f]">{project.description}</p>
-                <div className="mt-6 grid grid-cols-4 gap-2 border-y border-[#e2e0d6] py-4">
-                  {project.visual.map((item, index) => (
-                    <div key={item} className="text-center">
-                      <div className={`mx-auto h-2 w-2 rounded-full ${index < 2 ? "bg-[#1f6b3f]" : "bg-[#c7d0e0]"}`} />
-                      <div className="mt-2 text-[11px] font-medium text-[#2d466f]">{item}</div>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {[project.region, project.status].map((signal) => (
-                    <span key={signal} className="rounded-full border border-[#e2e0d6] bg-white px-3 py-1 text-[12px] text-[#2d466f]">
-                      {signal}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <div className="mt-10 flex flex-wrap gap-3">
-          <MarketingLinkButton href="/projects">View projects</MarketingLinkButton>
-          <MarketingLinkButton href="/contact?intent=venture">Submit venture</MarketingLinkButton>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-export function BlogCarouselSection() {
-  const reduceMotion = useReducedMotion();
-
-  return (
-    <section id="journal" className="border-b border-[#c7d0e0] bg-[#fafaf7] py-24 md:py-32">
-      <div className={marketingShell}>
-        <SectionHeading
-          numeral="VI"
-          kicker="Journal"
-          title="A more visual, less square carousel for the ideas behind the work."
-          accent="less square"
-          description="Desktop readers get a horizontal editorial carousel. Mobile readers can swipe through the same field notes without another stack of identical cards."
-        />
-
-        <motion.div
-          variants={containerVariants}
-          initial={reduceMotion ? false : "hidden"}
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.2 }}
-          className="mt-14 overflow-x-auto pb-5 [scroll-snap-type:x_mandatory]"
-        >
-          <div className="flex min-w-max gap-5">
-            {articleCards.map((article, index) => (
-              <motion.article
-                key={article.slug}
-                variants={itemVariants}
-                className="relative flex min-h-[380px] w-[78vw] max-w-[560px] shrink-0 scroll-ml-5 flex-col overflow-hidden rounded-[22px] border border-[#e2e0d6] bg-white p-7 shadow-[0_1px_0_#e2e0d6] [scroll-snap-align:start] transition-all hover:-translate-y-[2px] hover:border-[#c7d0e0] md:w-[460px] lg:w-[520px]"
-              >
-                <div className="absolute inset-x-0 top-0 h-24 bg-[linear-gradient(135deg,rgba(31,107,63,0.16),rgba(45,70,111,0.08),transparent)]" />
-                <div className="relative flex justify-between gap-5">
-                  <div>
-                    <div className="as25-font-mono text-[10.5px] uppercase tracking-[0.18em] text-[#1f6b3f]">{article.label}</div>
-                    <div className="mt-2 inline-flex rounded-full border border-[#e2e0d6] bg-[#fafaf7] px-3 py-1 text-[12px] text-[#2d466f]">
-                      {article.theme}
-                    </div>
-                  </div>
-                  <div className="as25-font-display text-[62px] italic leading-none text-[#c7d0e0]">{index + 1}</div>
-                </div>
-                <div className="relative mt-auto pt-12">
-                  <h3 className="as25-font-display text-[32px] font-normal leading-[1.05] tracking-[-0.03em] text-[#0b1b33] md:text-[40px]">
-                    {article.title}
-                  </h3>
-                  <p className="mt-5 text-[15px] leading-7 text-[#2d466f]">{article.deck}</p>
-                  <div className="mt-7 flex items-center justify-between border-t border-[#e2e0d6] pt-5">
-                    <span className="as25-font-mono text-[10.5px] uppercase tracking-[0.16em] text-[#6b7e9e]">{article.readTime}</span>
-                    <span className="text-[14px] font-semibold text-[#1f6b3f]">Preview →</span>
-                  </div>
-                </div>
-              </motion.article>
-            ))}
-          </div>
-        </motion.div>
-
-        <div className="mt-4 flex flex-wrap gap-3">
-          <MarketingLinkButton href="/blog">Open journal</MarketingLinkButton>
-          <MarketingLinkButton href="/contact?intent=message">Submit message</MarketingLinkButton>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 export function ProofSection({ onGetStarted }: SectionProps) {
   return (
     <section id="proof" className="border-b border-[#c7d0e0] bg-white py-24 md:py-32">
       <div className={marketingShell}>
         <SectionHeading
-          numeral="VII"
+          numeral="V"
           kicker="The proof"
           title="The quiet relief of being believed before you've had to argue."
           accent="being believed"
@@ -590,7 +469,7 @@ export function LegalServicesSection({ onGetStarted }: SectionProps) {
     <section id="legal" className="border-b border-[#c7d0e0] bg-[#fafaf7] py-24 md:py-32">
       <div className={marketingShell}>
         <SectionHeading
-          numeral="VIII"
+          numeral="VI"
           kicker="Legal services"
           title="When you need a solicitor, we connect you - faster."
           accent="connect you"
@@ -706,7 +585,7 @@ export function PricingSection({ onGetStarted }: SectionProps) {
     <section id="pricing" className="border-b border-[#c7d0e0] bg-white py-24 md:py-32">
       <div className={marketingShell}>
         <SectionHeading
-          numeral="IX"
+          numeral="VII"
           kicker="Pricing"
           title="A small fee to lock in your whole payday."
           accent="whole payday."
@@ -788,7 +667,7 @@ export function FaqSection() {
     <section id="faq" className="border-b border-[#c7d0e0] bg-[#fafaf7] py-24 md:py-32">
       <div className={marketingShell}>
         <SectionHeading
-          numeral="X"
+          numeral="VIII"
           kicker="Honest answers"
           title="What most people want to ask, but don't."
           accent="most"
