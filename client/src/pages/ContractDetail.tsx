@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRoute, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
+import { itemVariants } from "@/lib/motion";
 import { safeJsonParse } from "@/lib/utils";
 import MilestoneManager from "@/components/MilestoneManager";
 import { Button } from "@/components/ui/button";
@@ -23,6 +24,7 @@ import {
   Tag,
   Banknote,
 } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 
 type ContractSignature = {
   userId?: string;
@@ -39,6 +41,7 @@ type ContractContent = {
 export default function ContractDetail() {
   const [, params] = useRoute("/dashboard/contracts/:id");
   const [, setLocation] = useLocation();
+  const reduceMotion = useReducedMotion();
   const contractId = params?.id || "";
   const [signatureName, setSignatureName] = useState("");
   const [isSignDialogOpen, setIsSignDialogOpen] = useState(false);
@@ -262,11 +265,17 @@ export default function ContractDetail() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Actions */}
-          <Card className="border-0 shadow-sm">
-            <CardHeader>
-              <CardTitle className="text-base">Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
+          <motion.div
+            variants={itemVariants}
+            initial={reduceMotion ? false : "hidden"}
+            whileInView="visible"
+            viewport={{ once: true, amount: 0.4 }}
+          >
+            <Card className="border-0 shadow-sm">
+              <CardHeader>
+                <CardTitle className="text-base">Actions</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3">
               {contract.status === "draft" && (
                 <Button
                   className="w-full"
@@ -323,8 +332,9 @@ export default function ContractDetail() {
                   No actions available for this contract status.
                 </p>
               )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
 
           {/* Parties */}
           <Card className="border-0 shadow-sm">

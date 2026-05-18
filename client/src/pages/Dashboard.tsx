@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/react";
 import { trpc } from "@/lib/trpc";
+import { containerVariants, itemVariants } from "@/lib/motion";
 import { MD3Button } from "@/components/md3/Button";
 import { MD3Card, MD3CardContent, MD3CardHeader } from "@/components/md3/Card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,11 +19,13 @@ import {
   X,
   Sparkles,
 } from "lucide-react";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 const ONBOARDING_DISMISSED_KEY = "allsquared_onboarding_dismissed";
 
 export default function Dashboard() {
   const { isLoaded, isSignedIn } = useUser();
+  const reduceMotion = useReducedMotion();
   const ready = isLoaded && isSignedIn;
 
   const { data: stats, isLoading: statsLoading } = trpc.contracts.stats.useQuery(
@@ -131,8 +134,14 @@ export default function Dashboard() {
       )}
 
       {/* Stats Cards */}
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <MD3Card variant="elevated">
+      <motion.div
+        variants={containerVariants}
+        initial={reduceMotion ? false : "hidden"}
+        animate="visible"
+        className="grid gap-4 md:grid-cols-2 lg:grid-cols-4"
+      >
+        <motion.div variants={itemVariants}>
+          <MD3Card variant="elevated">
           <MD3CardContent>
             <div className="flex items-center justify-between mb-3">
               <span className="md3-label-large text-[var(--md-sys-color-on-surface-variant)]">Active Contracts</span>
@@ -146,9 +155,11 @@ export default function Dashboard() {
               Currently in progress
             </p>
           </MD3CardContent>
-        </MD3Card>
+          </MD3Card>
+        </motion.div>
 
-        <MD3Card variant="elevated">
+        <motion.div variants={itemVariants}>
+          <MD3Card variant="elevated">
           <MD3CardContent>
             <div className="flex items-center justify-between mb-3">
               <span className="md3-label-large text-[var(--md-sys-color-on-surface-variant)]">Completed</span>
@@ -162,9 +173,11 @@ export default function Dashboard() {
               Successfully finished
             </p>
           </MD3CardContent>
-        </MD3Card>
+          </MD3Card>
+        </motion.div>
 
-        <MD3Card variant="elevated">
+        <motion.div variants={itemVariants}>
+          <MD3Card variant="elevated">
           <MD3CardContent>
             <div className="flex items-center justify-between mb-3">
               <span className="md3-label-large text-[var(--md-sys-color-on-surface-variant)]">Draft Contracts</span>
@@ -177,9 +190,11 @@ export default function Dashboard() {
               Awaiting completion
             </p>
           </MD3CardContent>
-        </MD3Card>
+          </MD3Card>
+        </motion.div>
 
-        <MD3Card variant="elevated">
+        <motion.div variants={itemVariants}>
+          <MD3Card variant="elevated">
           <MD3CardContent>
             <div className="flex items-center justify-between mb-3">
               <span className="md3-label-large text-[var(--md-sys-color-on-surface-variant)]">Total Value</span>
@@ -195,8 +210,9 @@ export default function Dashboard() {
               Active + completed
             </p>
           </MD3CardContent>
-        </MD3Card>
-      </div>
+          </MD3Card>
+        </motion.div>
+      </motion.div>
 
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Recent Contracts */}
@@ -232,10 +248,22 @@ export default function Dashboard() {
                 </Link>
               </div>
             ) : (
-              <div className="space-y-2">
-                {contracts.map((contract) => (
-                  <Link key={contract.id} href={`/dashboard/contracts/${contract.id}`}>
-                    <div className="flex items-center justify-between p-4 rounded-[var(--md-sys-shape-large)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors cursor-pointer group">
+              <motion.div
+                variants={containerVariants}
+                initial={reduceMotion ? false : "hidden"}
+                animate="visible"
+                className="space-y-2"
+              >
+                <AnimatePresence initial={!reduceMotion}>
+                  {contracts.map((contract) => (
+                    <Link key={contract.id} href={`/dashboard/contracts/${contract.id}`}>
+                      <motion.div
+                        variants={itemVariants}
+                        initial={reduceMotion ? false : "hidden"}
+                        animate="visible"
+                        exit={reduceMotion ? undefined : { opacity: 0, y: -8, transition: { duration: 0.2, ease: [0.32, 0.72, 0, 1] } }}
+                        className="flex items-center justify-between p-4 rounded-[var(--md-sys-shape-large)] hover:bg-[var(--md-sys-color-surface-container-high)] transition-colors cursor-pointer group"
+                      >
                       <div className="flex items-center gap-4 flex-1 min-w-0">
                         <div className="h-10 w-10 rounded-[var(--md-sys-shape-medium)] bg-[var(--md-sys-color-primary-container)] flex items-center justify-center shrink-0">
                           <FileText className="h-5 w-5 text-[var(--md-sys-color-on-primary-container)]" />
@@ -255,10 +283,11 @@ export default function Dashboard() {
                         </div>
                       </div>
                       <ArrowRight className="h-4 w-4 text-[var(--md-sys-color-on-surface-variant)] opacity-0 group-hover:opacity-100 transition-opacity shrink-0 ml-2" />
-                    </div>
-                  </Link>
-                ))}
-              </div>
+                      </motion.div>
+                    </Link>
+                  ))}
+                </AnimatePresence>
+              </motion.div>
             )}
           </MD3CardContent>
         </MD3Card>

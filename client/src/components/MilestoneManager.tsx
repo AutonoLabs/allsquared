@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { trpc } from "@/lib/trpc";
+import { containerVariants, itemVariants } from "@/lib/motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -21,6 +22,7 @@ import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 import { FileUpload } from "@/components/FileUpload";
 import { FileList } from "@/components/FileList";
+import { motion, useReducedMotion } from "framer-motion";
 
 interface MilestoneManagerProps {
   contractId: string;
@@ -29,6 +31,7 @@ interface MilestoneManagerProps {
 
 export default function MilestoneManager({ contractId, userRole }: MilestoneManagerProps) {
   const { data: milestones = [], refetch } = trpc.milestones.list.useQuery({ contractId });
+  const reduceMotion = useReducedMotion();
   const [submitDialogOpen, setSubmitDialogOpen] = useState(false);
   const [selectedMilestone, setSelectedMilestone] = useState<string | null>(null);
   const [submissionNotes, setSubmissionNotes] = useState("");
@@ -124,9 +127,15 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
       </Card>
 
       {/* Milestone List */}
-      <div className="space-y-4">
+      <motion.div
+        variants={containerVariants}
+        initial={reduceMotion ? false : "hidden"}
+        animate="visible"
+        className="space-y-4"
+      >
         {milestones.map((milestone: any, index: number) => (
-          <Card key={milestone.id} className={milestone.status === "submitted" ? "border-blue-500" : ""}>
+          <motion.div key={milestone.id} variants={itemVariants}>
+            <Card className={milestone.status === "submitted" ? "border-blue-500" : ""}>
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
@@ -301,10 +310,10 @@ export default function MilestoneManager({ contractId, userRole }: MilestoneMana
                 )}
               </div>
             </CardContent>
-          </Card>
+            </Card>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 }
-

@@ -616,6 +616,35 @@
     font-weight: 400;
   }
 
+  .as25-nav-link {
+    position: relative;
+  }
+
+  .as25-nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -0.35rem;
+    height: 2px;
+    border-radius: 999px;
+    background: #7331df;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 220ms cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  .as25-nav-link:hover::after,
+  .as25-nav-link:focus-visible::after {
+    transform: scaleX(1);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .as25-nav-link::after {
+      transition: none;
+    }
+  }
+
   .as25-hero-bg {
     position: relative;
     isolation: isolate;

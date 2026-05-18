@@ -4,19 +4,24 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Link } from "wouter";
 import { Plus, Search, FileText, ArrowRight, Calendar, Banknote, Tag } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+
+const statusTabs = [
+  { label: "All", value: undefined },
+  { label: "Draft", value: "draft" },
+  { label: "Pending", value: "pending_signature" },
+  { label: "Active", value: "active" },
+  { label: "Completed", value: "completed" },
+  { label: "Disputed", value: "disputed" },
+  { label: "Cancelled", value: "cancelled" },
+] as const;
 
 export default function Contracts() {
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
   const [searchQuery, setSearchQuery] = useState("");
+  const reduceMotion = useReducedMotion();
 
   const { data, isLoading } = trpc.contracts.list.useQuery({
     status: statusFilter as any,
@@ -95,7 +100,34 @@ export default function Contracts() {
       {/* Filters */}
       <Card className="border-0 shadow-sm">
         <CardContent className="pt-6">
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-1 overflow-x-auto border-b border-border">
+              {statusTabs.map((tab) => {
+                const active = statusFilter === tab.value;
+
+                return (
+                  <button
+                    key={tab.label}
+                    type="button"
+                    onClick={() => setStatusFilter(tab.value)}
+                    className={`relative px-3 py-2 text-sm font-medium transition-colors ${
+                      active ? "text-foreground" : "text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {tab.label}
+                    {active && !reduceMotion ? (
+                      <motion.span
+                        layoutId="contracts-filter-underline"
+                        className="absolute inset-x-2 bottom-0 h-0.5 rounded-full bg-primary"
+                        transition={{ duration: 0.24, ease: [0.32, 0.72, 0, 1] }}
+                      />
+                    ) : active ? (
+                      <span className="absolute inset-x-2 bottom-0 h-0.5 rounded-full bg-primary" />
+                    ) : null}
+                  </button>
+                );
+              })}
+            </div>
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -105,20 +137,6 @@ export default function Contracts() {
                 className="pl-10"
               />
             </div>
-            <Select value={statusFilter || "all"} onValueChange={(value) => setStatusFilter(value === "all" ? undefined : value)}>
-              <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="All Statuses" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="draft">Draft</SelectItem>
-                <SelectItem value="pending_signature">Pending Signature</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="completed">Completed</SelectItem>
-                <SelectItem value="disputed">Disputed</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-              </SelectContent>
-            </Select>
           </div>
         </CardContent>
       </Card>
@@ -154,7 +172,11 @@ export default function Contracts() {
         <div className="space-y-3">
           {filteredContracts.map((contract) => (
             <Link key={contract.id} href={`/dashboard/contracts/${contract.id}`}>
-              <Card className="border-0 shadow-sm hover:shadow-md transition-all cursor-pointer group">
+              <motion.div
+                whileHover={reduceMotion ? undefined : { y: -2, boxShadow: "0 14px 30px -18px rgba(15, 23, 42, 0.45)" }}
+                transition={{ duration: 0.22, ease: [0.32, 0.72, 0, 1] }}
+              >
+                <Card className="border-0 shadow-sm transition-all cursor-pointer group">
                 <CardContent className="p-5">
                   <div className="flex items-start gap-4">
                     <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
@@ -194,7 +216,8 @@ export default function Contracts() {
                     <ArrowRight className="h-5 w-5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-2" />
                   </div>
                 </CardContent>
-              </Card>
+                </Card>
+              </motion.div>
             </Link>
           ))}
         </div>

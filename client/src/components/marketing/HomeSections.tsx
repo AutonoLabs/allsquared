@@ -14,6 +14,8 @@ import {
 } from "@/components/marketing/homeContent";
 import { MarketingCtaButton, MarketingLinkButton } from "@/components/marketing/MarketingCtas";
 import { SectionHeading } from "@/components/marketing/SectionHeading";
+import { containerVariants, itemVariants } from "@/lib/motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 type SectionProps = {
   onGetStarted: () => void;
@@ -27,39 +29,55 @@ function matrixCellClass(value: string, isUs = false) {
 }
 
 export function HeroSection({ onGetStarted }: SectionProps) {
+  const reduceMotion = useReducedMotion();
+
   return (
     <section className="as25-hero-bg relative overflow-hidden border-b border-[#c7d0e0] py-20 md:py-24">
       <div className={marketingShell}>
         <div className="relative z-10 grid gap-14 lg:grid-cols-[1.05fr_1fr] lg:items-start">
-          <div>
-            <div className="as25-font-mono inline-flex items-center gap-2 rounded-full border border-[#e2e0d6] bg-white px-4 py-2 text-[11px] uppercase tracking-[0.16em] text-[#2d466f]">
+          <motion.div
+            variants={containerVariants}
+            initial={reduceMotion ? false : "hidden"}
+            animate="visible"
+          >
+            <motion.div
+              variants={itemVariants}
+              className="as25-font-mono inline-flex items-center gap-2 rounded-full border border-[#e2e0d6] bg-white px-4 py-2 text-[11px] uppercase tracking-[0.16em] text-[#2d466f]"
+            >
               <span className="inline-flex h-[7px] w-[7px] rounded-full bg-[#2a8554] shadow-[0_0_0_3px_rgba(229,241,234,1)]" />
               FCA-authorised escrow · SRA-regulated solicitor network
-            </div>
+            </motion.div>
 
             <h1 className="as25-font-display mt-8 max-w-[760px] text-[44px] font-normal leading-[1.02] tracking-[-0.03em] text-[#0b1b33] md:text-[78px]">
-              Weeks of work. Months of <span className="italic text-[#2d466f]">chasing.</span>
-              <span
+              <motion.span variants={itemVariants} className="block">
+                Weeks of work.
+              </motion.span>
+              <motion.span variants={itemVariants} className="block">
+                Months of <span className="italic text-[#2d466f]">chasing.</span>
+              </motion.span>
+              <motion.span
+                variants={itemVariants}
                 className="as25-caret ml-1 inline-block h-[0.85em] w-[0.5ch] translate-y-[0.06em] rounded-[1px] bg-[#2a8554]"
                 aria-hidden="true"
               />
             </h1>
 
-            <p className="mt-7 max-w-[560px] text-[18px] leading-8 text-[#2d466f]">
+            <motion.p variants={itemVariants} className="mt-7 max-w-[560px] text-[18px] leading-8 text-[#2d466f]">
               It&apos;s the 21st century. A serious tradesman, a serious agency, a serious producer
               - none of them should still be writing{" "}
               <strong className="font-semibold text-[#0b1b33]">careful reminder emails</strong> to
               get paid what they&apos;re owed.
-            </p>
+            </motion.p>
 
-            <ul className="mt-10 flex max-w-[560px] flex-col gap-4 border-y border-[#c7d0e0] py-6">
+            <motion.ul variants={containerVariants} className="mt-10 flex max-w-[560px] flex-col gap-4 border-y border-[#c7d0e0] py-6">
               {[
                 ["i.", "FCA-authorised escrow for every deal", "£5K - £1m+"],
                 ["ii.", "AI-drafted, solicitor-certified contracts", "Ready in minutes"],
                 ["iii.", "Instant payouts on milestone proof", "Not reminders"],
               ].map(([index, label, amount]) => (
-                <li
+                <motion.li
                   key={label}
+                  variants={itemVariants}
                   className="grid grid-cols-[28px_1fr_auto] items-baseline gap-4 text-[15.5px] leading-7 text-[#0b1b33]"
                 >
                   <span className="as25-font-mono text-[11px] tracking-[0.1em] text-[#6b7e9e]">
@@ -69,24 +87,24 @@ export function HeroSection({ onGetStarted }: SectionProps) {
                   <span className="as25-font-mono text-[12px] font-medium tracking-[0.05em] text-[#1f6b3f]">
                     {amount}
                   </span>
-                </li>
+                </motion.li>
               ))}
-            </ul>
+            </motion.ul>
 
-            <div className="mt-9 flex flex-wrap gap-3">
+            <motion.div variants={itemVariants} className="mt-9 flex flex-wrap gap-3">
               <MarketingCtaButton onClick={onGetStarted}>Draft my first contract</MarketingCtaButton>
               <MarketingLinkButton href="#how">See how it works</MarketingLinkButton>
-            </div>
+            </motion.div>
 
-            <div className="mt-10 flex flex-wrap gap-4 text-[10.5px] uppercase tracking-[0.12em] text-[#2d466f]">
+            <motion.div variants={itemVariants} className="mt-10 flex flex-wrap gap-4 text-[10.5px] uppercase tracking-[0.12em] text-[#2d466f]">
               {["FCA-regulated escrow", "SRA-regulated solicitor network", "UK client-money rules"].map((item) => (
                 <span key={item} className="as25-font-mono inline-flex items-center gap-2">
                   <span className="h-[6px] w-[6px] rounded-full bg-[#2a8554]" />
                   {item}
                 </span>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           <aside className="rounded-[14px] border border-[#e2e0d6] bg-white p-7 shadow-[0_1px_0_#e2e0d6,0_24px_48px_-16px_rgba(11,27,51,0.12),0_8px_16px_-8px_rgba(11,27,51,0.06)]">
             <div className="relative">
@@ -258,6 +276,8 @@ export function ProblemSection() {
 }
 
 export function HowItWorksSection() {
+  const reduceMotion = useReducedMotion();
+
   return (
     <section id="how" className="border-b border-[#c7d0e0] bg-[#fafaf7] py-24 md:py-32">
       <div className={marketingShell}>
@@ -269,14 +289,21 @@ export function HowItWorksSection() {
           description="Draft the agreement. Fund it into regulated escrow. Verify each milestone with proof, not promise. Release the money the same day. Repeat until the job is done."
         />
 
-        <div className="mt-14 grid border-y border-[#c7d0e0] md:grid-cols-2 xl:grid-cols-4">
+        <motion.div
+          variants={containerVariants}
+          initial={reduceMotion ? false : "hidden"}
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+          className="mt-14 grid border-y border-[#c7d0e0] md:grid-cols-2 xl:grid-cols-4"
+        >
           {steps.map((step, index) => {
             const Icon = step.icon;
             const parts = step.title.split(step.accent);
 
             return (
-              <article
+              <motion.article
                 key={step.number}
+                variants={itemVariants}
                 className={`flex flex-col gap-4 bg-[#fafaf7] px-7 py-10 ${
                   index < steps.length - 1 ? "border-b border-[#c7d0e0] xl:border-b-0 xl:border-r" : ""
                 } ${index === 1 ? "md:border-r-0 xl:border-r" : ""}`}
@@ -294,10 +321,10 @@ export function HowItWorksSection() {
                   {parts[1] ?? ""}
                 </h3>
                 <p className="text-[14.5px] leading-7 text-[#2d466f]">{step.body}</p>
-              </article>
+              </motion.article>
             );
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

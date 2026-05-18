@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
 
 type MarketingCtaButtonProps = {
@@ -12,10 +13,15 @@ export function MarketingCtaButton({
   primary = true,
   onClick,
 }: MarketingCtaButtonProps) {
+  const reduceMotion = useReducedMotion();
+
   return (
-    <button
+    <motion.button
       type="button"
       onClick={onClick}
+      whileHover={reduceMotion ? undefined : { scale: 1.02 }}
+      whileTap={reduceMotion ? undefined : { scale: 0.97 }}
+      transition={{ duration: 0.2, ease: [0.32, 0.72, 0, 1] }}
       className={
         primary
           ? "inline-flex items-center gap-2 rounded-[8px] border border-[#1f6b3f] bg-[#1f6b3f] px-6 py-3 text-[14.5px] font-semibold text-white transition hover:bg-[#2a8554] hover:border-[#2a8554]"
@@ -24,7 +30,7 @@ export function MarketingCtaButton({
     >
       {children}
       <ArrowRight className="h-4 w-4" />
-    </button>
+    </motion.button>
   );
 }
 

@@ -8,7 +8,7 @@
  */
 import { useState, useCallback } from "react";
 import { useLocation } from "wouter";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -66,12 +66,12 @@ const STEPS = [
 // ─── Slide animation ──────────────────────────────────────────────────────────
 
 const variants = {
-  enter: (dir: number) => ({ x: dir > 0 ? 500 : -500, opacity: 0 }),
+  enter: (dir: number) => ({ x: dir > 0 ? 40 : -40, opacity: 0 }),
   center: { x: 0, opacity: 1 },
-  exit: (dir: number) => ({ x: dir < 0 ? 500 : -500, opacity: 0 }),
+  exit: (dir: number) => ({ x: dir < 0 ? 40 : -40, opacity: 0 }),
 };
 
-const transition = { type: "spring" as const, stiffness: 300, damping: 35 };
+const transition = { duration: 0.45, ease: [0.32, 0.72, 0, 1] as const };
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -152,6 +152,7 @@ ${varList || "Details to be completed."}
 
 export default function NewContractTypeform() {
   const [, navigate] = useLocation();
+  const reduceMotion = useReducedMotion();
   const [step, setStep] = useState(0);
   const [dir, setDir] = useState(1);
   const [chatOpen, setChatOpen] = useState(false);
@@ -546,9 +547,9 @@ export default function NewContractTypeform() {
             key={step}
             custom={dir}
             variants={variants}
-            initial="enter"
+            initial={reduceMotion ? false : "enter"}
             animate="center"
-            exit="exit"
+            exit={reduceMotion ? undefined : "exit"}
             transition={transition}
           >
             {renderStep()}

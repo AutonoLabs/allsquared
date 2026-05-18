@@ -3,6 +3,7 @@ import { MarketingPageHero } from "@/components/marketing/MarketingPageHero";
 import { MarketingSection } from "@/components/marketing/MarketingSection";
 import { faqs, legalServices, pricingPlans } from "@/components/marketing/homeContent";
 import { useMarketingCta } from "@/hooks/useMarketingCta";
+import { motion, useReducedMotion } from "framer-motion";
 
 const pricingFaqs = faqs.filter((faq) =>
   [
@@ -14,6 +15,7 @@ const pricingFaqs = faqs.filter((faq) =>
 
 export default function Pricing() {
   const { handleGetStarted } = useMarketingCta();
+  const reduceMotion = useReducedMotion();
 
   return (
     <div className="overflow-hidden bg-[#fafaf7] text-[#0b1b33]">
@@ -41,8 +43,10 @@ export default function Pricing() {
       >
         <div className="mt-14 grid gap-5 xl:grid-cols-3">
           {pricingPlans.map((plan) => (
-            <article
+            <motion.article
               key={plan.name}
+              whileHover={reduceMotion ? undefined : { y: -4, boxShadow: "0 18px 40px -20px rgba(11, 27, 51, 0.28)" }}
+              transition={{ duration: 0.24, ease: [0.32, 0.72, 0, 1] }}
               className={`relative flex flex-col rounded-[14px] border bg-white p-8 ${
                 plan.featured
                   ? "border-[#1f6b3f] bg-[linear-gradient(180deg,rgba(31,107,63,0.05),transparent_45%)]"
@@ -50,9 +54,13 @@ export default function Pricing() {
               }`}
             >
               {plan.featured ? (
-                <div className="as25-font-mono absolute right-5 top-0 rounded-b-[8px] bg-[#0b1b33] px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-white">
+                <motion.div
+                  animate={reduceMotion ? undefined : { opacity: [1, 0.72, 1] }}
+                  transition={{ duration: 2.4, repeat: Infinity, ease: [0.32, 0.72, 0, 1] }}
+                  className="as25-font-mono absolute right-5 top-0 rounded-b-[8px] bg-[#0b1b33] px-3 py-1 text-[10px] uppercase tracking-[0.16em] text-white"
+                >
                   Most chosen
-                </div>
+                </motion.div>
               ) : null}
 
               <div className="as25-font-display text-[24px] font-normal text-[#0b1b33]">{plan.name}</div>
@@ -69,7 +77,7 @@ export default function Pricing() {
                   </li>
                 ))}
               </ul>
-            </article>
+            </motion.article>
           ))}
         </div>
 

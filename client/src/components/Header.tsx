@@ -5,11 +5,13 @@ import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
 import { useUser } from "@clerk/react";
 import { hasClerkPublishableKey, UserButton } from "@/lib/clerk";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [location] = useLocation();
+  const reduceMotion = useReducedMotion();
   const clerkUser = hasClerkPublishableKey ? useUser() : { isSignedIn: false };
   const { isSignedIn } = clerkUser;
 
@@ -42,7 +44,7 @@ export default function Header() {
             <Link
               key={item.name}
               href={item.href}
-              className="as25-font-body text-[14px] font-medium text-[#2d466f] transition-colors hover:text-[#0b1b33]"
+              className="as25-nav-link as25-font-body text-[14px] font-medium text-[#2d466f] transition-colors hover:text-[#0b1b33]"
             >
               {item.name}
             </Link>
@@ -99,8 +101,15 @@ export default function Header() {
         </button>
       </nav>
 
-      {mobileMenuOpen && (
-        <div className="border-t border-[#c7d0e0] bg-[#fafaf7]/95 backdrop-blur-xl md:hidden">
+      <AnimatePresence initial={false}>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={reduceMotion ? false : { height: 0, opacity: 0, y: -8 }}
+            animate={{ height: "auto", opacity: 1, y: 0 }}
+            exit={reduceMotion ? undefined : { height: 0, opacity: 0, y: -8 }}
+            transition={{ duration: 0.28, ease: [0.32, 0.72, 0, 1] }}
+            className="overflow-hidden border-t border-[#c7d0e0] bg-[#fafaf7]/95 backdrop-blur-xl md:hidden"
+          >
           <div className="space-y-1 px-5 py-4">
             {navigation.map((item) => (
               <Link
@@ -138,8 +147,9 @@ export default function Header() {
               )}
             </div>
           </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
