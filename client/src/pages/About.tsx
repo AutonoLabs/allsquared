@@ -25,7 +25,7 @@ export default function About() {
   return (
     <div className="overflow-hidden bg-[#fafaf7] text-[#0b1b33]">
       <MarketingPageHero
-        badge="Built in London for serious UK project work"
+        badge="UK based with a global team"
         kicker="About"
         title="We are building the version of getting paid that should already exist."
         accent="should already exist."
@@ -34,8 +34,8 @@ export default function About() {
         secondaryAction={{ label: "Contact the team", onClick: () => goToPath("/contact"), primary: false }}
         highlights={[
           "Contract, escrow, proof, dispute",
-          "UK-focused commercial flow",
-          "Designed for higher-value project work",
+          "UK-based commercial flow",
+          "Global team, distributed builders",
         ]}
       />
 

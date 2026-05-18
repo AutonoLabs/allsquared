@@ -12,7 +12,7 @@ export default function Footer() {
             <AllSquaredWordmark />
             <p className="max-w-[320px] text-sm leading-6 text-[#2d466f]">
               One platform for the contract, the escrow, the verified payments, and the dispute safety
-              net. Built in London for serious UK professionals moving serious money.
+              net. UK based with a global team, built for serious professionals moving serious money.
             </p>
           </div>
 
@@ -27,13 +27,18 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/features" className="transition-colors hover:text-[#0b1b33]">
-                  Features
+                <Link href="/projects" className="transition-colors hover:text-[#0b1b33]">
+                  Projects
                 </Link>
               </li>
               <li>
-                <Link href="/legal-services" className="transition-colors hover:text-[#0b1b33]">
-                  Legal Services
+                <Link href="/blog" className="transition-colors hover:text-[#0b1b33]">
+                  Journal
+                </Link>
+              </li>
+              <li>
+                <Link href="/features" className="transition-colors hover:text-[#0b1b33]">
+                  Features
                 </Link>
               </li>
               <li>

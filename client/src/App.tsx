@@ -31,6 +31,8 @@ const Home = lazyRetry(() => import("./pages/Home"));
 const HowItWorks = lazyRetry(() => import("./pages/HowItWorks"));
 const Features = lazyRetry(() => import("./pages/Features"));
 const Pricing = lazyRetry(() => import("./pages/Pricing"));
+const Projects = lazyRetry(() => import("./pages/Projects"));
+const Blog = lazyRetry(() => import("./pages/Blog"));
 const About = lazyRetry(() => import("./pages/About"));
 const Contact = lazyRetry(() => import("./pages/Contact"));
 const Terms = lazyRetry(() => import("./pages/Terms"));
@@ -230,6 +232,8 @@ function Router() {
                   <Route path={"/"} component={Home} />
                   <Route path={"/how-it-works"} component={HowItWorks} />
                   <Route path={"/features"} component={Features} />
+                  <Route path={"/projects"} component={Projects} />
+                  <Route path={"/blog"} component={Blog} />
                   <Route path={"/pricing"} component={Pricing} />
                   <Route path={"/sign-in"}>
                     <AuthPage mode="sign-in" />
