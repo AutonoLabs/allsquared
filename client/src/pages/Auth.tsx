@@ -2,6 +2,8 @@ import { AllSquaredWordmark } from "@/components/marketing/AllSquaredWordmark";
 import { Button } from "@/components/ui/button";
 import { hasClerkPublishableKey, SignIn, SignUp } from "@/lib/clerk";
 import { Link } from "wouter";
+import { ClerkLoading, ClerkLoaded } from "@clerk/clerk-react";
+import { PageSpinner } from "@/components/spinner";
 
 type AuthPageProps = {
   mode: "sign-in" | "sign-up";
@@ -55,47 +57,54 @@ export default function AuthPage({ mode }: AuthPageProps) {
         </div>
 
         <div className="rounded-[24px] border border-[#c7d0e0] bg-white p-4 shadow-[0_18px_60px_rgba(11,27,51,0.12)] md:p-6">
-          {!hasClerkPublishableKey ? (
-            <div className="space-y-4 p-4 text-[#0b1b33]">
-              <p className="as25-font-mono text-xs font-semibold uppercase tracking-[0.18em] text-[#b45309]">
-                Auth configuration missing
-              </p>
-              <h2 className="as25-font-display text-3xl font-normal tracking-[-0.04em]">
-                Clerk is not configured for this environment.
-              </h2>
-              <p className="text-sm leading-6 text-[#2d466f]">
-                Set `VITE_CLERK_PUBLISHABLE_KEY` before testing sign-up or sign-in. The app now shows this state instead of hanging on a blank screen.
-              </p>
+          <ClerkLoading>
+            <div className="flex items-center justify-center py-12">
+              <PageSpinner />
             </div>
-          ) : isSignUp ? (
-            <SignUp
-              routing="hash"
-              signInUrl="/sign-in"
-              fallbackRedirectUrl={redirectPath}
-              appearance={{
-                elements: {
-                  rootBox: "w-full",
-                  card: "w-full shadow-none border-0 bg-transparent",
-                  socialButtonsBlockButton__github: { display: "none" },
-                  socialButtonsIconButton__github: { display: "none" },
-                },
-              }}
-            />
-          ) : (
-            <SignIn
-              routing="hash"
-              signUpUrl={`/sign-up?redirect=${encodeURIComponent(redirectPath)}`}
-              fallbackRedirectUrl={redirectPath}
-              appearance={{
-                elements: {
-                  rootBox: "w-full",
-                  card: "w-full shadow-none border-0 bg-transparent",
-                  socialButtonsBlockButton__github: { display: "none" },
-                  socialButtonsIconButton__github: { display: "none" },
-                },
-              }}
-            />
-          )}
+          </ClerkLoading>
+          <ClerkLoaded>
+            {!hasClerkPublishableKey ? (
+              <div className="space-y-4 p-4 text-[#0b1b33]">
+                <p className="as25-font-mono text-xs font-semibold uppercase tracking-[0.18em] text-[#b45309]">
+                  Auth configuration missing
+                </p>
+                <h2 className="as25-font-display text-3xl font-normal tracking-[-0.04em]">
+                  Clerk is not configured for this environment.
+                </h2>
+                <p className="text-sm leading-6 text-[#2d466f]">
+                  Set `VITE_CLERK_PUBLISHABLE_KEY` before testing sign-up or sign-in. The app now shows this state instead of hanging on a blank screen.
+                </p>
+              </div>
+            ) : isSignUp ? (
+              <SignUp
+                routing="hash"
+                signInUrl="/sign-in"
+                fallbackRedirectUrl={redirectPath}
+                appearance={{
+                  elements: {
+                    rootBox: "w-full",
+                    card: "w-full shadow-none border-0 bg-transparent",
+                    socialButtonsBlockButton__github: { display: "none" },
+                    socialButtonsIconButton__github: { display: "none" },
+                  },
+                }}
+              />
+            ) : (
+              <SignIn
+                routing="hash"
+                signUpUrl={`/sign-up?redirect=${encodeURIComponent(redirectPath)}`}
+                fallbackRedirectUrl={redirectPath}
+                appearance={{
+                  elements: {
+                    rootBox: "w-full",
+                    card: "w-full shadow-none border-0 bg-transparent",
+                    socialButtonsBlockButton__github: { display: "none" },
+                    socialButtonsIconButton__github: { display: "none" },
+                  },
+                }}
+              />
+            )}
+          </ClerkLoaded>
         </div>
       </div>
     </section>
