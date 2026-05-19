@@ -16,7 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2, FileText, Check, X } from "lucide-react";
+import { ArrowLeft, Loader2, FileText, Check, X, Bot } from "lucide-react";
+import { ContractChatbot } from "@/components/contract-builder/ContractChatbot";
 
 const CONTRACT_CATEGORIES = [
   { value: "freelance", label: "Freelance Services", description: "Web design, writing, consulting, etc." },
@@ -48,6 +49,7 @@ export default function NewContract() {
     endDate: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showChat, setShowChat] = useState(false);
 
   const { data: templates, isLoading: templatesLoading } = trpc.templates.list.useQuery({});
 
@@ -173,6 +175,18 @@ export default function NewContract() {
     { label: "Financial & Timeline", completed: false },
   ];
 
+  const assistantContractMarkdown = `# ${formData.title || "Draft Contract"}
+
+Category: ${formData.category ? getCategoryLabel(formData.category) : "Not selected"}
+Template: ${selectedTemplate?.name || "None"}
+Service provider email: ${formData.providerEmail || "Not provided"}
+Total amount: ${formData.totalAmount ? `£${formData.totalAmount}` : "Not set"}
+Start date: ${formData.startDate || "Not set"}
+End date: ${formData.endDate || "Not set"}
+
+## Service description
+${formData.description || "Not yet provided"}`;
+
   return (
     <div className="max-w-3xl mx-auto py-8 px-2">
       {/* Header */}
@@ -194,14 +208,27 @@ export default function NewContract() {
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </Button>
-        <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Create New Contract</h1>
-        <p className="text-muted-foreground mt-1">
-          {step === 0
-            ? "Choose a template or start from scratch"
-            : step === 1
-            ? "Describe the service and choose a category"
-            : "Set the contract value and timeline"}
-        </p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">Create New Contract</h1>
+            <p className="text-muted-foreground mt-1">
+              {step === 0
+                ? "Choose a template or start from scratch"
+                : step === 1
+                ? "Describe the service and choose a category"
+                : "Set the contract value and timeline"}
+            </p>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setShowChat(true)}
+            className="self-start border-primary/30 text-primary hover:bg-primary/5"
+          >
+            <Bot className="mr-2 h-4 w-4" />
+            AI Assistant
+          </Button>
+        </div>
       </div>
 
       {/* Progress Steps */}
@@ -544,6 +571,12 @@ export default function NewContract() {
           </Card>
         )}
       </form>
+
+      <ContractChatbot
+        contractMarkdown={assistantContractMarkdown}
+        open={showChat}
+        onOpenChange={setShowChat}
+      />
     </div>
   );
 }

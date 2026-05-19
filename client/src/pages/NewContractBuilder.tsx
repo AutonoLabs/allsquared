@@ -215,7 +215,7 @@ export default function NewContractBuilder() {
     { role: "assistant", content: "Hi! I'm here to help you build your contract. Let's start with the parties involved. Who is Party A (you or your company)?" },
   ]);
   const [chatInput, setChatInput] = useState("");
-  const [showChat, setShowChat] = useState(true);
+  const [showChat, setShowChat] = useState(false);
   const [chatLoading, setChatLoading] = useState(false);
   const [chatModel, setChatModel] = useState<ChatbotModelId>(DEFAULT_CHATBOT_MODEL);
   const [showModelPicker, setShowModelPicker] = useState(false);
@@ -959,7 +959,7 @@ export default function NewContractBuilder() {
         </div>
       )}
 
-      {renderChatPanel()}
+      {showChat && renderChatPanel()}
     </div>
   );
 }

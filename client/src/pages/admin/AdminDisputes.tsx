@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronLeft, ChevronRight, Eye, CheckCircle } from "lucide-react";
+import { Bot, ChevronLeft, ChevronRight, Eye, CheckCircle, MessageSquare } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 
@@ -276,6 +276,46 @@ export default function AdminDisputes() {
                   </p>
                 </div>
               </div>
+
+              {disputeDetail.analyses?.[0] && (
+                <div className="rounded-md border bg-blue-50/60 p-3 dark:bg-blue-950/20">
+                  <p className="mb-2 flex items-center gap-2 text-sm font-medium"><Bot className="h-4 w-4" /> AI Judge Brief</p>
+                  <div className="grid gap-2 text-xs sm:grid-cols-3">
+                    <div><span className="text-muted-foreground">Action:</span> {disputeDetail.analyses[0].recommendedAction}</div>
+                    <div><span className="text-muted-foreground">Confidence:</span> {disputeDetail.analyses[0].confidence}</div>
+                    <div><span className="text-muted-foreground">Model:</span> {disputeDetail.analyses[0].aiModel || "AI"}</div>
+                  </div>
+                  <p className="mt-2 text-sm leading-relaxed">{disputeDetail.analyses[0].contractSummary}</p>
+                </div>
+              )}
+
+              {disputeDetail.mediation?.length > 0 && (
+                <div>
+                  <p className="mb-2 flex items-center gap-2 text-sm font-medium"><MessageSquare className="h-4 w-4" /> Evidence / mediation exchange</p>
+                  <div className="max-h-56 space-y-2 overflow-y-auto rounded-md border p-2">
+                    {disputeDetail.mediation.map((entry) => (
+                      <div key={entry.id} className="rounded-md bg-muted p-2 text-sm">
+                        <div className="mb-1 text-xs font-medium uppercase text-muted-foreground">Round {entry.round} · {entry.role}</div>
+                        {entry.message}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {disputeDetail.settlements?.length > 0 && (
+                <div>
+                  <p className="mb-2 text-sm font-medium">Settlement proposals</p>
+                  <div className="space-y-2">
+                    {disputeDetail.settlements.map((settlement) => (
+                      <div key={settlement.id} className="rounded-md border p-2 text-sm">
+                        <p>{settlement.description}</p>
+                        <p className="mt-1 text-xs text-muted-foreground">Status: {settlement.status}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {disputeDetail.dispute.resolution && (
                 <div>

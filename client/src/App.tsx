@@ -33,6 +33,7 @@ const Features = lazyRetry(() => import("./pages/Features"));
 const Pricing = lazyRetry(() => import("./pages/Pricing"));
 const About = lazyRetry(() => import("./pages/About"));
 const Contact = lazyRetry(() => import("./pages/Contact"));
+const Blog = lazyRetry(() => import("./pages/Blog"));
 const Terms = lazyRetry(() => import("./pages/Terms"));
 const Privacy = lazyRetry(() => import("./pages/Privacy"));
 const CookiePolicy = lazyRetry(() => import("./pages/CookiePolicy"));
@@ -46,6 +47,7 @@ const Contracts = lazyRetry(() => import("./pages/Contracts"));
 const NewContractTypeform = lazyRetry(() => import("./pages/NewContractTypeform"));
 const NewContractBuilder = lazyRetry(() => import("./pages/NewContractBuilder"));
 const ContractDetail = lazyRetry(() => import("./pages/ContractDetail"));
+const DisputeDetail = lazyRetry(() => import("./pages/DisputeDetail"));
 const Templates = lazyRetry(() => import("./pages/Templates"));
 const TemplateEditor = lazyRetry(() => import("./pages/TemplateEditor"));
 const Profile = lazyRetry(() => import("./pages/Profile"));
@@ -152,6 +154,13 @@ function Router() {
             </ErrorBoundary>
           </DashboardLayout>
         </Route>
+        <Route path="/dashboard/disputes/:id">
+          <DashboardLayout>
+            <ErrorBoundary>
+              <DisputeDetail />
+            </ErrorBoundary>
+          </DashboardLayout>
+        </Route>
         <Route path="/dashboard/templates">
           <DashboardLayout>
             <Templates />
@@ -238,6 +247,7 @@ function Router() {
                     <AuthPage mode="sign-up" />
                   </Route>
                   <Route path={"/about"} component={About} />
+                  <Route path={"/blog"} component={Blog} />
                   <Route path={"/contact"} component={Contact} />
                   <Route path={"/terms"} component={Terms} />
                   <Route path={"/privacy"} component={Privacy} />

@@ -10,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import {
   ArrowLeft,
@@ -18,6 +19,7 @@ import {
   Users,
   CheckCircle2,
   AlertCircle,
+  Gavel,
   Send,
   Edit,
   Trash2,
@@ -45,6 +47,9 @@ export default function ContractDetail() {
   const contractId = params?.id || "";
   const [signatureName, setSignatureName] = useState("");
   const [isSignDialogOpen, setIsSignDialogOpen] = useState(false);
+  const [isDisputeDialogOpen, setIsDisputeDialogOpen] = useState(false);
+  const [disputeReason, setDisputeReason] = useState("");
+  const [disputeEvidence, setDisputeEvidence] = useState("");
 
   const utils = trpc.useUtils();
   const { data: currentUser } = trpc.auth.me.useQuery();
@@ -81,6 +86,20 @@ export default function ContractDetail() {
       toast.error(error.message || "Failed to delete contract");
     },
   });
+  const fileDisputeMutation = trpc.disputes.file.useMutation({
+    onSuccess: (data) => {
+      toast.success("Dispute filed. The other party has been notified.");
+      utils.contracts.get.invalidate({ id: contractId });
+      setIsDisputeDialogOpen(false);
+      setDisputeReason("");
+      setDisputeEvidence("");
+      setLocation(`/dashboard/disputes/${data.disputeId}`);
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to file dispute");
+    },
+  });
+
 
   if (isLoading) {
     return (
@@ -322,6 +341,61 @@ export default function ContractDetail() {
                         disabled={!signatureName || signMutation.isPending}
                       >
                         Sign Contract
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
+              )}
+              {contract.status !== "draft" && contract.status !== "cancelled" && contract.status !== "completed" && (
+                <Dialog open={isDisputeDialogOpen} onOpenChange={setIsDisputeDialogOpen}>
+                  <DialogTrigger asChild>
+                    <Button variant="outline" className="w-full border-amber-300 text-amber-700 hover:bg-amber-50">
+                      <Gavel className="mr-2 h-4 w-4" />
+                      File a Dispute
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>File a dispute</DialogTitle>
+                      <DialogDescription>
+                        Explain the issue clearly. AllSquared will open an evidence-exchange and mediation flow.
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="disputeReason">What happened?</Label>
+                        <Textarea
+                          id="disputeReason"
+                          value={disputeReason}
+                          onChange={(e) => setDisputeReason(e.target.value)}
+                          placeholder="Describe the breach, non-payment, delivery issue, or milestone disagreement..."
+                          className="min-h-28"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="disputeEvidence">Evidence links or notes</Label>
+                        <Textarea
+                          id="disputeEvidence"
+                          value={disputeEvidence}
+                          onChange={(e) => setDisputeEvidence(e.target.value)}
+                          placeholder="One item per line: invoice links, screenshots, email summaries, delivery proofs..."
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-3">
+                      <Button variant="outline" className="flex-1" onClick={() => setIsDisputeDialogOpen(false)}>
+                        Cancel
+                      </Button>
+                      <Button
+                        className="flex-1"
+                        onClick={() => fileDisputeMutation.mutate({
+                          contractId,
+                          reason: disputeReason,
+                          evidence: disputeEvidence.split("\n").map((line) => line.trim()).filter(Boolean),
+                        })}
+                        disabled={disputeReason.trim().length < 10 || fileDisputeMutation.isPending}
+                      >
+                        {fileDisputeMutation.isPending ? "Filing..." : "Open Dispute"}
                       </Button>
                     </div>
                   </DialogContent>

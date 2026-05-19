@@ -5,6 +5,9 @@ import {
   users,
   contracts,
   disputes,
+  disputeAnalyses,
+  mediationResponses,
+  settlementOptions,
   kycVerifications,
   auditLogs,
   subscriptions,
@@ -510,10 +513,31 @@ const disputesRouter = router({
         .where(eq(users.id, dispute.raisedBy))
         .limit(1);
 
+      const [analyses, mediation, settlements] = await Promise.all([
+        db
+          .select()
+          .from(disputeAnalyses)
+          .where(eq(disputeAnalyses.disputeId, input.id))
+          .orderBy(desc(disputeAnalyses.createdAt)),
+        db
+          .select()
+          .from(mediationResponses)
+          .where(eq(mediationResponses.disputeId, input.id))
+          .orderBy(mediationResponses.round, mediationResponses.createdAt),
+        db
+          .select()
+          .from(settlementOptions)
+          .where(eq(settlementOptions.disputeId, input.id))
+          .orderBy(desc(settlementOptions.createdAt)),
+      ]);
+
       return {
         dispute,
         contract,
         raisedByUser,
+        analyses,
+        mediation,
+        settlements,
       };
     }),
 

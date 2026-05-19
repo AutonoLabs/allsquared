@@ -266,6 +266,133 @@ export async function seedTemplates(db: ReturnType<typeof drizzle>) {
   console.log("[seed] Done! Seeded", TEMPLATES.length, "legal templates.");
 }
 
+// ── Seed from templates directory (YAML frontmatter) ─────────────────────
+
+interface SimpleFrontmatter {
+  title: string;
+  category: string;
+  description?: string;
+}
+
+function parseYamlFrontmatter(content: string): { frontmatter: SimpleFrontmatter; body: string } {
+  const match = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/);
+  if (!match) {
+    throw new Error(`Invalid frontmatter format`);
+  }
+  const fmRaw = match[1];
+  const body = match[2];
+  const frontmatter: Record<string, string> = {};
+  for (const line of fmRaw.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    const colonIndex = trimmed.indexOf(':');
+    if (colonIndex === -1) continue;
+    const key = trimmed.substring(0, colonIndex).trim();
+    let value = trimmed.substring(colonIndex + 1).trim();
+    // Strip quotes if present
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    frontmatter[key] = value;
+  }
+  return {
+    frontmatter: {
+      title: frontmatter.title || '',
+      category: frontmatter.category || '',
+      description: frontmatter.description || '',
+    },
+    body,
+  };
+}
+
+function extractVariableNames(content: string): string[] {
+  const regex = /{{\s*([a-zA-Z0-9_]+)\s*}}/g;
+  const vars = new Set<string>();
+  let match;
+  while ((match = regex.exec(content)) !== null) {
+    vars.add(match[1]);
+  }
+  return Array.from(vars);
+}
+
+async function seedFromTemplatesDir(db: ReturnType<typeof drizzle>) {
+  const templatesDir = path.resolve(__dirname, "../templates");
+  if (!fs.existsSync(templatesDir)) {
+    console.log("  [seed] Templates directory not found, skipping...");
+    return;
+  }
+
+  const files = fs.readdirSync(templatesDir).filter(f => f.endsWith('.md'));
+  console.log(`  [seed] Seeding ${files.length} templates from templates/ directory...`);
+
+  for (const file of files) {
+    const filePath = path.join(templatesDir, file);
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const { frontmatter, body } = parseYamlFrontmatter(content);
+    const slug = file.replace(/\.md$/, '');
+
+    const allowedCategories = ["freelance", "home_improvement", "event_services", "trade_services", "other"] as const;
+    if (!allowedCategories.includes(frontmatter.category as any)) {
+      console.warn(`  ⚠ Skipping ${file}: invalid category '${frontmatter.category}'`);
+      continue;
+    }
+
+    const variableNames = extractVariableNames(body);
+    const variables: VariableDef[] = variableNames.map(name => ({
+      name,
+      label: name.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase()),
+      type: name.toLowerCase().includes('date') ? 'date' : 'text' as const,
+      group: 'General',
+      required: false,
+    }));
+
+    const templateData = {
+      name: frontmatter.title,
+      description: frontmatter.description || '',
+      category: frontmatter.category as any,
+      templateContent: JSON.stringify({ content: frontmatter.description || '', variables: variableNames }),
+      isActive: "yes" as const,
+      variables: JSON.stringify(variables),
+      clauseBanks: JSON.stringify({}),
+      templateMarkdown: body,
+      templateSlug: slug,
+      updatedAt: new Date(),
+    };
+
+    const existing = await db
+      .select()
+      .from(contractTemplates)
+      .where(eq(contractTemplates.templateSlug, slug))
+      .limit(1);
+
+    if (existing.length > 0) {
+      await db
+        .update(contractTemplates)
+        .set(templateData)
+        .where(eq(contractTemplates.id, existing[0].id));
+      console.log(`  ✓ Updated template: ${frontmatter.title} (${slug})`);
+    } else {
+      await db.insert(contractTemplates).values({
+        id: `tmpl_${nanoid(16)}`,
+        ...templateData,
+        createdAt: new Date(),
+      });
+      console.log(`  + Created template: ${frontmatter.title} (${slug})`);
+    }
+  }
+
+  console.log(`  [seed] Templates directory seeding complete.`);
+}
+
+async function seedAllTemplates(db: ReturnType<typeof drizzle>) {
+  console.log("[seed] Seeding all contract templates...\n");
+  // Seed existing legal templates
+  await seedTemplates(db);
+  // Seed new YAML-based templates
+  await seedFromTemplatesDir(db);
+  console.log("[seed] All templates seeded!");
+}
+
 // CLI entrypoint: npx tsx server/seed-templates.ts
 const isCLI = process.argv[1] && (
   process.argv[1].endsWith('seed-templates.ts') ||
@@ -278,7 +405,7 @@ if (isCLI) {
     console.error("DATABASE_URL is required");
     process.exit(1);
   }
-  seedTemplates(drizzle(dbUrl))
+  seedAllTemplates(drizzle(dbUrl))
     .then(() => process.exit(0))
     .catch((err) => {
       console.error("Seed failed:", err);

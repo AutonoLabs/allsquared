@@ -2,8 +2,8 @@ import { AllSquaredWordmark } from "@/components/marketing/AllSquaredWordmark";
 import { Button } from "@/components/ui/button";
 import { hasClerkPublishableKey, SignIn, SignUp } from "@/lib/clerk";
 import { Link } from "wouter";
-import { ClerkLoading, ClerkLoaded } from "@clerk/clerk-react";
-import { PageSpinner } from "@/components/spinner";
+import { ClerkLoading, ClerkLoaded } from "@clerk/react";
+import { Spinner } from "@/components/ui/spinner";
 
 type AuthPageProps = {
   mode: "sign-in" | "sign-up";
@@ -59,7 +59,7 @@ export default function AuthPage({ mode }: AuthPageProps) {
         <div className="rounded-[24px] border border-[#c7d0e0] bg-white p-4 shadow-[0_18px_60px_rgba(11,27,51,0.12)] md:p-6">
           <ClerkLoading>
             <div className="flex items-center justify-center py-12">
-              <PageSpinner />
+              <Spinner className="h-8 w-8 text-[#1f6b3f]" />
             </div>
           </ClerkLoading>
           <ClerkLoaded>

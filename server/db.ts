@@ -28,6 +28,15 @@ import {
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
+function getAdminEmails(): Set<string> {
+  return new Set(
+    (process.env.ADMIN_EMAILS || "")
+      .split(/[\s,;]+/)
+      .map((email) => email.trim().toLowerCase())
+      .filter(Boolean)
+  );
+}
+
 // Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
@@ -75,9 +84,13 @@ export async function upsertUser(user: InsertUser): Promise<void> {
       values.lastSignedIn = user.lastSignedIn;
       updateSet.lastSignedIn = user.lastSignedIn;
     }
-    if (user.role !== undefined) {
-      values.role = user.role;
-      updateSet.role = user.role;
+    const normalizedEmail = user.email?.toLowerCase() || "";
+    const configuredAdminRole = normalizedEmail && getAdminEmails().has(normalizedEmail) ? "admin" : undefined;
+
+    if (configuredAdminRole || user.role !== undefined) {
+      const role = configuredAdminRole || user.role;
+      values.role = role;
+      updateSet.role = role;
     }
 
     if (Object.keys(updateSet).length === 0) {
