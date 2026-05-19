@@ -44,6 +44,7 @@ const clerkAppearance = {
     formFieldInput: 'border-[#c7d0e0] focus:ring-[#1f6b3f] focus:border-[#1f6b3f]',
     formFieldLabel: 'text-[#0b1b33]',
     formButtonPrimary: 'bg-[#1f6b3f] hover:bg-[#2a8554]',
+  },
 };
 
 export function ClerkAuthProvider({ children }: ClerkAuthProviderProps) {
