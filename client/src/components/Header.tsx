@@ -61,7 +61,15 @@ export default function Header() {
               >
                 <Link href="/dashboard">Dashboard</Link>
               </Button>
-              <UserButton />
+              <UserButton
+                appearance={{
+                  elements: {
+                    userButtonPopoverCard: { boxShadow: 'none' },
+                    userButtonPopoverActionButton: 'text-[#0b1b33]',
+                    userButtonPopoverActionButtonText: 'text-[#0b1b33]',
+                  },
+                }}
+              />
             </>
           ) : (
             <>

@@ -25,7 +25,6 @@ const clerkAppearance = {
     borderRadius: '0.5rem',
   },
   elements: {
-    formButtonPrimary: 'bg-[#1f6b3f] hover:bg-[#2a8554]',
     headerTitle: 'text-xl font-bold',
     headerSubtitle: 'text-muted-foreground',
     card: 'shadow-none',
@@ -35,7 +34,16 @@ const clerkAppearance = {
     footerPages: { display: 'none' },
     badge: { display: 'none' },
     developmentModeNotice: { display: 'none' },
-  },
+    // Green overrides for all Clerk components — prevents default purple
+    userButtonPopoverCard: 'border border-[#c7d0e0] shadow-md',
+    userButtonPopoverActionButton: 'text-[#0b1b33] hover:bg-[#1f6b3f]/10',
+    userButtonPopoverActionButtonText: 'text-[#0b1b33]',
+    userButtonPopoverFooter: 'hidden',
+    modalContent: 'border-t-[3px] border-t-[#1f6b3f]',
+    modalHeader: 'bg-[#fafaf7]',
+    formFieldInput: 'border-[#c7d0e0] focus:ring-[#1f6b3f] focus:border-[#1f6b3f]',
+    formFieldLabel: 'text-[#0b1b33]',
+    formButtonPrimary: 'bg-[#1f6b3f] hover:bg-[#2a8554]',
 };
 
 export function ClerkAuthProvider({ children }: ClerkAuthProviderProps) {
