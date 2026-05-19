@@ -8,17 +8,17 @@ description: "Agreement for specialized trade services such as plumbing, electri
 
 Trade Contractor will perform the following services:
 
-{{service_description}}
+{{SERVICE_DESCRIPTION}}
 
 ## 2. Term
 
-Start date: {{start_date}}
-Estimated completion: {{completion_date}}
+Start date: {{START_DATE}}
+Estimated completion: {{COMPLETION_DATE}}
 
 ## 3. Compensation
 
-Total fee: {{total_amount}}
-Payment schedule: {{payment_schedule}}
+Total fee: {{TOTAL_AMOUNT}}
+Payment schedule: {{PAYMENT_SCHEDULE}}
 
 ## 4. Materials and Equipment
 
@@ -34,11 +34,11 @@ Contractor will maintain a safe worksite and follow industry safety practices.
 
 ## 7. Warranty
 
-Contractor warrants the workmanship for a period of {{warranty_period}} from completion.
+Contractor warrants the workmanship for a period of {{WARRANTY_PERIOD}} from completion.
 
 ## 8. Indemnification and Insurance
 
-{{indemnification_terms}}
+{{INDEMNIFICATION_TERMS}}
 Contractor maintains liability insurance.
 
 ## 9. Termination
@@ -51,14 +51,14 @@ Either party may terminate for material breach. Upon termination, Client will pa
 
 **Client**
 
-Name: {{client_name}}
-Address: {{client_address}}
+Name: {{CLIENT_NAME}}
+Address: {{CLIENT_ADDRESS}}
 Signature: ____________________
 Date: ____________________
 
 **Trade Contractor**
 
-Name: {{contractor_name}}
-Address: {{contractor_address}}
+Name: {{CONTRACTOR_NAME}}
+Address: {{CONTRACTOR_ADDRESS}}
 Signature: ____________________
 Date: ____________________

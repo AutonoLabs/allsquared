@@ -368,8 +368,8 @@ export default function NewContractTypeform() {
                           key={t.id}
                           className={`cursor-pointer transition-all border ${
                             selectedTemplateId === t.id
-                              ? "border-violet-400 bg-violet-50/60"
-                              : "border-border hover:border-violet-200"
+                              ? "border-emerald-300 bg-emerald-50/60"
+                              : "border-border hover:border-emerald-100"
                           }`}
                           onClick={() => {
                             setSelectedTemplateId(t.id === selectedTemplateId ? "" : t.id);
@@ -384,7 +384,7 @@ export default function NewContractTypeform() {
                               )}
                             </div>
                             {selectedTemplateId === t.id && (
-                              <CheckCircle2 className="w-4 h-4 text-violet-600 shrink-0" />
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                             )}
                           </CardContent>
                         </Card>
@@ -431,14 +431,14 @@ export default function NewContractTypeform() {
               <Card className="border-border">
                 <CardHeader className="pb-2 flex flex-row items-center justify-between">
                   <CardTitle className="text-sm font-semibold flex items-center gap-1.5">
-                    <FileText className="w-4 h-4 text-violet-500" />
+                    <FileText className="w-4 h-4 text-emerald-500" />
                     Contract Preview
                   </CardTitle>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setChatOpen(true)}
-                    className="text-violet-600 hover:bg-violet-50 h-7 px-2"
+                    className="text-emerald-600 hover:bg-emerald-50 h-7 px-2"
                   >
                     <MessageCircle className="w-3.5 h-3.5 mr-1" />
                     Ask AI
@@ -455,9 +455,9 @@ export default function NewContractTypeform() {
 
               {/* Party summary */}
               <div className="grid grid-cols-2 gap-3">
-                <Card className="border-violet-100 bg-violet-50/40">
+                <Card className="border-emerald-50 bg-emerald-50/40">
                   <CardContent className="p-3">
-                    <Badge variant="outline" className="text-[10px] border-violet-300 text-violet-700 mb-1.5">Client</Badge>
+                    <Badge variant="outline" className="text-[10px] border-emerald-200 text-emerald-700 mb-1.5">Client</Badge>
                     <div className="font-medium text-sm">{partyA.name || "—"}</div>
                     {partyA.email && <div className="text-xs text-muted-foreground mt-0.5">{partyA.email}</div>}
                   </CardContent>
@@ -475,7 +475,7 @@ export default function NewContractTypeform() {
               <div className="flex gap-3 pt-1">
                 <Button
                   variant="outline"
-                  className="flex-1 border-violet-200 text-violet-700 hover:bg-violet-50"
+                  className="flex-1 border-emerald-100 text-emerald-700 hover:bg-emerald-50"
                   onClick={handleSaveDraft}
                   disabled={saving}
                 >
@@ -483,7 +483,7 @@ export default function NewContractTypeform() {
                   Save as Draft
                 </Button>
                 <Button
-                  className="flex-1 bg-violet-600 hover:bg-violet-700 text-white"
+                  className="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white"
                   onClick={handleSendForSignature}
                   disabled={saving}
                 >
@@ -500,7 +500,7 @@ export default function NewContractTypeform() {
   // ── Layout ───────────────────────────────────────────────────────────────────
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-violet-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-emerald-50/30">
       {/* Header with progress */}
       <div className="sticky top-0 z-20 bg-white/90 backdrop-blur border-b border-border">
         <div className="max-w-2xl mx-auto px-4 py-3">
@@ -521,9 +521,9 @@ export default function NewContractTypeform() {
                   key={i}
                   className={`flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium transition-colors ${
                     i === step
-                      ? "bg-violet-600 text-white"
+                      ? "bg-emerald-600 text-white"
                       : i < step
-                      ? "bg-violet-100 text-violet-700"
+                      ? "bg-emerald-50 text-emerald-700"
                       : "bg-muted text-muted-foreground"
                   }`}
                 >
@@ -582,7 +582,7 @@ export default function NewContractTypeform() {
                   setShowValidation(false);
                   go(step + 1);
                 }}
-                className="bg-violet-600 hover:bg-violet-700 text-white gap-1.5"
+                className="bg-emerald-600 hover:bg-emerald-700 text-white gap-1.5"
               >
                 Continue
                 <ArrowRight className="w-4 h-4" />
@@ -603,7 +603,7 @@ export default function NewContractTypeform() {
       {step === 4 && !chatOpen && (
         <button
           onClick={() => setChatOpen(true)}
-          className="fixed bottom-6 right-6 bg-violet-600 hover:bg-violet-700 text-white rounded-full shadow-lg w-12 h-12 flex items-center justify-center transition-colors z-30"
+          className="fixed bottom-6 right-6 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full shadow-lg w-12 h-12 flex items-center justify-center transition-colors z-30"
         >
           <MessageCircle className="w-5 h-5" />
         </button>

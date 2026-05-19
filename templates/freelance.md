@@ -8,29 +8,29 @@ description: "Standard agreement for freelance services between a contractor and
 
 Contractor will provide the following services to Client:
 
-{{service_description}}
+{{SERVICE_DESCRIPTION}}
 
 ## 2. Term
 
-The engagement will commence on {{start_date}} and will continue until {{end_date}} unless earlier terminated in accordance with this Agreement.
+The engagement will commence on {{START_DATE}} and will continue until {{END_DATE}} unless earlier terminated in accordance with this Agreement.
 
 ## 3. Compensation
 
-Client will pay Contractor a total fee of {{total_amount}} (the "Fee"). Payment will be made according to the following schedule:
+Client will pay Contractor a total fee of {{TOTAL_AMOUNT}} (the "Fee"). Payment will be made according to the following schedule:
 
-{{payment_schedule}}
+{{PAYMENT_SCHEDULE}}
 
 ## 4. Expenses
 
-{{expenses_policy}}
+{{EXPENSES_POLICY}}
 
 ## 5. Intellectual Property
 
-{{ip_terms}}
+{{IP_TERMS}}
 
 ## 6. Confidentiality
 
-{{confidentiality_terms}}
+{{CONFIDENTIALITY_TERMS}}
 
 ## 7. Independent Contractor Status
 
@@ -38,7 +38,7 @@ The parties agree that Contractor is an independent contractor and not an employ
 
 ## 8. Indemnification
 
-{{indemnification_terms}}
+{{INDEMNIFICATION_TERMS}}
 
 ## 9. Governing Law
 
@@ -52,14 +52,14 @@ All notices will be sent to the addresses set forth below.
 
 **Client**
 
-Name: {{client_name}}
-Address: {{client_address}}
+Name: {{CLIENT_NAME}}
+Address: {{CLIENT_ADDRESS}}
 Signature: ____________________
 Date: ____________________
 
 **Contractor**
 
-Name: {{contractor_name}}
-Address: {{contractor_address}}
+Name: {{CONTRACTOR_NAME}}
+Address: {{CONTRACTOR_ADDRESS}}
 Signature: ____________________
 Date: ____________________

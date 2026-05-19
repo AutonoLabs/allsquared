@@ -109,21 +109,21 @@ export function PartySearch({ label, role, value, onChange, savedProfiles = [] }
             variant="outline"
             size="sm"
             onClick={() => setShowProfiles(!showProfiles)}
-            className="text-violet-600 border-violet-200 hover:bg-violet-50"
+            className="text-emerald-600 border-emerald-100 hover:bg-emerald-50"
           >
             <User className="w-3.5 h-3.5 mr-1.5" />
             Pick from saved profiles
             <ChevronDown className={`w-3.5 h-3.5 ml-1 transition-transform ${showProfiles ? "rotate-180" : ""}`} />
           </Button>
           {showProfiles && (
-            <Card className="mt-2 border-violet-100">
+            <Card className="mt-2 border-emerald-50">
               <CardContent className="p-2 space-y-1">
                 {savedProfiles.map((p) => (
                   <button
                     key={p.id}
                     type="button"
                     onClick={() => selectProfile(p)}
-                    className="w-full text-left px-3 py-2 rounded-md hover:bg-violet-50 transition-colors"
+                    className="w-full text-left px-3 py-2 rounded-md hover:bg-emerald-50 transition-colors"
                   >
                     <div className="font-medium text-sm text-navy-900">{p.name}</div>
                     {p.companyNumber && (
@@ -140,7 +140,7 @@ export function PartySearch({ label, role, value, onChange, savedProfiles = [] }
       {/* Companies House search */}
       <div className="relative" ref={dropdownRef}>
         <Label className="text-sm font-medium mb-1.5 block">
-          <Building2 className="inline w-3.5 h-3.5 mr-1 text-violet-500" />
+          <Building2 className="inline w-3.5 h-3.5 mr-1 text-emerald-500" />
           Search Companies House
         </Label>
         <div className="relative">
@@ -158,7 +158,7 @@ export function PartySearch({ label, role, value, onChange, savedProfiles = [] }
         </div>
 
         {showDropdown && debouncedQuery.length >= 2 && (
-          <Card className="absolute z-50 w-full mt-1 shadow-lg border-violet-100">
+          <Card className="absolute z-50 w-full mt-1 shadow-lg border-emerald-50">
             <CardContent className="p-1">
               {searchResult.isLoading && (
                 <div className="space-y-2 p-2">
@@ -175,7 +175,7 @@ export function PartySearch({ label, role, value, onChange, savedProfiles = [] }
                   key={item.companyNumber}
                   type="button"
                   onClick={() => selectCompany(item)}
-                  className="w-full text-left px-3 py-2.5 rounded-md hover:bg-violet-50 transition-colors"
+                  className="w-full text-left px-3 py-2.5 rounded-md hover:bg-emerald-50 transition-colors"
                 >
                   <div className="flex items-center justify-between">
                     <span className="font-medium text-sm">{item.companyName}</span>

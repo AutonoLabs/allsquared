@@ -723,8 +723,8 @@ function KycStatusCard({ userId }: { userId?: string }) {
     },
     requires_input: {
       label: "Additional Info Required",
-      color: "bg-purple-100 text-purple-800",
-      icon: <AlertCircle className="h-5 w-5 text-purple-600" />,
+      color: "bg-emerald-50 text-emerald-800",
+      icon: <AlertCircle className="h-5 w-5 text-emerald-600" />,
       description: "We need additional information to complete your verification.",
     },
   };

@@ -63,7 +63,7 @@ export function ModuleSelector({ clauseBanks, selectedClauses, onChange }: Props
       {Object.entries(clauseBanks).map(([groupKey, options]) => (
         <div key={groupKey}>
           <div className="flex items-center gap-2 mb-3">
-            <span className="text-violet-600">{getIcon(groupKey)}</span>
+            <span className="text-emerald-600">{getIcon(groupKey)}</span>
             <h3 className="font-medium text-sm capitalize text-foreground">
               {groupKey.replace(/_/g, " ")}
             </h3>
@@ -77,8 +77,8 @@ export function ModuleSelector({ clauseBanks, selectedClauses, onChange }: Props
                   key={opt.id}
                   className={`cursor-pointer transition-all border ${
                     isSelected
-                      ? "border-violet-400 bg-violet-50/60 shadow-sm"
-                      : "border-border hover:border-violet-200"
+                      ? "border-emerald-300 bg-emerald-50/60 shadow-sm"
+                      : "border-border hover:border-emerald-100"
                   }`}
                   onClick={() => toggle(groupKey, opt.id, !isSelected)}
                 >

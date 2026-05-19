@@ -43,7 +43,7 @@ export default function AdminAnalytics() {
       value: analytics?.totalContracts || 0,
       icon: FileText,
       description: "All contracts created",
-      color: "text-indigo-500",
+      color: "text-emerald-500",
     },
     {
       title: "Active Contracts",
@@ -231,7 +231,7 @@ export default function AdminAnalytics() {
               <p className="text-sm text-muted-foreground">Active Contracts</p>
             </div>
             <div className="text-center p-4 bg-muted rounded-lg">
-              <p className="text-2xl font-bold text-purple-500">{analytics?.totalUsers || 0}</p>
+              <p className="text-2xl font-bold text-emerald-500">{analytics?.totalUsers || 0}</p>
               <p className="text-sm text-muted-foreground">Total Users</p>
             </div>
           </div>

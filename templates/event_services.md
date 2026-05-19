@@ -8,19 +8,19 @@ description: "Agreement for event planning, coordination, or related services be
 
 Provider will deliver the following event services:
 
-{{service_description}}
+{{SERVICE_DESCRIPTION}}
 
 ## 2. Event Details
 
-Event date: {{event_date}}
-Event location: {{event_location}}
-Expected attendance: {{attendance}}
+Event date: {{EVENT_DATE}}
+Event location: {{EVENT_LOCATION}}
+Expected attendance: {{ATTENDANCE}}
 
 ## 3. Compensation
 
-Client will pay Provider the total fee of {{total_amount}} according to the following schedule:
+Client will pay Provider the total fee of {{TOTAL_AMOUNT}} according to the following schedule:
 
-{{payment_schedule}}
+{{PAYMENT_SCHEDULE}}
 
 ## 4. Expenses
 
@@ -36,7 +36,7 @@ Provider will obtain necessary permits for the event, if any. Costs are included
 
 ## 7. Cancellation
 
-In the event of cancellation by Client, Provider will retain a cancellation fee as specified: {{cancellation_terms}}.
+In the event of cancellation by Client, Provider will retain a cancellation fee as specified: {{CANCELLATION_TERMS}}.
 
 ## 8. Insurance
 
@@ -44,7 +44,7 @@ Provider maintains event liability insurance. Certificate available upon request
 
 ## 9. Indemnification
 
-{{indemnification_terms}}
+{{INDEMNIFICATION_TERMS}}
 
 ## 10. Signatures
 
@@ -52,14 +52,14 @@ Provider maintains event liability insurance. Certificate available upon request
 
 **Client**
 
-Name: {{client_name}}
-Address: {{client_address}}
+Name: {{CLIENT_NAME}}
+Address: {{CLIENT_ADDRESS}}
 Signature: ____________________
 Date: ____________________
 
 **Provider**
 
-Name: {{provider_name}}
-Address: {{provider_address}}
+Name: {{PROVIDER_NAME}}
+Address: {{PROVIDER_ADDRESS}}
 Signature: ____________________
 Date: ____________________

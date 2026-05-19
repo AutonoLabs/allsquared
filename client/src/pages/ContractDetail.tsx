@@ -237,8 +237,8 @@ export default function ContractDetail() {
                 )}
                 {contract.endDate && (
                   <div className="flex items-start gap-3 p-3 rounded-lg bg-muted/50">
-                    <div className="h-9 w-9 rounded-lg bg-purple-500/10 flex items-center justify-center shrink-0">
-                      <Calendar className="h-4 w-4 text-purple-600" />
+                    <div className="h-9 w-9 rounded-lg bg-emerald-500/10 flex items-center justify-center shrink-0">
+                      <Calendar className="h-4 w-4 text-emerald-600" />
                     </div>
                     <div>
                       <p className="text-xs text-muted-foreground font-medium">End Date</p>

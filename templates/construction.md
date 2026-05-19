@@ -8,13 +8,13 @@ description: "Agreement for construction, renovation, or home improvement servic
 
 Contractor will perform the following work at the Property:
 
-{{work_description}}
+{{WORK_DESCRIPTION}}
 
 ## 2. Contract Price
 
-The total contract price is {{total_amount}}. Payment will be made in installments as follows:
+The total contract price is {{TOTAL_AMOUNT}}. Payment will be made in installments as follows:
 
-{{payment_schedule}}
+{{PAYMENT_SCHEDULE}}
 
 ## 3. Change Orders
 
@@ -22,7 +22,7 @@ Any modifications to the Scope of Work must be in writing and signed by both par
 
 ## 4. Completion Date
 
-Work will commence on {{start_date}} and be substantially completed by {{completion_date}}.
+Work will commence on {{START_DATE}} and be substantially completed by {{COMPLETION_DATE}}.
 
 ## 5. Insurance and Bonding
 
@@ -34,7 +34,7 @@ Contractor warrants that all work will be performed in a workmanlike manner and 
 
 ## 7. Indemnification and Liability
 
-{{indemnification_terms}}
+{{INDEMNIFICATION_TERMS}}
 
 ## 8. Dispute Resolution
 
@@ -50,14 +50,14 @@ This Agreement is governed by the laws of England and Wales.
 
 **Homeowner**
 
-Name: {{client_name}}
-Address: {{client_address}}
+Name: {{CLIENT_NAME}}
+Address: {{CLIENT_ADDRESS}}
 Signature: ____________________
 Date: ____________________
 
 **Contractor**
 
-Name: {{contractor_name}}
-Address: {{contractor_address}}
+Name: {{CONTRACTOR_NAME}}
+Address: {{CONTRACTOR_ADDRESS}}
 Signature: ____________________
 Date: ____________________

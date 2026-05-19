@@ -118,12 +118,12 @@ export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props)
         side="right"
         className="w-[380px] sm:w-[420px] flex flex-col p-0"
       >
-        <SheetHeader className="px-4 py-3 border-b bg-gradient-to-r from-navy-900 to-violet-700 text-white">
+        <SheetHeader className="px-4 py-3 border-b bg-gradient-to-r from-navy-900 to-emerald-700 text-white">
           <SheetTitle className="flex items-center gap-2 text-white">
             <Bot className="w-4 h-4" />
             UK Contract Assistant (English Law)
           </SheetTitle>
-          <p className="text-xs text-violet-200 mt-0.5">AI-assisted contract drafting under English and Welsh common law only.</p>
+          <p className="text-xs text-emerald-100 mt-0.5">AI-assisted contract drafting under English and Welsh common law only.</p>
         </SheetHeader>
 
         <ScrollArea className="flex-1 px-4 py-3">
@@ -137,7 +137,7 @@ export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props)
                   className={cn(
                     "w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5",
                     msg.role === "user"
-                      ? "bg-violet-600 text-white"
+                      ? "bg-emerald-600 text-white"
                       : "bg-navy-100 text-navy-700 border border-navy-200"
                   )}
                 >
@@ -151,7 +151,7 @@ export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props)
                   className={cn(
                     "max-w-[80%] rounded-xl px-3 py-2 text-sm leading-relaxed",
                     msg.role === "user"
-                      ? "bg-violet-600 text-white rounded-tr-sm"
+                      ? "bg-emerald-600 text-white rounded-tr-sm"
                       : "bg-muted text-foreground rounded-tl-sm"
                   )}
                 >
@@ -192,7 +192,7 @@ export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props)
             onClick={send}
             disabled={!input.trim() || loading}
             size="icon"
-            className="bg-violet-600 hover:bg-violet-700 text-white shrink-0"
+            className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"
           >
             <Send className="w-4 h-4" />
           </Button>
