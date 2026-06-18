@@ -8,6 +8,17 @@ import { sql } from "drizzle-orm";
 import { processStripeWebhook } from "../routers/payments";
 import { processTranspactWebhook } from "../routers/escrow";
 import { timingSafeEqual, createHmac } from "crypto";
+import { verifyStripeSignature } from "./webhookVerify";
+import { initSentry, Sentry } from "./sentry";
+import { checkRateLimit, isDistributedRateLimitEnabled } from "./rateLimit";
+import { CSP_DIRECTIVES, PERMISSIONS_POLICY } from "./csp";
+
+// Initialize Sentry before anything else
+initSentry();
+
+// Sentry request handler must be the FIRST middleware
+app.use(Sentry.Handlers.requestHandler());
+app.use(Sentry.Handlers.tracingHandler());
 
 // Create Express app
 const app = express();
@@ -39,80 +50,49 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
 
   // Content Security Policy
-  res.setHeader(
-    'Content-Security-Policy',
-    [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://js.stripe.com https://www.google-analytics.com https://clerk.allsquared.io https://accounts.allsquared.io https://*.clerk.accounts.dev https://challenges.cloudflare.com",
-      "worker-src 'self' blob:",
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-      "font-src 'self' https://fonts.gstatic.com",
-      "img-src 'self' data: https: blob:",
-      "connect-src 'self' https://api.stripe.com https://*.transpact.com https://*.docusign.com https://api.openai.com https://clerk.allsquared.io https://accounts.allsquared.io https://*.clerk.accounts.dev https://*.clerk.dev https://api.clerk.com https://challenges.cloudflare.com wss:",
-      "frame-src 'self' https://js.stripe.com https://*.docusign.com https://*.signwell.com https://challenges.cloudflare.com",
-      "object-src 'none'",
-    ].join('; ')
-  );
+  res.setHeader('Content-Security-Policy', CSP_DIRECTIVES);
 
   // Permissions Policy
-  res.setHeader(
-    'Permissions-Policy',
-    'camera=(), microphone=(), geolocation=(), payment=(self "https://js.stripe.com")'
-  );
+  res.setHeader('Permissions-Policy', PERMISSIONS_POLICY);
 
   next();
 });
 
-// Simple in-memory rate limiting (use Redis in production for distributed systems)
-const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
-
-const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
-const RATE_LIMIT_MAX_REQUESTS = 100; // 100 requests per minute
-
 // Rate limiting middleware
-app.use('/api', (req: Request, res: Response, next: NextFunction) => {
+// Uses Upstash Redis when configured (Vercel serverless), falls back to
+// process-local Map for dev.
+app.use('/api', async (req: Request, res: Response, next: NextFunction) => {
   const clientIp = req.ip || req.socket?.remoteAddress || 'unknown';
-  const now = Date.now();
 
-  const record = rateLimitStore.get(clientIp);
+  try {
+    const { success, limit, remaining, reset } = await checkRateLimit(clientIp);
 
-  if (!record || now > record.resetTime) {
-    // Reset or create new record
-    rateLimitStore.set(clientIp, {
-      count: 1,
-      resetTime: now + RATE_LIMIT_WINDOW,
-    });
-  } else {
-    record.count++;
+    res.setHeader('X-RateLimit-Limit', limit);
+    res.setHeader('X-RateLimit-Remaining', remaining);
+    res.setHeader('X-RateLimit-Reset', Math.ceil(reset / 1000));
 
-    if (record.count > RATE_LIMIT_MAX_REQUESTS) {
+    if (!success) {
       res.status(429).json({
         error: 'Too many requests',
         message: 'Please slow down. Try again in a minute.',
-        retryAfter: Math.ceil((record.resetTime - now) / 1000),
+        retryAfter: Math.ceil((reset - Date.now()) / 1000),
       });
       return;
     }
+  } catch (err) {
+    // Rate limit failures should not break the request
+    console.warn('[Server] Rate limit check failed:', (err as Error).message);
   }
-
-  // Add rate limit headers
-  const currentRecord = rateLimitStore.get(clientIp)!;
-  res.setHeader('X-RateLimit-Limit', RATE_LIMIT_MAX_REQUESTS);
-  res.setHeader('X-RateLimit-Remaining', Math.max(0, RATE_LIMIT_MAX_REQUESTS - currentRecord.count));
-  res.setHeader('X-RateLimit-Reset', Math.ceil(currentRecord.resetTime / 1000));
 
   next();
 });
 
-// Clean up rate limit store periodically (every 5 minutes)
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, value] of Array.from(rateLimitStore.entries())) {
-    if (now > value.resetTime) {
-      rateLimitStore.delete(key);
-    }
-  }
-}, 5 * 60 * 1000);
+if (!isDistributedRateLimitEnabled()) {
+  console.warn(
+    '[Server] UPSTASH_REDIS_REST_URL/TOKEN not set — using in-memory rate limit. ' +
+      'This is unsafe on Vercel serverless. Configure Upstash for production.',
+  );
+}
 
 // Input sanitization for common XSS patterns
 // Skip JSON parsing for webhook routes — they need raw body for signature verification
@@ -218,37 +198,9 @@ app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), asyn
   try {
     // Manual HMAC-SHA256 signature verification (avoids Stripe SDK dependency)
     const rawBody = req.body as Buffer;
-    const sigHeader = sig as string;
-
-    // Parse Stripe-Signature header: t=timestamp,v1=hash
-    const sigParts = sigHeader.split(',').reduce<Record<string, string>>((acc, part) => {
-      const [k, v] = part.split('=');
-      if (k && v) acc[k.trim()] = v.trim();
-      return acc;
-    }, {});
-
-    const timestamp = sigParts['t'];
-    const v1Sig = sigParts['v1'];
-
-    if (!timestamp || !v1Sig) {
-      throw new Error('Invalid Stripe-Signature header format');
-    }
-
-    // Reject webhooks older than 5 minutes (replay attack protection)
-    const tolerance = 5 * 60; // 5 minutes
-    const now = Math.floor(Date.now() / 1000);
-    if (Math.abs(now - parseInt(timestamp)) > tolerance) {
-      throw new Error(`Webhook timestamp too old: ${timestamp}`);
-    }
-
-    // Compute expected signature
-    const signedPayload = `${timestamp}.${rawBody.toString()}`;
-    const expectedSig = createHmac('sha256', webhookSecret)
-      .update(signedPayload, 'utf8')
-      .digest('hex');
-
-    if (!signaturesMatch(expectedSig, v1Sig)) {
-      throw new Error('Stripe signature mismatch');
+    const verification = verifyStripeSignature(rawBody, sig as string, webhookSecret);
+    if (!verification.valid) {
+      throw new Error(verification.reason ?? 'Stripe signature verification failed');
     }
 
     event = JSON.parse(rawBody.toString());
@@ -362,6 +314,18 @@ if (!process.env.VERCEL) {
     console.warn('[Server] Auto-seed skipped:', (err as Error).message);
   }
 })();
+
+// Sentry error handler must be registered AFTER all routes and BEFORE any other error handler
+app.use(Sentry.Handlers.errorHandler());
+
+// Optional: tail off remaining errors to Sentry
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+  console.error('[Server] Unhandled error:', err);
+  Sentry.captureException(err);
+  if (!res.headersSent) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
 
 // Export for Vercel serverless
 export default app;

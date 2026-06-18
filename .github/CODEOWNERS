@@ -1,0 +1,19 @@
+# AllSquared code owners
+# Anyone in the listed teams/users must approve PRs touching the matching paths.
+# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+
+# Default: project lead
+*       @autonolabs/maintainers
+
+# Server / API — stricter review
+/server/     @autonolabs/backend
+/api/        @autonolabs/backend
+
+# Billing + escrow — most sensitive
+/server/routers/payments.ts   @autonolabs/backend @autonolabs/finance
+/server/routers/escrow.ts     @autonolabs/backend @autonolabs/finance
+
+# Security middleware
+/server/_core/csp.ts          @autonolabs/security
+/server/_core/sentry.ts       @autonolabs/security
+/server/_core/rateLimit.ts    @autonolabs/security

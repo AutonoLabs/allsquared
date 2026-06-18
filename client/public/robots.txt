@@ -1,0 +1,20 @@
+# AllSquared
+# https://allsquared.io
+
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /admin
+Disallow: /api/
+Disallow: /contracts/*
+Disallow: /billing
+Disallow: /profile
+Disallow: /payment-settings
+Disallow: /disputes/*
+Disallow: /templates/
+
+# Crawl-delay for well-behaved bots
+Crawl-delay: 1
+
+# Sitemap location
+Sitemap: https://allsquared.io/sitemap.xml
