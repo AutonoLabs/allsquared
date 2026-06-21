@@ -243,6 +243,16 @@ export default function NewContractBuilder() {
 
   function handleSaveDraft() {
     if (saving) return;
+
+    // Pre-flight validation — avoid creating £0.01 ghost contracts
+    const missing: string[] = [];
+    if (!partyA?.name) missing.push("Party A (you) name");
+    if (!partyB?.name) missing.push("Party B (counterparty) name");
+    if (missing.length > 0) {
+      toast.error(`Cannot save: ${missing.join(", ")} required.`);
+      return;
+    }
+
     setSaving(true);
 
     // Build content from modules
@@ -256,11 +266,11 @@ export default function NewContractBuilder() {
       })),
     };
 
-    // Extract total amount from payment module
+    // Extract total amount from payment module (no £0.01 hack — leave 0 if unset)
     const payModule = enabledModules.find((m) => m.id === "payment");
     const totalAmount = parseFloat(
       payModule?.questions.find((q) => q.id === "pay_total")?.answer || "0"
-    ) || 0.01; // minimum to pass validation
+    ) || 0;
 
     // Extract dates from timeline module
     const timeModule = enabledModules.find((m) => m.id === "timeline");
