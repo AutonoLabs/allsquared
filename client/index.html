@@ -39,6 +39,71 @@
     <meta name="robots" content="index, follow" />
     <link rel="canonical" href="https://allsquared.io/" />
 
+    <!-- Structured Data: Organization + SoftwareApplication -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@graph": [
+        {
+          "@type": "Organization",
+          "@id": "https://allsquared.io/#organization",
+          "name": "AllSquared",
+          "url": "https://allsquared.io",
+          "logo": "https://allsquared.io/logo.png",
+          "description": "AI-drafted contracts, FCA-authorised escrow, and milestone-verified payments for serious UK project work.",
+          "foundingDate": "2025",
+          "founder": {
+            "@type": "Person",
+            "name": "Eli Bernstein"
+          },
+          "address": {
+            "@type": "PostalAddress",
+            "addressCountry": "GB"
+          },
+          "areaServed": {
+            "@type": "Country",
+            "name": "United Kingdom"
+          },
+          "sameAs": [
+            "https://github.com/AutonoLabs/allsquared-app"
+          ],
+          "contactPoint": {
+            "@type": "ContactPoint",
+            "contactType": "customer support",
+            "email": "hello@allsquared.io",
+            "availableLanguage": "English"
+          }
+        },
+        {
+          "@type": "SoftwareApplication",
+          "@id": "https://allsquared.io/#software",
+          "name": "AllSquared",
+          "applicationCategory": "BusinessApplication",
+          "applicationSubCategory": "Contract Management Software",
+          "operatingSystem": "Web",
+          "url": "https://allsquared.io",
+          "description": "All-in-one platform for UK freelancers and clients: AI contract drafting, FCA-authorised escrow, milestone-based payments, and structured dispute resolution.",
+          "offers": {
+            "@type": "Offer",
+            "url": "https://allsquared.io/pricing",
+            "priceCurrency": "GBP",
+            "price": "0",
+            "description": "Free tier available; paid plans from £X/month"
+          },
+          "publisher": { "@id": "https://allsquared.io/#organization" }
+        },
+        {
+          "@type": "WebSite",
+          "@id": "https://allsquared.io/#website",
+          "url": "https://allsquared.io",
+          "name": "AllSquared",
+          "inLanguage": "en-GB",
+          "publisher": { "@id": "https://allsquared.io/#organization" }
+        }
+      ]
+    }
+    </script>
+
     <style>
       body {
         font-family: 'Inter Tight', system-ui, -apple-system, sans-serif;

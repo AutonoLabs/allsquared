@@ -7,6 +7,11 @@ dist/
 build/
 *.dist
 
+# Dead homepage snapshots (kept out of repo — allsquared-{25,25-2,29}.html)
+allsquared-*.html
+!client/index.html
+
+
 # Environment variables
 .env
 .env.*

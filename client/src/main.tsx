@@ -7,7 +7,22 @@ import superjson from "superjson";
 import App from "./App";
 import { ClerkAuthProvider, hasClerkPublishableKey } from "./lib/clerk";
 import { useAuth as useClerkAuth } from "@clerk/react";
+import * as Sentry from "@sentry/react";
 import "./index.css";
+
+// Initialize Sentry on the client (no-op when VITE_SENTRY_DSN is unset)
+const sentryDsn = import.meta.env.VITE_SENTRY_DSN;
+if (sentryDsn) {
+  Sentry.init({
+    dsn: sentryDsn,
+    environment: import.meta.env.MODE,
+    release: import.meta.env.VITE_VERCEL_GIT_COMMIT_SHA || undefined,
+    tracesSampleRate: import.meta.env.PROD ? 0.1 : 1.0,
+    sendDefaultPii: false,
+    integrations: [Sentry.browserTracingIntegration()],
+  });
+  console.log("[Sentry] Initialized (client)");
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {
