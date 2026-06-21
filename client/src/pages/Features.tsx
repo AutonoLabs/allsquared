@@ -43,9 +43,10 @@ export default function Features() {
         secondaryAction={{ label: "See how it works", href: "/how-it-works" }}
         highlights={[
           "AI-drafted contract flow",
-          "Regulated escrow partner",
+          "Regulated UK escrow partner",
           "Evidence-led milestone release",
         ]}
+        heroVariant="flat"
       />
 
       <MarketingSection

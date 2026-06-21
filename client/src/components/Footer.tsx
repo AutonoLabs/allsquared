@@ -1,7 +1,21 @@
 import { AllSquaredWordmark } from "@/components/marketing/AllSquaredWordmark";
-import { Link } from "wouter";
+import { useEffect } from "react";
+import { Link, useLocation } from "wouter";
 
 export default function Footer() {
+  const [location] = useLocation();
+
+  // Footer Link clicks should always reset scroll position.
+  // Without this, navigating via the footer leaves the page scrolled
+  // partway down which feels broken on mobile where the footer is long.
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }
+  }, [location]);
+
+  // Year recomputes on render so the footer never shows a stale year
+  // (e.g. deployed Dec 31 → Jan 1).
   const currentYear = new Date().getFullYear();
 
   return (

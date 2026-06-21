@@ -24,8 +24,10 @@ export default function Header() {
   const navigation = [
     { name: "How it works", href: "/how-it-works" },
     { name: "Features", href: "/features" },
-    { name: "Legal services", href: "/legal-services" },
     { name: "Pricing", href: "/pricing" },
+    { name: "Legal services", href: "/legal-services" },
+    { name: "About", href: "/about" },
+    { name: "Contact", href: "/contact" },
   ];
 
   return (
@@ -39,7 +41,7 @@ export default function Header() {
       <nav className="mx-auto flex h-[76px] w-full max-w-[1240px] items-center justify-between gap-6 px-5 md:px-8 lg:px-10">
         <AllSquaredWordmark />
 
-        <div className="hidden md:flex md:items-center md:gap-8">
+        <div className="hidden md:flex md:items-center md:gap-6 lg:gap-7">
           {navigation.map((item) => (
             <Link
               key={item.name}
