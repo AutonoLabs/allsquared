@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Squario - AllSquared mascot">
+  <title>Squario</title>
+  <desc>Friendly rounded-square mascot: bright green body, navy accents, warm eyes, cheerful smile.</desc>
+
+  <defs>
+    <!-- Soft drop shadow under the body -->
+    <radialGradient id="groundShadow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0b1b33" stop-opacity="0.28"/>
+      <stop offset="70%" stop-color="#0b1b33" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#0b1b33" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Body gradient: deep forest green to brighter mint -->
+    <linearGradient id="bodyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a8554"/>
+      <stop offset="55%" stop-color="#1f6b3f"/>
+      <stop offset="100%" stop-color="#002c22"/>
+    </linearGradient>
+
+    <!-- Soft inner highlight on the top-left -->
+    <radialGradient id="topHighlight" cx="30%" cy="22%" r="45%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.28"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Eye gradient -->
+    <radialGradient id="eyeGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#0b1b33"/>
+      <stop offset="100%" stop-color="#032e15"/>
+    </radialGradient>
+  </defs>
+
+  <!-- Ground shadow -->
+  <ellipse cx="256" cy="470" rx="170" ry="22" fill="url(#groundShadow)"/>
+
+  <!-- Tilted body (slight rotation gives personality) -->
+  <g transform="rotate(-6 256 256)">
+    <!-- Main rounded square body -->
+    <rect x="76" y="72" width="360" height="360" rx="92" ry="92" fill="url(#bodyGrad)"/>
+
+    <!-- Top-left highlight -->
+    <rect x="76" y="72" width="360" height="360" rx="92" ry="92" fill="url(#topHighlight)"/>
+
+    <!-- Subtle navy outline -->
+    <rect x="76" y="72" width="360" height="360" rx="92" ry="92" fill="none" stroke="#0b1b33" stroke-opacity="0.18" stroke-width="4"/>
+
+    <!-- Geometric contract-precision accent: a thin navy checkmark in top-right corner -->
+    <path d="M 332 138 L 356 162 L 396 122"
+          fill="none" stroke="#fafaf7" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+
+    <!-- A small squared "2" superscript (the ² in AllSquared) -->
+    <text x="408" y="118" font-family="Inter Tight, system-ui, sans-serif"
+          font-size="36" font-weight="800" fill="#fafaf7" opacity="0.9" text-anchor="end">²</text>
+
+    <!-- Eyes (warm, friendly) -->
+    <g>
+      <ellipse cx="200" cy="244" rx="28" ry="34" fill="url(#eyeGrad)"/>
+      <ellipse cx="312" cy="244" rx="28" ry="34" fill="url(#eyeGrad)"/>
+      <!-- Eye sparkles -->
+      <circle cx="192" cy="234" r="7" fill="#fafaf7"/>
+      <circle cx="304" cy="234" r="7" fill="#fafaf7"/>
+      <circle cx="208" cy="252" r="3" fill="#fafaf7" opacity="0.7"/>
+      <circle cx="320" cy="252" r="3" fill="#fafaf7" opacity="0.7"/>
+    </g>
+
+    <!-- Cheek blushes (warm) -->
+    <ellipse cx="160" cy="298" rx="22" ry="13" fill="#f5b800" opacity="0.25"/>
+    <ellipse cx="352" cy="298" rx="22" ry="13" fill="#f5b800" opacity="0.25"/>
+
+    <!-- Confident smile (asymmetric, slightly upturned, suggests friendly competence) -->
+    <path d="M 198 320 Q 256 366 314 320"
+          fill="none" stroke="#0b1b33" stroke-width="11" stroke-linecap="round"/>
+
+    <!-- Tiny tongue/tooth highlight for warmth -->
+    <path d="M 234 338 Q 256 350 278 338 Q 256 344 234 338 Z"
+          fill="#fafaf7" opacity="0.55"/>
+  </g>
+
+  <!-- Left arm: thumbs up (outside the tilted body group so it stays crisp) -->
+  <g transform="translate(74 318)">
+    <!-- Arm -->
+    <rect x="-2" y="0" width="38" height="24" rx="12" fill="url(#bodyGrad)"/>
+    <!-- Fist -->
+    <circle cx="34" cy="12" r="26" fill="url(#bodyGrad)" stroke="#0b1b33" stroke-opacity="0.2" stroke-width="3"/>
+    <!-- Thumb up -->
+    <rect x="28" y="-22" width="14" height="22" rx="7" fill="url(#bodyGrad)" stroke="#0b1b33" stroke-opacity="0.2" stroke-width="3"/>
+  </g>
+
+  <!-- Right arm: resting at side -->
+  <g transform="translate(404 360)">
+    <rect x="0" y="0" width="38" height="24" rx="12" fill="url(#bodyGrad)"/>
+    <circle cx="6" cy="12" r="20" fill="url(#bodyGrad)" stroke="#0b1b33" stroke-opacity="0.2" stroke-width="3"/>
+  </g>
+
+  <!-- Feet (so he stands, not floats) -->
+  <g transform="translate(0 0)">
+    <ellipse cx="200" cy="450" rx="38" ry="14" fill="#0b1b33" opacity="0.85"/>
+    <ellipse cx="312" cy="450" rx="38" ry="14" fill="#0b1b33" opacity="0.85"/>
+  </g>
+</svg>

@@ -3,8 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { MessageCircle, Send, X, Bot, User, Loader2 } from "lucide-react";
+import { Send, X, User, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { SQUARIO_GREETING, SQUARIO_FALLBACK } from "@shared/chatbot-config";
 
 interface Message {
   role: "user" | "assistant";
@@ -74,14 +75,14 @@ function generateFallbackResponse(question: string, context: string): string {
   if (q.includes("dispute") || q.includes("problem") || q.includes("disagree")) {
     return "The contract includes AllSquared's AI-assisted mediation service as the first step for disputes. This is faster and cheaper than court. If unresolved, parties can escalate to formal mediation or the courts of England and Wales.";
   }
-  return "I can help you understand specific clauses in your contract. Ask about payment terms, termination, IP rights, confidentiality, dispute resolution, or any other section you'd like explained.";
+  return SQUARIO_FALLBACK;
 }
 
 export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props) {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hi! I'm your contract assistant. Ask me anything about this contract — payment terms, clauses, obligations, or what any section means.",
+      content: SQUARIO_GREETING,
       timestamp: new Date(),
     },
   ]);
@@ -118,10 +119,10 @@ export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props)
         side="right"
         className="w-[380px] sm:w-[420px] flex flex-col p-0"
       >
-        <SheetHeader className="px-4 py-3 border-b bg-gradient-to-r from-navy-900 to-emerald-700 text-white">
+        <SheetHeader className="px-4 py-3 border-b bg-gradient-to-r from-[#0b1b33] to-[#1f6b3f] text-white">
           <SheetTitle className="flex items-center gap-2 text-white">
-            <Bot className="w-4 h-4" />
-            UK Contract Assistant (English Law)
+            <img src="/squario.svg" alt="Squario" className="w-7 h-7 rounded-md bg-white/10 p-0.5" />
+            Squario — UK contract assistant
           </SheetTitle>
           <p className="text-xs text-emerald-100 mt-0.5">AI-assisted contract drafting under English and Welsh common law only.</p>
         </SheetHeader>
@@ -135,16 +136,16 @@ export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props)
               >
                 <div
                   className={cn(
-                    "w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5",
+                    "w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5 overflow-hidden",
                     msg.role === "user"
-                      ? "bg-emerald-600 text-white"
-                      : "bg-navy-100 text-navy-700 border border-navy-200"
+                      ? "bg-[#1f6b3f] text-white"
+                      : "bg-[#e5f1ea] border border-[#c7d0e0]"
                   )}
                 >
                   {msg.role === "user" ? (
                     <User className="w-3.5 h-3.5" />
                   ) : (
-                    <Bot className="w-3.5 h-3.5" />
+                    <img src="/squario.svg" alt="Squario" className="w-6 h-6" />
                   )}
                 </div>
                 <div
@@ -162,8 +163,8 @@ export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props)
 
             {loading && (
               <div className="flex gap-2">
-                <div className="w-7 h-7 rounded-full bg-navy-100 border border-navy-200 flex items-center justify-center shrink-0">
-                  <Bot className="w-3.5 h-3.5 text-navy-700" />
+                <div className="w-7 h-7 rounded-full bg-[#e5f1ea] border border-[#c7d0e0] flex items-center justify-center shrink-0 overflow-hidden">
+                  <img src="/squario.svg" alt="Squario" className="w-6 h-6" />
                 </div>
                 <div className="bg-muted rounded-xl rounded-tl-sm px-3 py-2">
                   <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
@@ -192,7 +193,7 @@ export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props)
             onClick={send}
             disabled={!input.trim() || loading}
             size="icon"
-            className="bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"
+            className="bg-[#1f6b3f] hover:bg-[#2a8554] text-white shrink-0"
           >
             <Send className="w-4 h-4" />
           </Button>
