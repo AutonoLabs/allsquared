@@ -81,7 +81,7 @@ const DEFAULT_MODULES: ContractModule[] = [
     questions: [
       { id: "scope_desc", question: "Describe the work to be done", type: "text", answer: "" },
       { id: "scope_deliverables", question: "List the key deliverables", type: "text", answer: "" },
-      { id: "scope_exclusions", question: "Any exclusions? (things NOT included)", type: "text", answer: "" },
+      { id: "scope_exclusions", question: "Any exclusions? (things NOT included)", helper: "List anything the deliverable does NOT cover. Examples: 'no copywriting', 'logo files only, not brand guidelines', 'one round of revisions only'. Empty is fine if scope is fully inclusive.", type: "text", answer: "" },
     ],
   },
   {
@@ -128,7 +128,7 @@ const DEFAULT_MODULES: ContractModule[] = [
     enabled: false,
     questions: [
       { id: "ip_ownership", question: "IP ownership on completion", type: "select", options: ["Transfers to client", "Stays with provider", "Joint ownership", "Licensed to client"], answer: "" },
-      { id: "ip_preexisting", question: "Pre-existing IP exclusions", type: "text", answer: "" },
+      { id: "ip_preexisting", question: "Pre-existing IP exclusions", helper: "Anything you (or the client) created before this project, that should NOT transfer to the other party. Empty is fine if the work is being built from scratch.", type: "text", answer: "" },
     ],
   },
   {
@@ -626,6 +626,9 @@ export default function NewContractBuilder() {
           {currentModule.questions.map((q) => (
             <div key={q.id} className="space-y-2">
               <Label className="font-semibold text-[#0b1b33]">{q.question}</Label>
+              {(q as any).helper && (
+                <p className="text-xs leading-5 text-[#6b7e9e]">{(q as any).helper}</p>
+              )}
 
               {q.type === "text" && (
                 <Textarea

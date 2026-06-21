@@ -157,7 +157,8 @@ export default function PaymentSettings() {
                   <div>
                     <p className="font-medium">Verify Identity</p>
                     <p className="text-sm text-muted-foreground">
-                      Complete identity verification for compliance
+                      UK anti-money-laundering checks (passport or driving licence + selfie).
+                      Required by our regulated payment partner before payouts can be enabled.
                     </p>
                   </div>
                 </div>
