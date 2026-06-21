@@ -1,0 +1,51 @@
+name: Branch Protection Sanity Check
+
+# This workflow does not enforce branch protection itself — GitHub does that
+# via repo Settings → Branches. It exists so that PRs which touch the
+# protected-path rules below automatically trigger an extra CI job that
+# verifies the production-readiness surface (legal pages, fees, security
+# headers) hasn't regressed.
+
+on:
+  pull_request:
+    paths:
+      - "client/src/pages/Terms.tsx"
+      - "client/src/pages/PrivacyPolicy.tsx"
+      - "client/src/pages/Complaints.tsx"
+      - "client/src/components/Footer.tsx"
+      - "client/src/components/CookieConsent.tsx"
+      - "client/public/**"
+      - "server/_core/platformFees.ts"
+      - "server/_core/escrowFees.ts"
+      - "server/_core/finance.ts"
+      - "LICENSE"
+      - ".github/CODEOWNERS"
+
+jobs:
+  legal-surface-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify legal pages exist
+        run: |
+          set -euo pipefail
+          test -f client/src/pages/Terms.tsx
+          test -f client/src/pages/PrivacyPolicy.tsx
+          test -f client/src/pages/Complaints.tsx
+          test -f client/src/components/CookieConsent.tsx
+          test -f client/src/components/Footer.tsx
+
+      - name: Verify SEO + security files
+        run: |
+          set -euo pipefail
+          test -f client/public/robots.txt
+          test -f client/public/sitemap.xml
+          test -f client/public/.well-known/security.txt
+          test -f LICENSE
+
+      - name: Verify fees are unit-tested
+        run: |
+          set -euo pipefail
+          test -f server/_core/platformFees.test.ts
+          test -f server/_core/escrowFees.test.ts

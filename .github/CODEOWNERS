@@ -1,19 +1,24 @@
-# AllSquared code owners
-# Anyone in the listed teams/users must approve PRs touching the matching paths.
-# See: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
+# CODEOWNERS — AllSquared
+# These owners will be requested for review on any PR touching the matched paths.
+# Used by GitHub branch protection to gate merges on review.
 
-# Default: project lead
-*       @autonolabs/maintainers
+# Default owner for everything in the repo.
+*       @elibernstein
 
-# Server / API — stricter review
-/server/     @autonolabs/backend
-/api/        @autonolabs/backend
+# Server-side code requires explicit principal review — it touches billing,
+# escrow, and PII, and there are no on-call rotation policies in place yet.
+/server/         @elibernstein
 
-# Billing + escrow — most sensitive
-/server/routers/payments.ts   @autonolabs/backend @autonolabs/finance
-/server/routers/escrow.ts     @autonolabs/backend @autonolabs/finance
+# Legal and compliance copy (terms, privacy, complaints, cookie policy) and
+# SEO/security metadata files must be reviewed by the principal.
+/LICENSE         @elibernstein
+/client/public/  @elibernstein
+/client/src/pages/Terms.tsx         @elibernstein
+/client/src/pages/PrivacyPolicy.tsx @elibernstein
+/client/src/pages/Complaints.tsx    @elibernstein
+/client/src/components/Footer.tsx  @elibernstein
+/client/src/components/CookieConsent.tsx @elibernstein
 
-# Security middleware
-/server/_core/csp.ts          @autonolabs/security
-/server/_core/sentry.ts       @autonolabs/security
-/server/_core/rateLimit.ts    @autonolabs/security
+# CI/CD and infra.
+/.github/        @elibernstein
+/drizzle/        @elibernstein

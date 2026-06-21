@@ -112,6 +112,11 @@ export default function Footer() {
                   Privacy Policy
                 </Link>
               </li>
+              <li>
+                <Link href="/complaints" className="transition-colors hover:text-[#0b1b33]">
+                  Complaints
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
@@ -129,6 +134,9 @@ export default function Footer() {
               <Link href="/cookies" className="hover:text-[#0b1b33]">
                 Cookies
               </Link>
+              <Link href="/complaints" className="hover:text-[#0b1b33]">
+                Complaints
+              </Link>
             </div>
           </div>
           <p className="max-w-[920px] text-xs leading-6 text-[#6b7e9e]">
@@ -136,10 +144,23 @@ export default function Footer() {
             (52% B2B late payment; c.50,000 SMEs closing annually); FSB &amp; Xero Small Business
             Index, 2024 (c.£22,000 average owed in overdue invoices); QuickBooks UK SME late-payment
             research, 2023 (56 million hours lost annually). AllSquared is a trading name of
-            AllSquared Ltd, registered in England &amp; Wales. Escrow services are provided by
-            Transpact, an FCA-authorised payment institution, under client-money rules. AllSquared
-            is not a law firm; when you book a legal service we connect you with independent
-            SRA-regulated solicitors who advise directly under their own professional terms.
+            AllSquared Ltd, registered in England &amp; Wales (company number on request; see our{" "}
+            <Link href="/privacy" className="underline hover:text-[#0b1b33]">
+              Privacy Policy
+            </Link>
+            ). Escrow services are provided by Transpact, an FCA-authorised payment institution,
+            under client-money rules. AllSquared does not hold client money. AllSquared is not a
+            law firm; when you book a legal service we connect you with independent SRA-regulated
+            solicitors who advise directly under their own professional terms. AI-assisted
+            features (contract drafting, dispute analysis, mediation suggestions) are not legal
+            advice. For anything that could have material legal, financial, or tax consequences,
+            consult a qualified professional. Data controller: AllSquared Ltd. For our
+            Information Commissioner&rsquo;s Office registration details and how to contact us,
+            see the{" "}
+            <Link href="/privacy" className="underline hover:text-[#0b1b33]">
+              Privacy Policy
+            </Link>
+            .
           </p>
         </div>
       </div>

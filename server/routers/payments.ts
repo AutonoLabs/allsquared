@@ -5,6 +5,7 @@ import { payments, subscriptions, users, webhookEvents, auditLogs } from '../../
 import { eq, and } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import Stripe from 'stripe';
+import { calculatePlatformFee, type Tier } from '../_core/platformFees';
 
 // Subscription tier pricing (in pence)
 const TIER_PRICING = {
@@ -12,14 +13,6 @@ const TIER_PRICING = {
   starter: 1500, // £15/month
   pro: 3500, // £35/month
   enterprise: 9900, // £99/month
-} as const;
-
-// Transaction fee rates
-const TRANSACTION_FEES = {
-  free: { rate: 0.025, min: 500, max: 10000 }, // 2.5%, min £5, max £100
-  starter: { rate: 0.02, min: 500, max: 7500 }, // 2.0%, min £5, max £75
-  pro: { rate: 0.015, min: 500, max: 5000 }, // 1.5%, min £5, max £50
-  enterprise: { rate: 0.01, min: 500, max: 2500 }, // 1.0%, min £5, max £25
 } as const;
 
 function getStripeClient() {
@@ -31,12 +24,10 @@ function getStripeClient() {
   return new Stripe(apiKey);
 }
 
-// Calculate platform fee based on user's subscription tier
-function calculatePlatformFee(amount: number, tier: keyof typeof TRANSACTION_FEES): number {
-  const fees = TRANSACTION_FEES[tier];
-  const calculatedFee = Math.round(amount * fees.rate);
-  return Math.max(fees.min, Math.min(fees.max, calculatedFee));
-}
+// Re-export for backward compatibility with any internal callers.
+// The canonical implementation lives in `_core/platformFees.ts` and is unit-tested there.
+export { calculatePlatformFee };
+export type { Tier };
 
 export const paymentsRouter = router({
   // Get user's subscription status
@@ -307,7 +298,7 @@ export const paymentsRouter = router({
         .where(eq(subscriptions.userId, user.id))
         .limit(1);
 
-      const tier = (subscription[0]?.tier || 'free') as keyof typeof TRANSACTION_FEES;
+      const tier = (subscription[0]?.tier || 'free') as Tier;
       const platformFee = calculatePlatformFee(input.amount, tier);
       const totalAmount = input.amount + platformFee;
 
