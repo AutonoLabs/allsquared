@@ -6,4 +6,4 @@ export const NOT_ADMIN_ERR_MSG = 'You do not have required permission (10002)';
 
 export const APP_TITLE = "AllSquared";
 export const APP_LOGO = "/logo.png";
-export const APP_DESCRIPTION = "Secure service contracts for the UK's freelance economy. The only platform combining AI contracts, FCA-backed escrow, and milestone management.";
+export const APP_DESCRIPTION = "Secure service contracts for the UK's freelance economy. The only platform combining AI contracts, regulated escrow, and milestone management.";

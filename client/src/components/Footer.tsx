@@ -137,9 +137,9 @@ export default function Footer() {
             Index, 2024 (c.£22,000 average owed in overdue invoices); QuickBooks UK SME late-payment
             research, 2023 (56 million hours lost annually). AllSquared is a trading name of
             AllSquared Ltd, registered in England &amp; Wales. Escrow services are provided by
-            Transpact, an FCA-authorised payment institution, under client-money rules. AllSquared
+            a regulated UK payment institution, with client funds held in segregated accounts under applicable client-money protections. AllSquared
             is not a law firm; when you book a legal service we connect you with independent
-            SRA-regulated solicitors who advise directly under their own professional terms.
+            UK-qualified solicitors who advise directly under their own professional terms.
           </p>
         </div>
       </div>

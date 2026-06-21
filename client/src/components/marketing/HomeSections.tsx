@@ -45,7 +45,7 @@ export function HeroSection({ onGetStarted }: SectionProps) {
               className="as25-font-mono inline-flex items-center gap-2 rounded-full border border-[#e2e0d6] bg-white px-4 py-2 text-[11px] uppercase tracking-[0.16em] text-[#2d466f]"
             >
               <span className="inline-flex h-[7px] w-[7px] rounded-full bg-[#2a8554] shadow-[0_0_0_3px_rgba(229,241,234,1)]" />
-              FCA-authorised escrow · SRA-regulated solicitor network
+              Regulated UK escrow · UK-qualified solicitor network
             </motion.div>
 
             <h1 className="as25-font-display mt-8 max-w-[760px] text-[44px] font-normal leading-[1.02] tracking-[-0.03em] text-[#0b1b33] md:text-[78px]">
@@ -71,8 +71,8 @@ export function HeroSection({ onGetStarted }: SectionProps) {
 
             <motion.ul variants={containerVariants} className="mt-10 flex max-w-[560px] flex-col gap-4 border-y border-[#c7d0e0] py-6">
               {[
-                ["i.", "FCA-authorised escrow for every deal", "£5K - £1m+"],
-                ["ii.", "AI-drafted, solicitor-certified contracts", "Ready in minutes"],
+                ["i.", "Regulated UK escrow for every deal", "£5K - £1m+"],
+                ["ii.", "AI-drafted, solicitor-reviewed contracts", "Ready in minutes"],
                 ["iii.", "Instant payouts on milestone proof", "Not reminders"],
               ].map(([index, label, amount]) => (
                 <motion.li
@@ -97,7 +97,7 @@ export function HeroSection({ onGetStarted }: SectionProps) {
             </motion.div>
 
             <motion.div variants={itemVariants} className="mt-10 flex flex-wrap gap-4 text-[10.5px] uppercase tracking-[0.12em] text-[#2d466f]">
-              {["FCA-regulated escrow", "SRA-regulated solicitor network", "UK client-money rules"].map((item) => (
+              {["Regulated UK escrow", "UK-qualified solicitor network", "Funds held in segregated client accounts"].map((item) => (
                 <span key={item} className="as25-font-mono inline-flex items-center gap-2">
                   <span className="h-[6px] w-[6px] rounded-full bg-[#2a8554]" />
                   {item}
@@ -536,7 +536,7 @@ export function LegalServicesSection({ onGetStarted }: SectionProps) {
           <div className="as25-font-mono text-[10.5px] uppercase tracking-[0.2em] text-[#1f6b3f]">
             Our solicitor network
             <br />
-            every member verified
+            every member independently checked
           </div>
           <ul className="grid gap-3 text-[14px] leading-6 text-[#2d466f] md:grid-cols-2">
             {legalCredentials.map((item) => (
@@ -648,7 +648,7 @@ export function PricingSection({ onGetStarted }: SectionProps) {
           </h3>
           <p className="mt-4 text-[15px] leading-7 text-[#2d466f]">
             If your deal needs extra legal input, a contract review, bespoke drafting, or dispute
-            support, we connect you with our partner solicitor network. Independent, SRA-regulated,
+            support, we connect you with our partner solicitor network. Independent, UK-qualified,
             fixed-fee quotes up front.
           </p>
           <div className="mt-6">
