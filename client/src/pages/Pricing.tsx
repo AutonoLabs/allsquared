@@ -8,7 +8,7 @@ import { motion, useReducedMotion } from "framer-motion";
 const pricingFaqs = faqs.filter((faq) =>
   [
     "What size of job is this really designed for?",
-    "What does \"FCA-authorised escrow\" actually mean?",
+    "How is my money actually protected?",
     "Is there an upper limit on deal size?",
   ].includes(faq.q)
 );

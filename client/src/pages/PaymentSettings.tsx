@@ -224,7 +224,7 @@ export default function PaymentSettings() {
               <h3 className="font-semibold">Client Deposits</h3>
               <p className="text-sm text-muted-foreground">
                 When a contract is signed, the client deposits funds into our
-                FCA-regulated escrow.
+                regulated escrow.
               </p>
             </div>
             <div className="space-y-2">
@@ -261,9 +261,9 @@ export default function PaymentSettings() {
             <div className="flex items-start gap-3 p-4 rounded-lg border">
               <Shield className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium">FCA Regulated</p>
+                <p className="font-medium">Regulated UK Escrow</p>
                 <p className="text-sm text-muted-foreground">
-                  Escrow services provided by Transpact Ltd (FCA Ref: 546279)
+                  Client funds are held in segregated accounts by our regulated UK escrow partner, under applicable client-money protections.
                 </p>
               </div>
             </div>

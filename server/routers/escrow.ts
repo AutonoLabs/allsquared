@@ -16,11 +16,16 @@ import * as transpact from '../lib/transpact-client';
 
 /**
  * Transpact Escrow Integration (SOAP)
- * FCA Reference: 546279
  *
  * This router handles escrow operations via Transpact's SOAP API.
  * The SOAP client lives in server/lib/transpact-client.ts and falls
  * back to mock responses when TRANSPACT_API_KEY is not set.
+ *
+ * IMPORTANT: This file's reference to a specific FCA number in earlier
+ * versions was unverified. Until Transpact's FCA authorisation status
+ * is independently confirmed, do NOT surface any FCA reference number
+ * to end users via this code path. Marketing copy uses neutral language
+ * (see PR: fix/compliance-copy-scrub).
  *
  * Env vars:
  *   TRANSPACT_API_KEY      — partner API key

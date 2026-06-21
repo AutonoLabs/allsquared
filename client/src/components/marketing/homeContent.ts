@@ -88,7 +88,7 @@ export const steps: MarketingStep[] = [
     number: "02 / Fund",
     title: "Funds held, never held up.",
     accent: "never held up.",
-    body: "The client transfers the project total into FCA-authorised escrow. The money is ring-fenced - neither party can touch it until agreed work is signed off.",
+    body: "The client transfers the project total into a regulated escrow account. The money is ring-fenced - neither party can touch it until agreed work is signed off.",
     icon: CreditCard,
   },
   {
@@ -109,9 +109,9 @@ export const steps: MarketingStep[] = [
 
 export const matrixRows: MatrixRow[] = [
   ["Contract drafted for you", "Copy-paste template", "Boilerplate only", "Yes", "Solicitor-certified"],
-  ["Funds held in regulated escrow", "On trust", "Platform credit", "No", "FCA-authorised"],
+  ["Funds held in regulated escrow", "On trust", "Platform credit", "No", "UK-regulated"],
   ["Payment released on verified proof", "Invoice & hope", "Partial", "Signing only", "Every milestone"],
-  ["Disputes handled by real solicitors", "Small claims court", "Slow mediation", "Not offered", "SRA-regulated"],
+  ["Disputes handled by real solicitors", "Small claims court", "Slow mediation", "Not offered", "Independent UK"],
   ["No cut of your future work", "Yes", "10-20% forever", "Yes", "Per-contract fee"],
 ];
 
@@ -198,7 +198,7 @@ export const legalServices: MarketingService[] = [
 ];
 
 export const legalCredentials = [
-  "Registered with the Solicitors Regulation Authority",
+  "UK-qualified, with current professional registrations verified at engagement",
   "Carrying full professional indemnity insurance",
   "Experienced in contract & commercial law",
   "Committed to fixed-fee, transparent pricing",
@@ -229,8 +229,8 @@ export const pricingPlans: MarketingPricingPlan[] = [
     suffix: "flat",
     description: "For jobs between £1,000 and £5,000. One flat fee, no percentages, full platform access.",
     items: [
-      "AI-drafted, solicitor-certified contract",
-      "FCA-authorised escrow via Transpact",
+      "AI-drafted, solicitor-reviewed contract",
+      "Regulated UK escrow",
       "Unlimited milestones per agreement",
       "Standard dispute routing",
     ],
@@ -244,7 +244,7 @@ export const pricingPlans: MarketingPricingPlan[] = [
     description: "For deals from £5,000 upward. Pay only when you use it - typically covered several times over by a single avoided dispute.",
     items: [
       "Everything in Small Deals, at scale",
-      "FCA-authorised escrow, no upper limit",
+      "Regulated UK escrow, no upper limit",
       "Priority dispute resolution",
       "Proof upload - photos, commits, timesheets, deliverables",
       "Email support, next working day",
@@ -271,8 +271,8 @@ export const pricingPlans: MarketingPricingPlan[] = [
 
 export const faqs: MarketingFaqItem[] = [
   {
-    q: 'What does "FCA-authorised escrow" actually mean?',
-    a: "Client funds are held in a ring-fenced account operated by a third-party FCA-authorised payment institution - our escrow partner is Transpact, under the FCA's client-money rules. Neither AllSquared nor the contracting parties can access those funds until the milestone is approved. If our company ceased trading tomorrow, the money would still be yours, held in a regulated account outside our control.",
+    q: "How is my money actually protected?",
+    a: "Client funds are held in a ring-fenced client account operated by a regulated UK escrow partner - completely separate from AllSquared's own accounts. Neither AllSquared nor the contracting parties can move those funds until the agreed milestone is approved and signed off. If AllSquared were to cease trading, the money would still be yours - held in a segregated account outside our control.",
   },
   {
     q: "How is AllSquared different from Shieldpay, PayTrustCare, or Escrow.com?",
@@ -280,8 +280,8 @@ export const faqs: MarketingFaqItem[] = [
     points: [
       {
         numeral: "i.",
-        head: "Not just escrow - real, solicitor-certified contracts on demand.",
-        body: "Competitors hold money. AllSquared drafts, certifies, and secures the whole agreement - through our partner solicitor network.",
+        head: "Not just escrow - real, solicitor-reviewed contracts on demand.",
+        body: "Competitors hold money. AllSquared drafts, reviews, and secures the whole agreement - with optional independent legal review through our partner network.",
       },
       {
         numeral: "ii.",
@@ -300,8 +300,8 @@ export const faqs: MarketingFaqItem[] = [
       },
       {
         numeral: "v.",
-        head: "Human assurance - real compliance, no AI slop.",
-        body: "Every critical contract is reviewable by UK-regulated legal professionals, not just bots or generic templates.",
+        head: "Human assurance - real legal review, no AI slop.",
+        body: "Every critical contract is reviewable by qualified UK legal professionals, not just bots or generic templates.",
       },
     ],
   },
@@ -315,15 +315,15 @@ export const faqs: MarketingFaqItem[] = [
   },
   {
     q: "I'm the client hiring. Does this help me too?",
-    a: "Significantly. You pay into a regulated account, not a stranger's. Your money doesn't leave until work you can see is delivered. You get a contract written in English, not jargon. And you avoid the most common bad outcome for commissioning clients: paying a deposit to a supplier who then disappears, restructures, or quietly degrades the work.",
+    a: "Significantly. You pay into a ring-fenced client account, not a stranger's. Your money doesn't leave until work you can see is delivered. You get a contract written in English, not jargon. And you avoid the most common bad outcome for commissioning clients: paying a deposit to a supplier who then disappears, restructures, or quietly degrades the work.",
   },
   {
     q: "Is AllSquared itself a law firm?",
-    a: "No. AllSquared is a technology platform - not a law firm. We draft contracts using AI and present them clearly for both parties to review and sign. For users who want an additional layer of legal assurance, we offer an optional connection to independent, SRA-regulated solicitors who can review or advise on agreements under their own professional terms. That's an add-on, not the core product. This page is marketing material and does not constitute legal advice.",
+    a: "No. AllSquared is a technology platform - not a law firm. We draft contracts using AI and present them clearly for both parties to review and sign. For users who want an additional layer of legal assurance, we offer an optional connection to independent UK-qualified solicitors who can review or advise on agreements under their own professional terms. That's an add-on, not the core product. This page is marketing material and does not constitute legal advice.",
   },
   {
     q: "Is there an upper limit on deal size?",
-    a: "No set upper limit. Our escrow partner Transpact is FCA-authorised and handles very large deal sizes routinely. For multi-million-pound programmes with unusual treasury or compliance requirements, talk to us - we'll set it up properly before your first deal goes through.",
+    a: "No set upper limit. Our escrow partner handles very large deal sizes routinely. For multi-million-pound programmes with unusual treasury or compliance requirements, talk to us - we'll set it up properly before your first deal goes through.",
   },
 ];
 
