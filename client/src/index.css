@@ -6,6 +6,18 @@
 @import "tw-animate-css";
 @import "./styles/md3-theme.css";
 
+/* ─── AllSquared — paint-stable brand background ────────────────
+   Kills the white→purple flash on every route navigation. The CSS
+   above (and any lazy-loaded route chunk) takes a tick to apply,
+   so we set the brand cream directly on <html> and <body> as the
+   very first paint so the user never sees a default browser white
+   that briefly renders before our M3 Surface T99 token kicks in. */
+html, body {
+  background-color: #fafaf7;
+  color: #0b1b33;
+}
+html { scroll-behavior: smooth; }
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
