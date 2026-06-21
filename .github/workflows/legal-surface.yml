@@ -31,7 +31,8 @@ jobs:
         run: |
           set -euo pipefail
           test -f client/src/pages/Terms.tsx
-          test -f client/src/pages/PrivacyPolicy.tsx
+          test -f client/src/pages/Privacy.tsx
+          test -f client/src/pages/CookiePolicy.tsx
           test -f client/src/pages/Complaints.tsx
           test -f client/src/components/CookieConsent.tsx
           test -f client/src/components/Footer.tsx

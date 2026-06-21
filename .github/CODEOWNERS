@@ -14,7 +14,8 @@
 /LICENSE         @elibernstein
 /client/public/  @elibernstein
 /client/src/pages/Terms.tsx         @elibernstein
-/client/src/pages/PrivacyPolicy.tsx @elibernstein
+/client/src/pages/Privacy.tsx       @elibernstein
+/client/src/pages/CookiePolicy.tsx  @elibernstein
 /client/src/pages/Complaints.tsx    @elibernstein
 /client/src/components/Footer.tsx  @elibernstein
 /client/src/components/CookieConsent.tsx @elibernstein
