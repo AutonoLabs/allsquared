@@ -1,0 +1,41 @@
+/* ─── AllSquared Brand Tokens ────────────────────────────────────────
+   Single source of truth for all brand colors. The marketing site
+   uses hex literals (legacy), but the dashboard / MD3 components
+   pull from these CSS variables.
+   ─────────────────────────────────────────────────────────────────── */
+
+:root {
+  /* Brand core */
+  --brand-green:        #1f6b3f;
+  --brand-green-bright: #2a8554;
+  --brand-green-deep:   #002c22;
+  --brand-green-pale:   #e5f1ea;
+  --brand-green-faint:  #ecfdf5;
+  --brand-green-soft:   #8fd1aa;
+
+  /* Navy (text + dark surfaces) */
+  --brand-navy:         #0b1b33;
+  --brand-navy-soft:    #2d466f;
+  --brand-navy-muted:   #6b7e9e;
+
+  /* Cream + lines */
+  --brand-cream:        #fafaf7;
+  --brand-cream-warm:   #f5f3eb;
+  --brand-line:         #e2e0d6;
+  --brand-line-strong:  #c7d0e0;
+
+  /* Accents */
+  --brand-gold:         #f5b800;
+
+  /* Squario mascot accents */
+  --squario-leaf:       #2a8554;
+  --squario-leaf-dark:  #002c22;
+  --squario-eye:        #0b1b33;
+  --squario-cheek:      #f5b800;
+
+  /* Status (semantic) */
+  --brand-success:      #1f6b3f;
+  --brand-warning:      #b67a00;
+  --brand-danger:       #ba1a1a;
+  --brand-info:         #2d466f;
+}

@@ -520,7 +520,7 @@ Format each clause with a title and the clause text.`;
       z.object({
         message: z.string().min(1),
         contractContext: z.string().optional(),
-        modelId: z.enum(['gpt-4o', 'lexai-rag', 'codex']).default(DEFAULT_CHATBOT_MODEL),
+        modelId: z.enum(['gpt-4o', 'lexai-rag', 'squario']).default(DEFAULT_CHATBOT_MODEL),
         history: z.array(z.object({
           role: z.enum(['user', 'assistant']),
           content: z.string(),
@@ -598,7 +598,7 @@ ${input.contractContext ? `\nCurrent contract context:\n${input.contractContext.
         };
       }
 
-      // ── OpenAI path (GPT-4o / Codex) ────────────────────────────
+      // ── OpenAI path (GPT-4o / Squario) ───────────────────────────
       if (!apiKey) {
         return {
           reply: chatFallback(input.message, input.contractContext || ''),
