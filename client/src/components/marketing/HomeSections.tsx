@@ -443,20 +443,19 @@ export function ProofSection({ onGetStarted }: SectionProps) {
         <div className="mx-auto mt-14 max-w-[760px] rounded-[14px] border border-[#e2e0d6] bg-white px-8 py-12 text-center shadow-[0_16px_40px_-20px_rgba(11,27,51,0.12)]">
           <div className="as25-font-mono inline-flex items-center gap-3 text-[10.5px] uppercase tracking-[0.18em] text-[#1f6b3f]">
             <span className="h-px w-6 bg-[#1f6b3f]/40" />
-            Stories from the founding cohort
+            Built for real UK work
             <span className="h-px w-6 bg-[#1f6b3f]/40" />
           </div>
           <h3 className="as25-font-display mx-auto mt-6 max-w-[560px] text-[30px] font-normal leading-[1.2] tracking-[-0.02em] text-[#0b1b33] md:text-[38px]">
-            We&apos;d rather show you <span className="italic text-[#2d466f]">real</span> stories than
-            invented ones.
+            One contract, one escrow account, one place
+            <span className="italic text-[#2d466f]"> to settle it.</span>
           </h3>
           <p className="mx-auto mt-5 max-w-[520px] text-[15.5px] leading-7 text-[#2d466f]">
-            Case studies land here as our founding users complete their first contracts. If
-            you&apos;d like yours to be among them - and you&apos;d be happy to share how it went -
-            we&apos;ll add an extra month to your plan in exchange.
+            AllSquared handles the agreement, the money, and the milestone proof in a single
+            workspace — so the work stays the work and the paperwork stays out of the way.
           </p>
           <div className="mt-8">
-            <MarketingCtaButton onClick={onGetStarted}>Join the founding cohort</MarketingCtaButton>
+            <MarketingCtaButton onClick={onGetStarted}>Draft your first contract</MarketingCtaButton>
           </div>
         </div>
       </div>

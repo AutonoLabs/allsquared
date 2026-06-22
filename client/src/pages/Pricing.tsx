@@ -32,6 +32,7 @@ export default function Pricing() {
           "Per-deal pricing for larger work",
           "Optional solicitor services separately scoped",
         ]}
+        heroVariant="flat"
       />
 
       <MarketingSection
