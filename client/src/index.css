@@ -126,10 +126,10 @@ html { scroll-behavior: smooth; }
   --secondary-container: oklch(0.94 0.016 270);
   --on-secondary-container: oklch(0.22 0.03 265);
 
-  /* ── M3 Tertiary ── Violet #6D28D9 */
-  --tertiary: oklch(0.41 0.249 285.75);          /* Violet T40 */
-  --tertiary-container: oklch(0.93 0.04 285);    /* Violet T90 */
-  --on-tertiary-container: oklch(0.22 0.1 285);  /* Violet T10 */
+  /* ── M3 Tertiary ── Brand Forest Green (was Violet #6D28D9) */
+  --tertiary: oklch(0.42 0.13 155);               /* Forest green T40 */
+  --tertiary-container: oklch(0.93 0.05 155);    /* Light green T90 */
+  --on-tertiary-container: oklch(0.22 0.08 155);  /* Deep green T10 */
 
   /* ── M3 Surface & Background ── */
   --background: oklch(0.984 0.003 247.86);       /* Surface T99 #F8FAFC */
@@ -139,7 +139,7 @@ html { scroll-behavior: smooth; }
   --on-surface-variant: oklch(0.42 0.025 265);   /* On Surface Variant T30 */
 
   /* ── M3 Surface Tint (Violet for elevation) ── */
-  --surface-tint: oklch(0.41 0.249 285.75);      /* Primary tint color */
+  --surface-tint: oklch(0.42 0.16 155);          /* Green tint (brand) */
 
   /* ── M3 Card / Popover / Muted ── */
   --card: oklch(1 0 0);                          /* Pure white elevated surface */
@@ -149,15 +149,15 @@ html { scroll-behavior: smooth; }
   --muted: oklch(0.955 0.012 265);
   --muted-foreground: oklch(0.50 0.025 265);     /* On Surface Variant T40 */
 
-  /* ── M3 Accent ── Violet #6D28D9 */
-  --accent: oklch(0.41 0.249 285.75);
+  /* ── M3 Accent ── Brand Green (was Violet) */
+  --accent: oklch(0.55 0.16 155);                /* Forest green accent */
   --accent-foreground: oklch(1 0 0);
 
   /* ── M3 Outline ── */
   --border: oklch(0.82 0.016 265);               /* Outline T50 */
   --outline-variant: oklch(0.90 0.012 265);      /* Outline Variant T80 */
   --input: oklch(0.90 0.012 265);
-  --ring: oklch(0.41 0.249 285.75);
+  --ring: oklch(0.42 0.16 155);                  /* Brand green focus ring */
 
   /* ── Semantic ── */
   --destructive: oklch(0.56 0.22 29);            /* Error T40 */
@@ -167,10 +167,10 @@ html { scroll-behavior: smooth; }
   --warning: oklch(0.72 0.18 75);                /* Gold — escrow held */
   --warning-foreground: oklch(0.17 0.04 265);
 
-  /* ── Chart ── */
-  --chart-1: oklch(0.41 0.249 285.75);           /* Violet */
+  /* ── Chart ── (greens + navy + gold, no purple) */
+  --chart-1: oklch(0.42 0.16 155);               /* Forest green */
   --chart-2: oklch(0.55 0.18 145);               /* Emerald */
-  --chart-3: oklch(0.665 0.156 293);             /* Violet Light */
+  --chart-3: oklch(0.65 0.10 165);               /* Sage */
   --chart-4: oklch(0.208 0.042 265.75);          /* Navy */
   --chart-5: oklch(0.72 0.18 75);                /* Gold */
 
@@ -179,17 +179,17 @@ html { scroll-behavior: smooth; }
   --sidebar-foreground: oklch(0.17 0.04 265);
   --sidebar-primary: oklch(0.208 0.042 265.75);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.93 0.04 285);
-  --sidebar-accent-foreground: oklch(0.22 0.1 285);
+  --sidebar-accent: oklch(0.93 0.04 155);        /* Light green tint (active nav) */
+  --sidebar-accent-foreground: oklch(0.22 0.08 155);
   --sidebar-border: oklch(0.90 0.012 265);
-  --sidebar-ring: oklch(0.41 0.249 285.75);
+  --sidebar-ring: oklch(0.42 0.16 155);
 
-  /* ── M3 Elevation Surface Colors (surface + tint at opacity) ── */
-  --surface-1: color-mix(in oklch, oklch(0.41 0.249 285.75) 5%, oklch(1 0 0));
-  --surface-2: color-mix(in oklch, oklch(0.41 0.249 285.75) 8%, oklch(1 0 0));
-  --surface-3: color-mix(in oklch, oklch(0.41 0.249 285.75) 11%, oklch(1 0 0));
-  --surface-4: color-mix(in oklch, oklch(0.41 0.249 285.75) 12%, oklch(1 0 0));
-  --surface-5: color-mix(in oklch, oklch(0.41 0.249 285.75) 14%, oklch(1 0 0));
+  /* ── M3 Elevation Surface Colors (green tint, not purple) ── */
+  --surface-1: color-mix(in oklch, oklch(0.42 0.16 155) 5%, oklch(1 0 0));
+  --surface-2: color-mix(in oklch, oklch(0.42 0.16 155) 8%, oklch(1 0 0));
+  --surface-3: color-mix(in oklch, oklch(0.42 0.16 155) 11%, oklch(1 0 0));
+  --surface-4: color-mix(in oklch, oklch(0.42 0.16 155) 12%, oklch(1 0 0));
+  --surface-5: color-mix(in oklch, oklch(0.42 0.16 155) 14%, oklch(1 0 0));
 }
 
 /* ─── Dark Theme ───────────────────────────────────────────────── */
@@ -202,9 +202,9 @@ html { scroll-behavior: smooth; }
   --secondary: oklch(0.30 0.03 265);
   --secondary-foreground: oklch(0.88 0.015 265);
 
-  --tertiary: oklch(0.70 0.15 285);             /* Violet T80 */
-  --tertiary-container: oklch(0.30 0.12 285);
-  --on-tertiary-container: oklch(0.88 0.06 285);
+  --tertiary: oklch(0.70 0.13 155);             /* Sage green (was Violet T80) */
+  --tertiary-container: oklch(0.30 0.10 155);
+  --on-tertiary-container: oklch(0.88 0.04 155);
 
   --background: oklch(0.14 0.018 265);          /* Surface T6 */
   --foreground: oklch(0.90 0.008 265);          /* On Surface T90 */
@@ -220,35 +220,35 @@ html { scroll-behavior: smooth; }
   --muted: oklch(0.28 0.022 265);
   --muted-foreground: oklch(0.65 0.018 265);
 
-  --accent: oklch(0.70 0.15 285);
+  --accent: oklch(0.70 0.13 155);               /* Forest green (was purple) */
   --accent-foreground: oklch(0.17 0.04 265);
 
   --border: oklch(1 0 0 / 12%);
   --outline-variant: oklch(1 0 0 / 8%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.70 0.15 285);
+  --ring: oklch(0.70 0.13 155);
 
   --destructive: oklch(0.70 0.19 29);
   --destructive-foreground: oklch(0.17 0.04 265);
 
-  --chart-1: oklch(0.70 0.15 285);
-  --chart-2: oklch(0.70 0.18 145);
-  --chart-3: oklch(0.41 0.249 285.75);
-  --chart-4: oklch(0.65 0.018 265);
-  --chart-5: oklch(0.78 0.16 75);
+  --chart-1: oklch(0.70 0.13 155);              /* Forest green */
+  --chart-2: oklch(0.70 0.18 145);              /* Emerald */
+  --chart-3: oklch(0.65 0.10 165);              /* Sage */
+  --chart-4: oklch(0.65 0.018 265);             /* Navy */
+  --chart-5: oklch(0.78 0.16 75);               /* Gold */
 
   --sidebar: oklch(0.20 0.022 265);
   --sidebar-foreground: oklch(0.90 0.008 265);
-  --sidebar-accent: oklch(0.30 0.12 285);
-  --sidebar-accent-foreground: oklch(0.88 0.06 285);
+  --sidebar-accent: oklch(0.30 0.10 155);        /* Dark green tint */
+  --sidebar-accent-foreground: oklch(0.88 0.04 155);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.70 0.15 285);
+  --sidebar-ring: oklch(0.70 0.13 155);
 
-  --surface-1: color-mix(in oklch, oklch(0.70 0.15 285) 5%, oklch(0.14 0.018 265));
-  --surface-2: color-mix(in oklch, oklch(0.70 0.15 285) 8%, oklch(0.14 0.018 265));
-  --surface-3: color-mix(in oklch, oklch(0.70 0.15 285) 11%, oklch(0.14 0.018 265));
-  --surface-4: color-mix(in oklch, oklch(0.70 0.15 285) 12%, oklch(0.14 0.018 265));
-  --surface-5: color-mix(in oklch, oklch(0.70 0.15 285) 14%, oklch(0.14 0.018 265));
+  --surface-1: color-mix(in oklch, oklch(0.70 0.13 155) 5%, oklch(0.14 0.018 265));
+  --surface-2: color-mix(in oklch, oklch(0.70 0.13 155) 8%, oklch(0.14 0.018 265));
+  --surface-3: color-mix(in oklch, oklch(0.70 0.13 155) 11%, oklch(0.14 0.018 265));
+  --surface-4: color-mix(in oklch, oklch(0.70 0.13 155) 12%, oklch(0.14 0.018 265));
+  --surface-5: color-mix(in oklch, oklch(0.70 0.13 155) 14%, oklch(0.14 0.018 265));
 }
 
 /* ─── Base Layer ────────────────────────────────────────────────── */
@@ -452,8 +452,8 @@ html { scroll-behavior: smooth; }
     height: 2.5rem;
     padding: 0 1.5rem;
     border-radius: var(--radius-xl);
-    background: var(--tertiary-container, oklch(0.93 0.04 285));
-    color: var(--on-tertiary-container, oklch(0.22 0.1 285));
+    background: var(--tertiary-container, oklch(0.93 0.05 155));
+    color: var(--on-tertiary-container, oklch(0.22 0.08 155));
     font-family: var(--font-sans);
     font-size: 0.875rem;
     font-weight: 500;
@@ -571,9 +571,9 @@ html { scroll-behavior: smooth; }
   /* ── M3 Gradient Mesh Hero ───────────────────────────────────── */
   .gradient-mesh {
     background:
-      radial-gradient(ellipse at 20% 50%, oklch(0.41 0.249 285.75 / 0.25) 0%, transparent 55%),
-      radial-gradient(ellipse at 80% 20%, oklch(0.665 0.156 293 / 0.18) 0%, transparent 55%),
-      radial-gradient(ellipse at 60% 80%, oklch(0.41 0.249 285.75 / 0.12) 0%, transparent 45%),
+      radial-gradient(ellipse at 20% 50%, oklch(0.55 0.16 155 / 0.25) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 20%, oklch(0.65 0.10 165 / 0.18) 0%, transparent 55%),
+      radial-gradient(ellipse at 60% 80%, oklch(0.42 0.16 155 / 0.12) 0%, transparent 45%),
       oklch(0.208 0.042 265.75);
   }
 
