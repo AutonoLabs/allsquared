@@ -13,7 +13,7 @@ const platformPillars = [
   },
   {
     title: "Regulated escrow",
-    body: "Client funds sit with an FCA-authorised partner instead of in either side's current account.",
+    body: "Client funds sit with a regulated escrow partner instead of in either side's current account.",
     icon: CreditCard,
   },
   {
@@ -43,9 +43,10 @@ export default function Features() {
         secondaryAction={{ label: "See how it works", href: "/how-it-works" }}
         highlights={[
           "AI-drafted contract flow",
-          "FCA-authorised escrow partner",
+          "Regulated UK escrow partner",
           "Evidence-led milestone release",
         ]}
+        heroVariant="flat"
       />
 
       <MarketingSection

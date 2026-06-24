@@ -1,7 +1,21 @@
 import { AllSquaredWordmark } from "@/components/marketing/AllSquaredWordmark";
-import { Link } from "wouter";
+import { useEffect } from "react";
+import { Link, useLocation } from "wouter";
 
 export default function Footer() {
+  const [location] = useLocation();
+
+  // Footer Link clicks should always reset scroll position.
+  // Without this, navigating via the footer leaves the page scrolled
+  // partway down which feels broken on mobile where the footer is long.
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }
+  }, [location]);
+
+  // Year recomputes on render so the footer never shows a stale year
+  // (e.g. deployed Dec 31 → Jan 1).
   const currentYear = new Date().getFullYear();
 
   return (
@@ -137,9 +151,9 @@ export default function Footer() {
             Index, 2024 (c.£22,000 average owed in overdue invoices); QuickBooks UK SME late-payment
             research, 2023 (56 million hours lost annually). AllSquared is a trading name of
             AllSquared Ltd, registered in England &amp; Wales. Escrow services are provided by
-            Transpact, an FCA-authorised payment institution, under client-money rules. AllSquared
+            a regulated UK payment institution, with client funds held in segregated accounts under applicable client-money protections. AllSquared
             is not a law firm; when you book a legal service we connect you with independent
-            SRA-regulated solicitors who advise directly under their own professional terms.
+            UK-qualified solicitors who advise directly under their own professional terms.
           </p>
         </div>
       </div>

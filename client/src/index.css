@@ -6,6 +6,18 @@
 @import "tw-animate-css";
 @import "./styles/md3-theme.css";
 
+/* ─── AllSquared — paint-stable brand background ────────────────
+   Kills the white→purple flash on every route navigation. The CSS
+   above (and any lazy-loaded route chunk) takes a tick to apply,
+   so we set the brand cream directly on <html> and <body> as the
+   very first paint so the user never sees a default browser white
+   that briefly renders before our M3 Surface T99 token kicks in. */
+html, body {
+  background-color: #fafaf7;
+  color: #0b1b33;
+}
+html { scroll-behavior: smooth; }
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -661,6 +673,48 @@
     opacity: 0.5;
     pointer-events: none;
     z-index: -1;
+  }
+
+  /* ─── Hero variant: split (About / Contact) ──────────────────────
+     Vertical green panel on the left, cream body. Different from
+     diagonal grid (Home) and flat (Features / Pricing). */
+  .as25-hero-bg-split {
+    position: relative;
+    isolation: isolate;
+    background: #fafaf7;
+  }
+
+  .as25-hero-bg-split::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, #1f6b3f 0%, #2a8554 100%);
+    clip-path: polygon(0 0, 38% 0, 28% 100%, 0 100%);
+    opacity: 0.92;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* ─── Hero variant: flat (Features / Pricing / HowItWorks / LegalServices)
+     Cream body with a navy hairline top stripe for visual rhythm.
+     No diagonal, no panels — feels like a docs page. */
+  .as25-hero-bg-flat {
+    position: relative;
+    isolation: isolate;
+    background: #fafaf7;
+  }
+
+  .as25-hero-bg-flat::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0b1b33 0%, #1f6b3f 50%, #2a8554 100%);
+    pointer-events: none;
+    z-index: 1;
   }
 
   .as25-marquee-track {

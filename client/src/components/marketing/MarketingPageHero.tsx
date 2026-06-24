@@ -19,6 +19,19 @@ type MarketingPageHeroProps = {
   secondaryAction?: HeroAction;
   highlights?: string[];
   aside?: ReactNode;
+  /**
+   * Visual treatment for the hero band.
+   *   "diagonal" — angled green stripe on cream (used by Home)
+   *   "split"    — vertical green panel + cream body (used by About / Contact)
+   *   "flat"     — solid cream + navy bar (used by Features / Pricing / HowItWorks / LegalServices)
+   */
+  heroVariant?: "diagonal" | "split" | "flat";
+};
+
+const HERO_BG: Record<NonNullable<MarketingPageHeroProps["heroVariant"]>, string> = {
+  diagonal: "as25-hero-bg",
+  split: "as25-hero-bg-split",
+  flat: "as25-hero-bg-flat",
 };
 
 function renderAction(action: HeroAction) {
@@ -47,12 +60,13 @@ export function MarketingPageHero({
   secondaryAction,
   highlights,
   aside,
+  heroVariant = "diagonal",
 }: MarketingPageHeroProps) {
   const parts = accent ? title.split(accent) : [title];
   const after = accent ? parts.slice(1).join(accent) : "";
 
   return (
-    <section className="as25-hero-bg relative overflow-hidden border-b border-[#c7d0e0] py-20 md:py-24">
+    <section className={`${HERO_BG[heroVariant]} relative overflow-hidden border-b border-[#c7d0e0] py-20 md:py-24`}>
       <div className={marketingShell}>
         <div className={`relative z-10 ${aside ? "grid gap-14 lg:grid-cols-[1.02fr_0.98fr] lg:items-start" : "max-w-[860px]"}`}>
           <div>

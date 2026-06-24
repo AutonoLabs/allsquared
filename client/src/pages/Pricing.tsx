@@ -8,7 +8,7 @@ import { motion, useReducedMotion } from "framer-motion";
 const pricingFaqs = faqs.filter((faq) =>
   [
     "What size of job is this really designed for?",
-    "What does \"FCA-authorised escrow\" actually mean?",
+    "How is my money actually protected?",
     "Is there an upper limit on deal size?",
   ].includes(faq.q)
 );
@@ -32,6 +32,7 @@ export default function Pricing() {
           "Per-deal pricing for larger work",
           "Optional solicitor services separately scoped",
         ]}
+        heroVariant="flat"
       />
 
       <MarketingSection

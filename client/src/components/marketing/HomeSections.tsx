@@ -45,7 +45,7 @@ export function HeroSection({ onGetStarted }: SectionProps) {
               className="as25-font-mono inline-flex items-center gap-2 rounded-full border border-[#e2e0d6] bg-white px-4 py-2 text-[11px] uppercase tracking-[0.16em] text-[#2d466f]"
             >
               <span className="inline-flex h-[7px] w-[7px] rounded-full bg-[#2a8554] shadow-[0_0_0_3px_rgba(229,241,234,1)]" />
-              FCA-authorised escrow · SRA-regulated solicitor network
+              Regulated UK escrow · UK-qualified solicitor network
             </motion.div>
 
             <h1 className="as25-font-display mt-8 max-w-[760px] text-[44px] font-normal leading-[1.02] tracking-[-0.03em] text-[#0b1b33] md:text-[78px]">
@@ -71,8 +71,8 @@ export function HeroSection({ onGetStarted }: SectionProps) {
 
             <motion.ul variants={containerVariants} className="mt-10 flex max-w-[560px] flex-col gap-4 border-y border-[#c7d0e0] py-6">
               {[
-                ["i.", "FCA-authorised escrow for every deal", "£5K - £1m+"],
-                ["ii.", "AI-drafted, solicitor-certified contracts", "Ready in minutes"],
+                ["i.", "Regulated UK escrow for every deal", "£5K - £1m+"],
+                ["ii.", "AI-drafted, solicitor-reviewed contracts", "Ready in minutes"],
                 ["iii.", "Instant payouts on milestone proof", "Not reminders"],
               ].map(([index, label, amount]) => (
                 <motion.li
@@ -97,7 +97,7 @@ export function HeroSection({ onGetStarted }: SectionProps) {
             </motion.div>
 
             <motion.div variants={itemVariants} className="mt-10 flex flex-wrap gap-4 text-[10.5px] uppercase tracking-[0.12em] text-[#2d466f]">
-              {["FCA-regulated escrow", "SRA-regulated solicitor network", "UK client-money rules"].map((item) => (
+              {["Regulated UK escrow", "UK-qualified solicitor network", "Funds held in segregated client accounts"].map((item) => (
                 <span key={item} className="as25-font-mono inline-flex items-center gap-2">
                   <span className="h-[6px] w-[6px] rounded-full bg-[#2a8554]" />
                   {item}
@@ -443,20 +443,19 @@ export function ProofSection({ onGetStarted }: SectionProps) {
         <div className="mx-auto mt-14 max-w-[760px] rounded-[14px] border border-[#e2e0d6] bg-white px-8 py-12 text-center shadow-[0_16px_40px_-20px_rgba(11,27,51,0.12)]">
           <div className="as25-font-mono inline-flex items-center gap-3 text-[10.5px] uppercase tracking-[0.18em] text-[#1f6b3f]">
             <span className="h-px w-6 bg-[#1f6b3f]/40" />
-            Stories from the founding cohort
+            Built for real UK work
             <span className="h-px w-6 bg-[#1f6b3f]/40" />
           </div>
           <h3 className="as25-font-display mx-auto mt-6 max-w-[560px] text-[30px] font-normal leading-[1.2] tracking-[-0.02em] text-[#0b1b33] md:text-[38px]">
-            We&apos;d rather show you <span className="italic text-[#2d466f]">real</span> stories than
-            invented ones.
+            One contract, one escrow account, one place
+            <span className="italic text-[#2d466f]"> to settle it.</span>
           </h3>
           <p className="mx-auto mt-5 max-w-[520px] text-[15.5px] leading-7 text-[#2d466f]">
-            Case studies land here as our founding users complete their first contracts. If
-            you&apos;d like yours to be among them - and you&apos;d be happy to share how it went -
-            we&apos;ll add an extra month to your plan in exchange.
+            AllSquared handles the agreement, the money, and the milestone proof in a single
+            workspace — so the work stays the work and the paperwork stays out of the way.
           </p>
           <div className="mt-8">
-            <MarketingCtaButton onClick={onGetStarted}>Join the founding cohort</MarketingCtaButton>
+            <MarketingCtaButton onClick={onGetStarted}>Draft your first contract</MarketingCtaButton>
           </div>
         </div>
       </div>
@@ -536,7 +535,7 @@ export function LegalServicesSection({ onGetStarted }: SectionProps) {
           <div className="as25-font-mono text-[10.5px] uppercase tracking-[0.2em] text-[#1f6b3f]">
             Our solicitor network
             <br />
-            every member verified
+            every member independently checked
           </div>
           <ul className="grid gap-3 text-[14px] leading-6 text-[#2d466f] md:grid-cols-2">
             {legalCredentials.map((item) => (
@@ -648,7 +647,7 @@ export function PricingSection({ onGetStarted }: SectionProps) {
           </h3>
           <p className="mt-4 text-[15px] leading-7 text-[#2d466f]">
             If your deal needs extra legal input, a contract review, bespoke drafting, or dispute
-            support, we connect you with our partner solicitor network. Independent, SRA-regulated,
+            support, we connect you with our partner solicitor network. Independent, UK-qualified,
             fixed-fee quotes up front.
           </p>
           <div className="mt-6">

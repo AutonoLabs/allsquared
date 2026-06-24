@@ -176,6 +176,7 @@ export default function NewContractTypeform() {
   const savedProfiles = trpc.partyProfiles.list.useQuery();
   const createProfile = trpc.partyProfiles.create.useMutation();
   const createContract = trpc.contracts.create.useMutation();
+  const sendForSignature = trpc.contracts.sendForSignature.useMutation();
 
   const templates = trpc.templateBuilder.listLegalTemplates.useQuery(undefined, {
     enabled: step >= 2,
@@ -256,6 +257,15 @@ export default function NewContractTypeform() {
   };
 
   const handleSaveDraft = async () => {
+    // Pre-flight: at minimum we need both parties named
+    if (!partyA?.name || !partyB?.name) {
+      const missing = [
+        !partyA?.name && "Party A (client) name",
+        !partyB?.name && "Party B (provider) name",
+      ].filter(Boolean).join(", ");
+      toast.error(`Cannot save: ${missing} required.`);
+      return;
+    }
     setSaving(true);
     try {
       await saveProfiles();
@@ -283,13 +293,48 @@ export default function NewContractTypeform() {
   };
 
   const handleSendForSignature = async () => {
+    // Pre-flight: party names + email + contract details required
+    const missing: string[] = [];
+    if (!partyA?.name) missing.push("Party A (client) name");
+    if (!partyB?.name) missing.push("Party B (provider) name");
+    if (!partyB?.email) missing.push("Party B email");
+    if (!variableValues["total_amount"] && !variableValues["totalAmount"]) {
+      missing.push("Total contract amount");
+    }
+    if (missing.length > 0) {
+      toast.error(`Cannot send: ${missing.join(", ")} required.`);
+      return;
+    }
+
     setSaving(true);
     try {
       await saveProfiles();
-      toast.success("Contract sent for signature (coming soon)");
+      const created = await createContract.mutateAsync({
+        title: `${partyA.name} ↔ ${partyB.name}`,
+        category: (category as Category) || "other",
+        description: selectedTemplate?.description || "",
+        totalAmount: variableValues["total_amount"] || variableValues["totalAmount"] || "0",
+        clientId: partyA.name,
+        providerId: partyB.name,
+        templateId: selectedTemplateId || undefined,
+        contractContent: previewMarkdown,
+        selectedClauses: JSON.stringify(selectedClauses),
+        filledVariables: JSON.stringify(variableValues),
+        generatedMarkdown: previewMarkdown,
+        status: "draft",
+      } as any);
+
+      // If we got an id back, immediately call sendForSignature
+      const newId = (created as any)?.id || (created as any)?.contractId;
+      if (newId && sendForSignature) {
+        await sendForSignature.mutateAsync({ id: newId });
+        toast.success("Contract sent for signature");
+      } else {
+        toast.success("Contract saved as draft — open it to send for signature");
+      }
       navigate("/dashboard/contracts");
     } catch (e: any) {
-      toast.error(e.message || "Failed to send");
+      toast.error(e.message || "Failed to send contract for signature");
     } finally {
       setSaving(false);
     }

@@ -47,7 +47,7 @@ const sections: MarketingLegalSection[] = [
   {
     title: "6. Escrow Services",
     paragraphs: [
-      "Escrow services are provided through our FCA-authorised partners. Funds held in escrow are subject to the terms and conditions of the relevant escrow partner. AllSquared acts as a facilitator and is not responsible for the escrow partner's independent actions or obligations.",
+      "Escrow services are provided through a regulated UK payment partner. Funds held in escrow are subject to the terms and conditions of the relevant escrow partner. AllSquared acts as a facilitator and is not responsible for the escrow partner's independent actions or obligations.",
     ],
   },
   {
