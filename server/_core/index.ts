@@ -16,12 +16,12 @@ import { CSP_DIRECTIVES, PERMISSIONS_POLICY } from "./csp";
 // Initialize Sentry before anything else
 initSentry();
 
+// Create Express app
+const app = express();
+
 // Sentry request handler must be the FIRST middleware
 app.use(Sentry.Handlers.requestHandler());
 app.use(Sentry.Handlers.tracingHandler());
-
-// Create Express app
-const app = express();
 
 // =============================================================================
 // SECURITY MIDDLEWARE
@@ -307,8 +307,8 @@ if (!process.env.VERCEL) {
     const templateCount = Number(rows[0]?.count ?? 0);
     if (templateCount === 0) {
       console.log('[Server] No templates found — auto-seeding...');
-      const { seedTemplates } = await import('../seed-templates');
-      await seedTemplates(db);
+      const { seedAllTemplates } = await import('../seed-templates');
+      await seedAllTemplates(db);
     }
   } catch (err) {
     console.warn('[Server] Auto-seed skipped:', (err as Error).message);

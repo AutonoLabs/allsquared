@@ -384,7 +384,7 @@ async function seedFromTemplatesDir(db: ReturnType<typeof drizzle>) {
   console.log(`  [seed] Templates directory seeding complete.`);
 }
 
-async function seedAllTemplates(db: ReturnType<typeof drizzle>) {
+export async function seedAllTemplates(db: ReturnType<typeof drizzle>) {
   console.log("[seed] Seeding all contract templates...\n");
   // Seed existing legal templates
   await seedTemplates(db);

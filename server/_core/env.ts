@@ -24,12 +24,6 @@ const BaseEnvSchema = z.object({
   VITE_APP_LOGO: z.string().default("/logo.png"),
   PORT: z.string().optional(),
 
-  // Firebase configuration (optional for file uploads)
-  FIREBASE_PROJECT_ID: z.string().optional(),
-  FIREBASE_CLIENT_EMAIL: z.string().optional(),
-  FIREBASE_PRIVATE_KEY: z.string().optional(),
-  FIREBASE_STORAGE_BUCKET: z.string().optional(),
-  
   // Stripe (optional for payments)
   STRIPE_SECRET_KEY: z.string().optional(),
   STRIPE_PUBLISHABLE_KEY: z.string().optional(),
@@ -67,12 +61,6 @@ export const ENV = {
   isProduction: envVars.NODE_ENV === "production",
   appTitle: envVars.VITE_APP_TITLE,
   appLogo: envVars.VITE_APP_LOGO,
-  
-  // Firebase
-  firebaseProjectId: envVars.FIREBASE_PROJECT_ID,
-  firebaseClientEmail: envVars.FIREBASE_CLIENT_EMAIL,
-  firebasePrivateKey: envVars.FIREBASE_PRIVATE_KEY,
-  firebaseStorageBucket: envVars.FIREBASE_STORAGE_BUCKET,
   
   // Stripe
   stripeSecretKey: envVars.STRIPE_SECRET_KEY,

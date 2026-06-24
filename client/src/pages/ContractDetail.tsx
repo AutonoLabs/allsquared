@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useRoute, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { itemVariants } from "@/lib/motion";
-import { safeJsonParse } from "@/lib/utils";
+import { parseContractContent, type ContractSignature } from "@shared/contract-content";
 import MilestoneManager from "@/components/MilestoneManager";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -28,16 +28,13 @@ import {
 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 
-type ContractSignature = {
-  userId?: string;
-  name: string;
-  signedAt: string;
-};
-
 type ContractContent = {
   content?: string;
   variables?: unknown[];
   signatures?: ContractSignature[];
+  partyA?: { name?: string; email?: string };
+  partyB?: { name?: string; email?: string };
+  generatedMarkdown?: string;
 };
 
 export default function ContractDetail() {
@@ -54,6 +51,11 @@ export default function ContractDetail() {
   const utils = trpc.useUtils();
   const { data: currentUser } = trpc.auth.me.useQuery();
   const { data: contract, isLoading } = trpc.contracts.get.useQuery({ id: contractId });
+  const { data: providerInfo } = trpc.signatures.getProviderInfo.useQuery();
+  const { data: signatureStatus } = trpc.signatures.getContractSignatures.useQuery(
+    { contractId },
+    { enabled: !!contractId }
+  );
 
   const signMutation = trpc.contracts.sign.useMutation({
     onSuccess: () => {
@@ -74,6 +76,18 @@ export default function ContractDetail() {
     },
     onError: (error) => {
       toast.error(error.message || "Failed to send contract");
+    },
+  });
+
+  const createSignatureRequestMutation = trpc.signatures.createSignatureRequest.useMutation({
+    onSuccess: (data) => {
+      const label = data.provider === "docuseal" ? "DocuSeal" : data.provider;
+      toast.success(`Signature request sent via ${label}`);
+      utils.contracts.get.invalidate({ id: contractId });
+      utils.signatures.getContractSignatures.invalidate({ contractId });
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to send e-signature request");
     },
   });
 
@@ -100,6 +114,48 @@ export default function ContractDetail() {
     },
   });
 
+
+  const contractContent: ContractContent = contract?.contractContent
+    ? parseContractContent(contract.contractContent as string)
+    : {};
+  const inlineSignatures = contractContent.signatures || [];
+  const eSignRecords = signatureStatus?.signatures ?? [];
+  const hasEsignFlow = eSignRecords.length > 0;
+
+  function handleSendForSignature() {
+    if (!contract || !currentUser) return;
+
+    const provider = providerInfo?.provider ?? "internal";
+    if (provider === "internal") {
+      sendForSignatureMutation.mutate({ id: contractId });
+      return;
+    }
+
+    const clientEmail = contractContent.partyA?.email || currentUser.email;
+    const providerEmail = contractContent.partyB?.email;
+    if (!clientEmail || !providerEmail) {
+      toast.error("Both parties need email addresses before sending for e-signature.");
+      return;
+    }
+
+    createSignatureRequestMutation.mutate({
+      contractId,
+      signers: [
+        {
+          userId: contract.clientId,
+          email: clientEmail,
+          name: contractContent.partyA?.name || currentUser.name || "Client",
+          role: "client",
+        },
+        {
+          userId: contract.providerId || contract.clientId,
+          email: providerEmail,
+          name: contractContent.partyB?.name || "Counterparty",
+          role: "provider",
+        },
+      ],
+    });
+  }
 
   if (isLoading) {
     return (
@@ -148,12 +204,7 @@ export default function ContractDetail() {
     );
   }
 
-  const contractContent: ContractContent = (() => {
-    if (!contract.contractContent) return {};
-    const raw = contract.contractContent as string;
-    return safeJsonParse<ContractContent>(raw, { content: raw, variables: [] });
-  })();
-  const signatures = contractContent.signatures || [];
+  const signatures = inlineSignatures;
 
   return (
     <div className="space-y-6 p-2">
@@ -298,12 +349,24 @@ export default function ContractDetail() {
               {contract.status === "draft" && (
                 <Button
                   className="w-full"
-                  onClick={() => sendForSignatureMutation.mutate({ id: contractId })}
-                  disabled={sendForSignatureMutation.isPending}
+                  onClick={handleSendForSignature}
+                  disabled={sendForSignatureMutation.isPending || createSignatureRequestMutation.isPending}
                 >
                   <Send className="mr-2 h-4 w-4" />
-                  Send for Signature
+                  {providerInfo && providerInfo.provider !== "internal"
+                    ? "Send via E-Signature"
+                    : "Send for Signature"}
                 </Button>
+              )}
+              {hasEsignFlow && (
+                <div className="rounded-lg border bg-muted/40 p-3 text-sm space-y-2">
+                  <p className="font-medium">
+                    E-signature ({providerInfo?.provider ?? "provider"})
+                  </p>
+                  <p className="text-muted-foreground">
+                    {signatureStatus?.signedCount ?? 0} of {eSignRecords.length} signed
+                  </p>
+                </div>
               )}
               {(contract.status === "pending_signature" || contract.status === "active") && (
                 <Dialog open={isSignDialogOpen} onOpenChange={setIsSignDialogOpen}>

@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import CompanyLookup from "@/components/CompanyLookup";
 import { CHATBOT_MODEL_LIST, DEFAULT_CHATBOT_MODEL, type ChatbotModelId } from "@shared/chatbot-config";
+import { buildTemplateVariablesFromBuilder, renderTemplate } from "@shared/template-render";
 
 // ── Types ──────────────────────────────────────────────────────────
 
@@ -61,6 +62,7 @@ interface ModuleQuestion {
   type: "text" | "select" | "number" | "date" | "toggle";
   options?: string[];
   default?: string;
+  helper?: string;
   answer: string;
 }
 
@@ -190,9 +192,16 @@ const DEFAULT_MODULES: ContractModule[] = [
 export default function NewContractBuilder() {
   const [, setLocation] = useLocation();
   
-  // Steps: parties → modules → questions → review
+  // Steps: template → parties → modules → questions → review
   const [step, setStep] = useState(0);
   const [contractTitle, setContractTitle] = useState("");
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+
+  const { data: legalTemplates = [] } = trpc.templateBuilder.listLegalTemplates.useQuery();
+  const { data: selectedTemplate } = trpc.templateBuilder.getLegalTemplate.useQuery(
+    { id: selectedTemplateId! },
+    { enabled: !!selectedTemplateId }
+  );
   
   // Party info
   const [partyA, setPartyA] = useState<PartyInfo>({
@@ -256,14 +265,28 @@ export default function NewContractBuilder() {
     setSaving(true);
 
     // Build content from modules
+    const modulePayload = enabledModules.map((m) => ({
+      id: m.id,
+      name: m.name,
+      answers: Object.fromEntries(m.questions.map((q) => [q.id, q.answer])),
+    }));
+
+    let generatedMarkdown: string | undefined;
+    if (selectedTemplate?.templateMarkdown) {
+      const vars = buildTemplateVariablesFromBuilder({
+        partyA: { name: partyA.name, address: partyA.address },
+        partyB: { name: partyB.name, address: partyB.address },
+        modules: modulePayload,
+      });
+      generatedMarkdown = renderTemplate(selectedTemplate.templateMarkdown, vars);
+    }
+
     const content = {
       partyA: { ...partyA },
       partyB: { ...partyB },
-      modules: enabledModules.map((m) => ({
-        id: m.id,
-        name: m.name,
-        answers: Object.fromEntries(m.questions.map((q) => [q.id, q.answer])),
-      })),
+      modules: modulePayload,
+      ...(selectedTemplateId ? { templateId: selectedTemplateId } : {}),
+      ...(generatedMarkdown ? { generatedMarkdown } : {}),
     };
 
     // Extract total amount from payment module (no £0.01 hack — leave 0 if unset)
@@ -294,9 +317,10 @@ export default function NewContractBuilder() {
     } else {
       createMutation.mutate(
         {
-          title: contractTitle || "Untitled Contract",
+          title: contractTitle || selectedTemplate?.name || "Untitled Contract",
           description: `Contract between ${partyA.name || "Party A"} and ${partyB.name || "Party B"}`,
-          category: "service_agreement",
+          category: (selectedTemplate?.category || "freelance") as "freelance" | "home_improvement" | "event_services" | "trade_services" | "other",
+          templateId: selectedTemplateId || undefined,
           totalAmount,
           startDate: startDate || undefined,
           endDate: endDate || undefined,
@@ -513,7 +537,62 @@ export default function NewContractBuilder() {
     );
   }
 
-  // ── Step 0: Parties ──────────────────────────────────────────────
+  // ── Step 0: Template ─────────────────────────────────────────────
+
+  function renderTemplateStep() {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="as25-font-display text-4xl font-normal tracking-[-0.04em] text-[#0b1b33]">Choose a starting point</h1>
+          <p className="mt-2 text-[#2d466f]">Pick a UK legal template or build from scratch with modules</p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+          <button
+            type="button"
+            onClick={() => {
+              setSelectedTemplateId(null);
+              if (!contractTitle) setContractTitle("");
+            }}
+            className={`rounded-2xl border p-4 text-left transition-all ${
+              selectedTemplateId === null
+                ? "border-[#1f6b3f] bg-[#eef6f1] shadow-sm"
+                : "border-[#c7d0e0] bg-white hover:border-[#1f6b3f]/40"
+            }`}
+          >
+            <p className="font-semibold text-[#0b1b33]">Start from scratch</p>
+            <p className="mt-1 text-sm text-[#2d466f]">Modular builder — scope, payment, escrow, IP, disputes</p>
+          </button>
+
+          {legalTemplates.map((tmpl) => (
+            <button
+              key={tmpl.id}
+              type="button"
+              onClick={() => {
+                setSelectedTemplateId(tmpl.id);
+                if (!contractTitle) setContractTitle(tmpl.name);
+              }}
+              className={`rounded-2xl border p-4 text-left transition-all ${
+                selectedTemplateId === tmpl.id
+                  ? "border-[#1f6b3f] bg-[#eef6f1] shadow-sm"
+                  : "border-[#c7d0e0] bg-white hover:border-[#1f6b3f]/40"
+              }`}
+            >
+              <div className="flex items-start justify-between gap-2">
+                <p className="font-semibold text-[#0b1b33]">{tmpl.name}</p>
+                <Badge variant="secondary" className="capitalize shrink-0">
+                  {tmpl.category.replace(/_/g, " ")}
+                </Badge>
+              </div>
+              <p className="mt-1 text-sm text-[#2d466f] line-clamp-2">{tmpl.description}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // ── Step 1: Parties ──────────────────────────────────────────────
 
   function renderStep0() {
     return (
@@ -636,8 +715,8 @@ export default function NewContractBuilder() {
           {currentModule.questions.map((q) => (
             <div key={q.id} className="space-y-2">
               <Label className="font-semibold text-[#0b1b33]">{q.question}</Label>
-              {(q as any).helper && (
-                <p className="text-xs leading-5 text-[#6b7e9e]">{(q as any).helper}</p>
+              {(q.helper) && (
+                <p className="text-xs leading-5 text-[#6b7e9e]">{q.helper}</p>
               )}
 
               {q.type === "text" && (
@@ -711,6 +790,12 @@ export default function NewContractBuilder() {
         </div>
 
         <div className="space-y-4 rounded-[18px] border border-[#c7d0e0] bg-white p-6 shadow-[0_10px_30px_rgba(11,27,51,0.06)]">
+          {selectedTemplate && (
+            <div>
+              <p className="as25-font-mono mb-2 text-xs uppercase tracking-[0.14em] text-[#2d466f]">Legal template</p>
+              <p className="text-sm font-medium">{selectedTemplate.name}</p>
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="as25-font-mono text-xs uppercase tracking-[0.14em] text-[#2d466f]">Party A</p>
@@ -886,7 +971,7 @@ export default function NewContractBuilder() {
 
   // ── Main Render ─────────────────────────────────────────────────
 
-  const steps = ["Parties", "Modules", "Details", "Review"];
+  const steps = ["Template", "Parties", "Modules", "Details", "Review"];
 
   return (
     <div className="min-h-screen bg-[#fafaf7]">
@@ -928,13 +1013,14 @@ export default function NewContractBuilder() {
       <div
         className={`mx-auto max-w-4xl px-4 py-8 transition-all duration-300 ${showChat ? "pr-[21rem]" : ""}`}
       >
-        {step === 0 && renderStep0()}
-        {step === 1 && renderStep1()}
-        {step === 2 && renderStep2()}
-        {step === 3 && renderStep3()}
+        {step === 0 && renderTemplateStep()}
+        {step === 1 && renderStep0()}
+        {step === 2 && renderStep1()}
+        {step === 3 && renderStep2()}
+        {step === 4 && renderStep3()}
       </div>
 
-      {step < 3 && (
+      {step < 4 && (
         <div className="sticky bottom-0 border-t border-[#c7d0e0] bg-[#fafaf7]/92 backdrop-blur-md">
           <div
             className={`mx-auto flex max-w-4xl items-center justify-between px-4 py-3.5 transition-all duration-300 ${

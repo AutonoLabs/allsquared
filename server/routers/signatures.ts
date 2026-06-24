@@ -188,6 +188,13 @@ export const signaturesRouter = router({
     return {
       provider,
       features: {
+        docuseal: {
+          name: 'DocuSeal',
+          description: 'Self-hosted e-signature (recommended for UK B2B)',
+          legalValidity: 'Valid under UK Electronic Communications Act 2000',
+          auditTrail: true,
+          mobileApp: false,
+        },
         docusign: {
           name: 'DocuSign',
           description: 'Enterprise e-signature solution',

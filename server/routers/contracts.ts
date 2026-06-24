@@ -9,6 +9,7 @@ import {
 } from '../db';
 import { createNotification } from '../db';
 import { assertContractStatusTransition, type ContractStatus } from '../lib/contract-state';
+import { parseContractContent, serializeContractContent } from '@shared/contract-content';
 import { nanoid } from 'nanoid';
 
 export const contractsRouter = router({
@@ -71,10 +72,10 @@ export const contractsRouter = router({
         templateId: z.string().optional(),
         title: z.string().min(1),
         description: z.string(),
-        category: z.string(),
+        category: z.enum(['freelance', 'home_improvement', 'event_services', 'trade_services', 'other']),
         providerId: z.string().optional(),
         providerEmail: z.string().email().optional(),
-        totalAmount: z.number().positive(),
+        totalAmount: z.number().min(0),
         startDate: z.string().optional(),
         endDate: z.string().optional(),
         content: z.any(),
@@ -82,6 +83,12 @@ export const contractsRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const contractId = `contract_${nanoid(16)}`;
+      const contentObj = typeof input.content === 'object' && input.content !== null
+        ? (input.content as Record<string, unknown>)
+        : {};
+      const generatedMarkdown = typeof contentObj.generatedMarkdown === 'string'
+        ? contentObj.generatedMarkdown
+        : undefined;
       
       const contract = await createContract({
         id: contractId,
@@ -95,6 +102,7 @@ export const contractsRouter = router({
         currency: 'GBP',
         status: 'draft',
         contractContent: JSON.stringify(input.content),
+        generatedMarkdown,
         startDate: input.startDate ? new Date(input.startDate) : undefined,
         endDate: input.endDate ? new Date(input.endDate) : undefined,
         createdAt: new Date(),
@@ -240,17 +248,16 @@ export const contractsRouter = router({
         throw new Error('Unauthorized');
       }
       
-      // For MVP, we'll track signatures in contract content
-      const content = contract.contractContent ? JSON.parse(contract.contractContent as string) : {};
+      // Track signatures in structured contract content (JSON or markdown wrapper)
+      const content = parseContractContent(contract.contractContent as string | null);
       if (!content.signatures) {
         content.signatures = [];
       }
-      
-      // Check if user already signed
+
       const alreadySigned = content.signatures.some(
-        (sig: any) => sig.userId === ctx.user.id
+        (sig) => sig.userId === ctx.user.id
       );
-      
+
       if (!alreadySigned) {
         content.signatures.push({
           userId: ctx.user.id,
@@ -258,14 +265,13 @@ export const contractsRouter = router({
           signedAt: new Date().toISOString(),
         });
       }
-      
-      // Check if both parties have signed
+
       const allSigned =
         content.signatures.length >= 2 ||
         (contract.clientId === contract.providerId && content.signatures.length >= 1);
-      
+
       await updateContract(input.id, {
-        contractContent: JSON.stringify(content),
+        contractContent: serializeContractContent(content),
         status: allSigned ? 'active' : 'pending_signature',
 
         updatedAt: new Date(),

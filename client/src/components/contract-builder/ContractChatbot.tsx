@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
-import { Send, X, User, Loader2 } from "lucide-react";
+import { Send, User, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { SQUARIO_GREETING, SQUARIO_FALLBACK } from "@shared/chatbot-config";
+import { trpc } from "@/lib/trpc";
+import { SQUARIO_GREETING } from "@shared/chatbot-config";
 
 interface Message {
   role: "user" | "assistant";
@@ -19,65 +20,6 @@ interface Props {
   onOpenChange: (open: boolean) => void;
 }
 
-async function askContractAI(question: string, context: string): Promise<string> {
-  const apiKey = (window as any).__openai_key || "";
-
-  // Fallback to heuristic response if no key
-  if (!apiKey) {
-    return generateFallbackResponse(question, context);
-  }
-
-  try {
-    const resp = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4o-mini",
-        messages: [
-          {
-            role: "system",
-            content: `You are a helpful contract assistant for AllSquared, a UK contract platform.
-You help users understand and improve their contract. Be concise and practical.
-Never provide legal advice — instead suggest seeking a solicitor for complex matters.
-
-Current contract context:
-${context.slice(0, 3000)}`,
-          },
-          { role: "user", content: question },
-        ],
-        max_tokens: 600,
-        temperature: 0.5,
-      }),
-    });
-
-    if (!resp.ok) throw new Error("API error");
-    const data = await resp.json();
-    return data.choices[0]?.message?.content || "Unable to generate response.";
-  } catch {
-    return generateFallbackResponse(question, context);
-  }
-}
-
-function generateFallbackResponse(question: string, context: string): string {
-  const q = question.toLowerCase();
-  if (q.includes("payment") || q.includes("pay")) {
-    return "Payment terms define when and how the client pays. The contract uses milestone-based payments held in escrow for security. You can edit the payment milestones and amounts in the contract fields.";
-  }
-  if (q.includes("terminat") || q.includes("cancel")) {
-    return "Termination clauses define how either party can end the agreement. Typically 14 days written notice is required. Upon termination, the client pays for completed work and the provider delivers all work to date.";
-  }
-  if (q.includes("ip") || q.includes("intellectual property") || q.includes("copyright")) {
-    return "IP ownership transfers to the client upon full payment. Until payment is complete, the provider retains ownership. You may want to specify this explicitly if your work involves sensitive IP.";
-  }
-  if (q.includes("dispute") || q.includes("problem") || q.includes("disagree")) {
-    return "The contract includes AllSquared's AI-assisted mediation service as the first step for disputes. This is faster and cheaper than court. If unresolved, parties can escalate to formal mediation or the courts of England and Wales.";
-  }
-  return SQUARIO_FALLBACK;
-}
-
 export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props) {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -89,6 +31,7 @@ export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props)
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const chatMutation = trpc.ai.chatMessage.useMutation();
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -99,14 +42,29 @@ export function ContractChatbot({ contractMarkdown, open, onOpenChange }: Props)
     if (!text || loading) return;
 
     setInput("");
-    setMessages((prev) => [...prev, { role: "user", content: text, timestamp: new Date() }]);
+    const userMessage: Message = { role: "user", content: text, timestamp: new Date() };
+    setMessages((prev) => [...prev, userMessage]);
     setLoading(true);
 
     try {
-      const reply = await askContractAI(text, contractMarkdown);
+      const result = await chatMutation.mutateAsync({
+        message: text,
+        contractContext: contractMarkdown.slice(0, 4000) || undefined,
+        modelId: "squario",
+        history: messages.slice(-8).map((m) => ({ role: m.role, content: m.content })),
+      });
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: reply, timestamp: new Date() },
+        { role: "assistant", content: result.reply, timestamp: new Date() },
+      ]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Sorry, I couldn't process that right now. Please try again.",
+          timestamp: new Date(),
+        },
       ]);
     } finally {
       setLoading(false);

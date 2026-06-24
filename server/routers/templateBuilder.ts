@@ -4,6 +4,7 @@ import { getDb } from "../db";
 import { contractTemplates, contracts } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
+import { renderTemplate } from "@shared/template-render";
 
 export const templateBuilderRouter = router({
   // List available legal templates (with variable defs and clause banks)
@@ -87,11 +88,7 @@ export const templateBuilderRouter = router({
       const template = result[0];
       let markdown = template.templateMarkdown || "";
 
-      // Replace all [VARIABLE_NAME] placeholders with values
-      for (const [key, value] of Object.entries(input.variables)) {
-        const regex = new RegExp(`\\[${key}\\]`, "g");
-        markdown = markdown.replace(regex, value || `[${key}]`);
-      }
+      markdown = renderTemplate(markdown, input.variables);
 
       // Generate a title from the template name + client name
       const title = `${template.name} - ${input.variables.CLIENT_NAME || input.variables.COMPANY_NAME || "Draft"}`;
