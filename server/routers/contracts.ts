@@ -304,21 +304,52 @@ export const contractsRouter = router({
   // Get dashboard stats
   stats: protectedProcedure.query(async ({ ctx }) => {
     const contracts = await getUserContracts(ctx.user.id);
-    
+
     const activeContracts = contracts.filter((c) => c.status === 'active').length;
     const completedContracts = contracts.filter((c) => c.status === 'completed').length;
     const draftContracts = contracts.filter((c) => c.status === 'draft').length;
-    
+
     const totalValue = contracts
       .filter((c) => c.status === 'active' || c.status === 'completed')
       .reduce((sum, c) => sum + (parseInt(c.totalAmount || '0', 10)), 0);
-    
+
     return {
       activeContracts,
       completedContracts,
       draftContracts,
       totalContracts: contracts.length,
       totalValue,
+    };
+  }),
+
+  /**
+   * Combined dashboard payload — returns stats AND the 5 most recent contracts
+   * in a single round-trip so the dashboard skeleton can disappear in one fetch
+   * instead of two sequential ones.
+   */
+  dashboard: protectedProcedure.query(async ({ ctx }) => {
+    const [{ contracts: recent }, total] = await Promise.all([
+      getUserContractsPage(ctx.user.id, { page: 1, limit: 5 }),
+      getUserContracts(ctx.user.id),
+    ]);
+
+    const activeContracts = total.filter((c) => c.status === 'active').length;
+    const completedContracts = total.filter((c) => c.status === 'completed').length;
+    const draftContracts = total.filter((c) => c.status === 'draft').length;
+
+    const totalValue = total
+      .filter((c) => c.status === 'active' || c.status === 'completed')
+      .reduce((sum, c) => sum + (parseInt(c.totalAmount || '0', 10)), 0);
+
+    return {
+      stats: {
+        activeContracts,
+        completedContracts,
+        draftContracts,
+        totalContracts: total.length,
+        totalValue,
+      },
+      contracts: recent,
     };
   }),
 });

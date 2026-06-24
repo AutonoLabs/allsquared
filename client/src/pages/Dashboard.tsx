@@ -28,14 +28,12 @@ export default function Dashboard() {
   const reduceMotion = useReducedMotion();
   const ready = isLoaded && isSignedIn;
 
-  const { data: stats, isLoading: statsLoading } = trpc.contracts.stats.useQuery(
+  const { data: dashboardData, isLoading: dashboardLoading } = trpc.contracts.dashboard.useQuery(
     undefined,
     { enabled: ready }
   );
-  const { data: contractsData, isLoading: contractsLoading } = trpc.contracts.list.useQuery(
-    { page: 1, limit: 5 },
-    { enabled: ready }
-  );
+  const stats = dashboardData?.stats;
+  const contracts = dashboardData?.contracts ?? [];
 
   const [onboardingDismissed, setOnboardingDismissed] = useState(() => {
     try { return localStorage.getItem(ONBOARDING_DISMISSED_KEY) === "true"; } catch { return false; }
@@ -46,7 +44,7 @@ export default function Dashboard() {
     try { localStorage.setItem(ONBOARDING_DISMISSED_KEY, "true"); } catch {}
   }
 
-  if (statsLoading || contractsLoading) {
+  if (dashboardLoading) {
     return (
       <div className="space-y-8 p-2">
         <div className="flex items-center justify-between">
@@ -83,8 +81,6 @@ export default function Dashboard() {
     );
   }
 
-  const contracts = contractsData?.contracts || [];
-
   return (
     <div className="space-y-8 p-2">
       {/* Header */}
@@ -103,7 +99,7 @@ export default function Dashboard() {
       </div>
 
       {/* Onboarding Banner */}
-      {!onboardingDismissed && !statsLoading && (stats?.activeContracts || 0) + (stats?.completedContracts || 0) + (stats?.draftContracts || 0) === 0 && (
+      {!onboardingDismissed && !dashboardLoading && (stats?.activeContracts || 0) + (stats?.completedContracts || 0) + (stats?.draftContracts || 0) === 0 && (
         <MD3Card variant="filled" className="relative overflow-hidden border-[var(--md-sys-color-primary)]/20">
           <MD3CardContent className="p-6">
             <button
