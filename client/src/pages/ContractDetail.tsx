@@ -6,7 +6,7 @@ import { safeJsonParse } from "@/lib/utils";
 import MilestoneManager from "@/components/MilestoneManager";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { DashboardSplash } from "@/components/DashboardSplash";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -52,8 +52,14 @@ export default function ContractDetail() {
   const [disputeEvidence, setDisputeEvidence] = useState("");
 
   const utils = trpc.useUtils();
-  const { data: currentUser } = trpc.auth.me.useQuery();
-  const { data: contract, isLoading } = trpc.contracts.get.useQuery({ id: contractId });
+  const { data: currentUser } = trpc.auth.me.useQuery(undefined, {
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+  });
+  const { data: contract, isLoading } = trpc.contracts.get.useQuery(
+    { id: contractId },
+    { staleTime: 30_000, refetchOnWindowFocus: false }
+  );
 
   const signMutation = trpc.contracts.sign.useMutation({
     onSuccess: () => {
@@ -102,34 +108,7 @@ export default function ContractDetail() {
 
 
   if (isLoading) {
-    return (
-      <div className="space-y-6 p-2">
-        <Skeleton className="h-8 w-32" />
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-9 w-64" />
-          <Skeleton className="h-6 w-20 rounded-full" />
-        </div>
-        <Skeleton className="h-5 w-96" />
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="border-0 shadow-sm">
-              <CardHeader><Skeleton className="h-6 w-40" /></CardHeader>
-              <CardContent><Skeleton className="h-32" /></CardContent>
-            </Card>
-            <Card className="border-0 shadow-sm">
-              <CardHeader><Skeleton className="h-6 w-40" /></CardHeader>
-              <CardContent><Skeleton className="h-48" /></CardContent>
-            </Card>
-          </div>
-          <div className="space-y-6">
-            <Card className="border-0 shadow-sm">
-              <CardHeader><Skeleton className="h-6 w-24" /></CardHeader>
-              <CardContent><Skeleton className="h-10 w-full" /></CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
-    );
+    return <DashboardSplash message="Loading contract…" />;
   }
 
   if (!contract) {

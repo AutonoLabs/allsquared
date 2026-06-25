@@ -7,7 +7,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { Loader2, Save, User, Building2, Mail, Phone, Briefcase, Search, CheckCircle2, AlertCircle, ShieldCheck, Clock, XCircle, ArrowRight } from "lucide-react";
+import { Save, User, Building2, Mail, Phone, Briefcase, Search, CheckCircle2, AlertCircle, ShieldCheck, Clock, XCircle, ArrowRight } from "lucide-react";
+import { DashboardSplash } from "@/components/DashboardSplash";
 import { Separator } from "@/components/ui/separator";
 import { Switch } from "@/components/ui/switch";
 import { UserTypeSelector } from "@/components/UserTypeSelector";
@@ -52,7 +53,10 @@ export function formatAddress(raw: string | null | undefined): string {
 }
 
 export default function Profile() {
-  const { data: user, isLoading, refetch } = trpc.auth.me.useQuery();
+  const { data: user, isLoading, refetch } = trpc.auth.me.useQuery(undefined, {
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+  });
   const updateProfileMutation = trpc.auth.updateProfile.useMutation({
     onSuccess: () => {
       toast.success("Profile updated successfully");
@@ -217,11 +221,7 @@ export default function Profile() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <DashboardSplash message="Loading profile…" />;
   }
 
   const initials = user?.name

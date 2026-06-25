@@ -29,7 +29,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Search, ChevronLeft, ChevronRight, Eye, XCircle } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { DashboardSplash, InlineLoader } from "@/components/DashboardSplash";
 import { toast } from "sonner";
 
 type ContractStatus = "draft" | "pending_signature" | "active" | "completed" | "disputed" | "cancelled";
@@ -53,16 +53,19 @@ export default function AdminContracts() {
 
   const utils = trpc.useUtils();
 
-  const { data, isLoading } = trpc.admin.contracts.list.useQuery({
-    page,
-    limit: 20,
-    search: search || undefined,
-    status: statusFilter,
-  });
+  const { data, isLoading } = trpc.admin.contracts.list.useQuery(
+    {
+      page,
+      limit: 20,
+      search: search || undefined,
+      status: statusFilter,
+    },
+    { staleTime: 30_000, refetchOnWindowFocus: false }
+  );
 
   const { data: contractDetail, isLoading: loadingDetail } = trpc.admin.contracts.get.useQuery(
     { id: selectedContract! },
-    { enabled: !!selectedContract }
+    { enabled: !!selectedContract, staleTime: 30_000, refetchOnWindowFocus: false }
   );
 
   const cancelMutation = trpc.admin.contracts.cancel.useMutation({
@@ -137,11 +140,7 @@ export default function AdminContracts() {
           </div>
 
           {isLoading ? (
-            <div className="space-y-2">
-              {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full" />
-              ))}
-            </div>
+            <DashboardSplash message="Loading contracts…" />
           ) : (
             <>
               <div className="rounded-md border">
@@ -261,11 +260,7 @@ export default function AdminContracts() {
             <DialogTitle>Contract Details</DialogTitle>
           </DialogHeader>
           {loadingDetail ? (
-            <div className="space-y-4">
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-full" />
-            </div>
+            <InlineLoader label="Loading details…" />
           ) : contractDetail ? (
             <div className="space-y-4">
               <div>

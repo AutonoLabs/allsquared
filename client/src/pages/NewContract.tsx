@@ -16,7 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { ArrowLeft, Loader2, FileText, Check, X, Bot } from "lucide-react";
+import { ArrowLeft, FileText, Check, X, Bot } from "lucide-react";
+import { DashboardSplash } from "@/components/DashboardSplash";
 import { ContractChatbot } from "@/components/contract-builder/ContractChatbot";
 
 const CONTRACT_CATEGORIES = [
@@ -51,7 +52,10 @@ export default function NewContract() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showChat, setShowChat] = useState(false);
 
-  const { data: templates, isLoading: templatesLoading } = trpc.templates.list.useQuery({});
+  const { data: templates, isLoading: templatesLoading } = trpc.templates.list.useQuery(
+    {},
+    { staleTime: 30_000, refetchOnWindowFocus: false }
+  );
 
   const createMutation = trpc.contracts.create.useMutation({
     onSuccess: (data) => {
@@ -269,9 +273,7 @@ ${formData.description || "Not yet provided"}`;
           </CardHeader>
           <CardContent className="space-y-4">
             {templatesLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
+              <DashboardSplash message="Loading templates…" />
             ) : hasTemplates ? (
               <>
                 <div className="grid gap-3 max-h-[400px] overflow-y-auto">
