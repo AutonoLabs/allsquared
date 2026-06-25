@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { hasClerkPublishableKey, SignIn, SignUp } from "@/lib/clerk";
+import { trpc } from "@/lib/trpc";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -78,6 +79,17 @@ export default function DashboardLayout({
   });
   const { loading, user, isAuthenticated } = useAuth();
   const [authTimeout, setAuthTimeout] = useState(false);
+
+  // Prefetch the dashboard payload as soon as the layout mounts and the user
+  // is authenticated. This way Dashboard.tsx usually finds the data already
+  // cached in React Query and can render the real UI on the first frame,
+  // skipping the splash entirely on warm navigations.
+  const utils = trpc.useUtils();
+  useEffect(() => {
+    if (isAuthenticated && !loading) {
+      utils.contracts.dashboard.prefetch(undefined, { staleTime: 30_000 });
+    }
+  }, [isAuthenticated, loading, utils]);
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
