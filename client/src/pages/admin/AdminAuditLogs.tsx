@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Search, ChevronLeft, ChevronRight, Eye } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { DashboardSplash } from "@/components/DashboardSplash";
 
 type AuditLog = {
   id: string;
@@ -49,12 +49,15 @@ export default function AdminAuditLogs() {
   const [entityTypeFilter, setEntityTypeFilter] = useState<string | undefined>();
   const [selectedLog, setSelectedLog] = useState<AuditLog | null>(null);
 
-  const { data, isLoading } = trpc.admin.auditLogs.list.useQuery({
-    page,
-    limit: 50,
-    action: actionFilter || undefined,
-    entityType: entityTypeFilter,
-  });
+  const { data, isLoading } = trpc.admin.auditLogs.list.useQuery(
+    {
+      page,
+      limit: 50,
+      action: actionFilter || undefined,
+      entityType: entityTypeFilter,
+    },
+    { staleTime: 30_000, refetchOnWindowFocus: false }
+  );
 
   const getActionColor = (action: string) => {
     if (action.includes("create") || action.includes("approve")) return "bg-green-500";
@@ -109,11 +112,7 @@ export default function AdminAuditLogs() {
           </div>
 
           {isLoading ? (
-            <div className="space-y-2">
-              {[...Array(10)].map((_, i) => (
-                <Skeleton key={i} className="h-10 w-full" />
-              ))}
-            </div>
+            <DashboardSplash message="Loading audit logs…" />
           ) : (
             <>
               <div className="rounded-md border">

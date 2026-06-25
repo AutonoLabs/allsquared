@@ -9,7 +9,8 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
-import { ArrowLeft, Save, Plus, X, Loader2, Sparkles } from "lucide-react";
+import { ArrowLeft, Save, Plus, X, Sparkles } from "lucide-react";
+import { DashboardSplash } from "@/components/DashboardSplash";
 import {
   Select,
   SelectContent,
@@ -58,7 +59,7 @@ export default function TemplateEditor() {
 
   const { data: template, isLoading } = trpc.templates.get.useQuery(
     { id: templateId! },
-    { enabled: !!isEditing }
+    { enabled: !!templateId, staleTime: 30_000, refetchOnWindowFocus: false }
   );
 
   const createMutation = trpc.templates.create.useMutation({
@@ -175,11 +176,7 @@ export default function TemplateEditor() {
   const isSaving = createMutation.isPending || updateMutation.isPending;
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
+    return <DashboardSplash message="Loading template…" />;
   }
 
   return (

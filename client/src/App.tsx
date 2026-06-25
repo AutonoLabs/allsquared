@@ -3,6 +3,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch, useLocation } from "wouter";
 import { lazy, Suspense, useEffect, useState, useRef, ComponentType } from "react";
+import { DashboardSplash } from "@/components/DashboardSplash";
 
 // Retry wrapper for lazy imports — handles stale chunk hashes after deploys
 function lazyRetry<T extends ComponentType<any>>(
@@ -65,16 +66,7 @@ const AdminKyc = lazyRetry(() => import("./pages/admin/AdminKyc"));
 const AdminAnalytics = lazyRetry(() => import("./pages/admin/AdminAnalytics"));
 const AdminAuditLogs = lazyRetry(() => import("./pages/admin/AdminAuditLogs"));
 
-function PageSpinner() {
-  return (
-    <div className="flex min-h-[60vh] items-center justify-center">
-      <div className="flex flex-col items-center gap-3">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-[#1f6b3f] border-t-transparent" />
-        <span className="as25-font-mono text-xs uppercase tracking-[0.18em] text-[#2d466f]">Loading</span>
-      </div>
-    </div>
-  );
-}
+
 
 function NavigationLoadingBar() {
   const [location] = useLocation();
@@ -116,7 +108,7 @@ function NavigationLoadingBar() {
 function Router() {
   // make sure to consider if you need authentication for certain routes
   return (
-    <Suspense fallback={<PageSpinner />}>
+    <Suspense fallback={<DashboardSplash message="Loading…" />}>
       <Switch>
         {/* Dashboard routes - protected */}
         <Route path="/dashboard">
@@ -234,7 +226,7 @@ function Router() {
           <div className="flex min-h-screen flex-col">
             <Header />
             <main className="flex-1">
-              <Suspense fallback={<PageSpinner />}>
+              <Suspense fallback={<DashboardSplash message="Loading…" />}>
                 <Switch>
                   <Route path={"/"} component={Home} />
                   <Route path={"/how-it-works"} component={HowItWorks} />

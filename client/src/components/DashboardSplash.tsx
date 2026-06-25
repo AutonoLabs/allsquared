@@ -1,15 +1,31 @@
 /**
- * DashboardSplash — branded loading screen for the /dashboard routes.
+ * DashboardSplash — branded loading screen used everywhere anything loads.
  *
- * Renders inside DashboardLayout (so the sidebar/header paint instantly from
- * Clerk's localStorage cache) while the data queries are still resolving.
- * Uses a pulsing Squario logo instead of the generic skeleton-bars look.
+ * Two variants:
+ *   - "page" (default): full-height, used when a route's data is loading
+ *   - "compact": smaller height for inline use inside shells that have their
+ *     own chrome (sidebar/header) — fills the remaining space below
+ *
+ * Uses pulsing Squario logo instead of generic skeleton bars.
  */
 import { motion } from "framer-motion";
 
-export function DashboardSplash({ message = "Loading your dashboard…" }: { message?: string }) {
+export type SplashVariant = "page" | "compact";
+
+export function DashboardSplash({
+  message = "Loading your dashboard…",
+  variant = "page",
+}: {
+  message?: string;
+  variant?: SplashVariant;
+}) {
+  const containerClass =
+    variant === "page"
+      ? "flex min-h-[calc(100vh-12rem)] items-center justify-center px-4"
+      : "flex min-h-[60vh] items-center justify-center px-4";
+
   return (
-    <div className="flex min-h-[calc(100vh-12rem)] items-center justify-center px-4">
+    <div className={containerClass}>
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -50,6 +66,23 @@ export function DashboardSplash({ message = "Loading your dashboard…" }: { mes
           />
         </div>
       </motion.div>
+    </div>
+  );
+}
+
+/**
+ * InlineLoader — small, inline spinner for component-level loads
+ * (search dropdowns, button states, file pickers, etc).
+ */
+export function InlineLoader({ message }: { message?: string }) {
+  return (
+    <div className="flex items-center gap-2 px-3 py-2 text-xs text-[#6b7e9e]">
+      <motion.div
+        animate={{ rotate: 360 }}
+        transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+        className="h-3.5 w-3.5 rounded-full border-2 border-[#1f6b3f] border-t-transparent"
+      />
+      {message && <span>{message}</span>}
     </div>
   );
 }

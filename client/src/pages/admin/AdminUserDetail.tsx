@@ -22,7 +22,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { ArrowLeft, Mail, Phone, Building, Calendar, Shield, Ban } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { DashboardSplash } from "@/components/DashboardSplash";
 import { toast } from "sonner";
 
 export default function AdminUserDetail() {
@@ -30,7 +30,10 @@ export default function AdminUserDetail() {
   const [, setLocation] = useLocation();
   const utils = trpc.useUtils();
 
-  const { data, isLoading } = trpc.admin.users.get.useQuery({ id: id! });
+  const { data, isLoading } = trpc.admin.users.get.useQuery(
+    { id: id! },
+    { enabled: !!id, staleTime: 30_000, refetchOnWindowFocus: false }
+  );
 
   const updateRoleMutation = trpc.admin.users.updateRole.useMutation({
     onSuccess: () => {
@@ -63,18 +66,7 @@ export default function AdminUserDetail() {
   });
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="sm" onClick={() => setLocation("/admin/users")}>
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
-          </Button>
-        </div>
-        <Skeleton className="h-48 w-full" />
-        <Skeleton className="h-48 w-full" />
-      </div>
-    );
+    return <DashboardSplash message="Loading user…" />;
   }
 
   if (!data?.user) {
