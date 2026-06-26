@@ -1,12 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, CreditCard, Loader2, AlertCircle } from "lucide-react";
+import { Check, CreditCard, AlertCircle, Loader2 } from "lucide-react";
+import { DashboardSplash } from "@/components/DashboardSplash";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
 export default function Billing() {
-  const { data: subscription, isLoading } = trpc.payments.getSubscription.useQuery();
+  const { data: subscription, isLoading } = trpc.payments.getSubscription.useQuery(undefined, {
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+  });
 
   const createCheckoutMutation = trpc.payments.createSubscriptionCheckout.useMutation({
     onSuccess: (data) => {
@@ -112,11 +116,7 @@ export default function Billing() {
   };
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <DashboardSplash message="Loading billing…" />;
   }
 
   const currentTier = subscription?.tier || "free";

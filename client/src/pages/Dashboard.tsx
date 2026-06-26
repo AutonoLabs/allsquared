@@ -4,7 +4,7 @@ import { trpc } from "@/lib/trpc";
 import { containerVariants, itemVariants } from "@/lib/motion";
 import { MD3Button } from "@/components/md3/Button";
 import { MD3Card, MD3CardContent, MD3CardHeader } from "@/components/md3/Card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { DashboardSplash } from "@/components/DashboardSplash";
 import { Link } from "wouter";
 import {
   FileText,
@@ -28,9 +28,16 @@ export default function Dashboard() {
   const reduceMotion = useReducedMotion();
   const ready = isLoaded && isSignedIn;
 
-  const { data: dashboardData, isLoading: dashboardLoading } = trpc.contracts.dashboard.useQuery(
+  // Use cache from prefetch (set in DashboardLayout) so the splash only shows
+  // when there's truly nothing cached. 30s staleTime prevents an instant
+  // refetch when navigating back to /dashboard.
+  const { data: dashboardData, isLoading: dashboardLoading, isFetching } = trpc.contracts.dashboard.useQuery(
     undefined,
-    { enabled: ready }
+    {
+      enabled: ready,
+      staleTime: 30_000,
+      refetchOnWindowFocus: false,
+    }
   );
   const stats = dashboardData?.stats;
   const contracts = dashboardData?.contracts ?? [];
@@ -44,41 +51,11 @@ export default function Dashboard() {
     try { localStorage.setItem(ONBOARDING_DISMISSED_KEY, "true"); } catch {}
   }
 
-  if (dashboardLoading) {
-    return (
-      <div className="space-y-8 p-2">
-        <div className="flex items-center justify-between">
-          <div>
-            <Skeleton className="h-9 w-48" />
-            <Skeleton className="h-5 w-72 mt-2" />
-          </div>
-          <Skeleton className="h-11 w-40" />
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {[...Array(4)].map((_, i) => (
-            <MD3Card key={i} variant="elevated">
-              <MD3CardHeader>
-                <Skeleton className="h-4 w-24" />
-              </MD3CardHeader>
-              <MD3CardContent>
-                <Skeleton className="h-8 w-20" />
-                <Skeleton className="h-3 w-32 mt-2" />
-              </MD3CardContent>
-            </MD3Card>
-          ))}
-        </div>
-        <MD3Card variant="outlined">
-          <MD3CardHeader>
-            <Skeleton className="h-6 w-40" />
-          </MD3CardHeader>
-          <MD3CardContent className="space-y-4">
-            {[...Array(3)].map((_, i) => (
-              <Skeleton key={i} className="h-20" />
-            ))}
-          </MD3CardContent>
-        </MD3Card>
-      </div>
-    );
+  // Only show the splash on FIRST load (no cached data). Background refetches
+  // (isFetching=true while data already cached) just leave the existing UI in
+  // place — much smoother UX.
+  if (dashboardLoading && !dashboardData) {
+    return <DashboardSplash message="Loading your dashboard…" />;
   }
 
   return (

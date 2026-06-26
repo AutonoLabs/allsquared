@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { DashboardSplash } from "@/components/DashboardSplash";
 import { toast } from "sonner";
 import { Plus, Search, FileText, Edit, Trash2, Copy } from "lucide-react";
 import {
@@ -41,9 +42,12 @@ export default function Templates() {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [deleteTemplateId, setDeleteTemplateId] = useState<string | null>(null);
 
-  const { data: templates, isLoading, refetch } = trpc.templates.list.useQuery({
-    category: selectedCategory === "all" ? undefined : selectedCategory,
-  });
+  const { data: templates, isLoading, refetch } = trpc.templates.list.useQuery(
+    {
+      category: selectedCategory === "all" ? undefined : selectedCategory,
+    },
+    { staleTime: 30_000, refetchOnWindowFocus: false }
+  );
 
   const deleteMutation = trpc.templates.delete.useMutation({
     onSuccess: () => {
@@ -79,6 +83,10 @@ export default function Templates() {
     };
     return colors[category] || colors.other;
   };
+
+  if (isLoading) {
+    return <DashboardSplash message="Loading templates…" />;
+  }
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -128,22 +136,7 @@ export default function Templates() {
       </Card>
 
       {/* Templates Grid */}
-      {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i} className="animate-pulse">
-              <CardHeader>
-                <div className="h-6 bg-gray-200 rounded w-3/4 mb-2" />
-                <div className="h-4 bg-gray-200 rounded w-1/2" />
-              </CardHeader>
-              <CardContent>
-                <div className="h-4 bg-gray-200 rounded w-full mb-2" />
-                <div className="h-4 bg-gray-200 rounded w-2/3" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      ) : filteredTemplates && filteredTemplates.length > 0 ? (
+      {filteredTemplates && filteredTemplates.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredTemplates.map((template) => {
             const templateContent = template.templateContent 

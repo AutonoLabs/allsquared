@@ -21,7 +21,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Search, ChevronLeft, ChevronRight, Eye } from "lucide-react";
 import { useLocation } from "wouter";
-import { Skeleton } from "@/components/ui/skeleton";
+import { DashboardSplash } from "@/components/DashboardSplash";
 
 export default function AdminUsers() {
   const [, setLocation] = useLocation();
@@ -30,13 +30,16 @@ export default function AdminUsers() {
   const [roleFilter, setRoleFilter] = useState<"user" | "admin" | undefined>();
   const [verifiedFilter, setVerifiedFilter] = useState<"yes" | "no" | undefined>();
 
-  const { data, isLoading } = trpc.admin.users.list.useQuery({
-    page,
-    limit: 20,
-    search: search || undefined,
-    role: roleFilter,
-    verified: verifiedFilter,
-  });
+  const { data, isLoading } = trpc.admin.users.list.useQuery(
+    {
+      page,
+      limit: 20,
+      search: search || undefined,
+      role: roleFilter,
+      verified: verifiedFilter,
+    },
+    { staleTime: 30_000, refetchOnWindowFocus: false }
+  );
 
   return (
     <div className="space-y-6">
@@ -98,11 +101,7 @@ export default function AdminUsers() {
           </div>
 
           {isLoading ? (
-            <div className="space-y-2">
-              {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full" />
-              ))}
-            </div>
+            <DashboardSplash message="Loading users…" />
           ) : (
             <>
               <div className="rounded-md border">

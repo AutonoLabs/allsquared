@@ -2,8 +2,8 @@ import { useState } from "react";
 import { trpc } from "@/lib/trpc";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { DashboardSplash } from "@/components/DashboardSplash";
 import { Input } from "@/components/ui/input";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "wouter";
 import { Plus, Search, FileText, ArrowRight, Calendar, Banknote, Tag } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
@@ -23,11 +23,14 @@ export default function Contracts() {
   const [searchQuery, setSearchQuery] = useState("");
   const reduceMotion = useReducedMotion();
 
-  const { data, isLoading } = trpc.contracts.list.useQuery({
-    status: statusFilter as any,
-    page: 1,
-    limit: 50,
-  });
+  const { data, isLoading } = trpc.contracts.list.useQuery(
+    {
+      status: statusFilter as any,
+      page: 1,
+      limit: 50,
+    },
+    { staleTime: 30_000, refetchOnWindowFocus: false }
+  );
 
   const contracts = data?.contracts || [];
 
@@ -42,41 +45,7 @@ export default function Contracts() {
   });
 
   if (isLoading) {
-    return (
-      <div className="space-y-6 p-2">
-        <div className="flex items-center justify-between">
-          <div>
-            <Skeleton className="h-9 w-48" />
-            <Skeleton className="h-5 w-64 mt-2" />
-          </div>
-          <Skeleton className="h-11 w-40" />
-        </div>
-        <Card className="border-0 shadow-sm">
-          <CardContent className="pt-6">
-            <div className="flex gap-4">
-              <Skeleton className="h-10 flex-1" />
-              <Skeleton className="h-10 w-48" />
-            </div>
-          </CardContent>
-        </Card>
-        <div className="space-y-3">
-          {[...Array(5)].map((_, i) => (
-            <Card key={i} className="border-0 shadow-sm">
-              <CardContent className="p-5">
-                <div className="flex items-start gap-4">
-                  <Skeleton className="h-10 w-10 rounded-lg" />
-                  <div className="flex-1 space-y-2">
-                    <Skeleton className="h-5 w-48" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-3 w-64" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
+    return <DashboardSplash message="Loading your contracts…" />;
   }
 
   return (

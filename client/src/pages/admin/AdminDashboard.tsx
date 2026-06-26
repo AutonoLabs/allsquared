@@ -2,35 +2,18 @@ import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, FileText, AlertTriangle, CheckSquare, TrendingUp, Clock } from "lucide-react";
 import { useLocation } from "wouter";
-import { Skeleton } from "@/components/ui/skeleton";
+import { DashboardSplash } from "@/components/DashboardSplash";
 import { Button } from "@/components/ui/button";
 
 export default function AdminDashboard() {
-  const { data: analytics, isLoading } = trpc.admin.analytics.overview.useQuery();
+  const { data: analytics, isLoading } = trpc.admin.analytics.overview.useQuery(undefined, {
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+  });
   const [, setLocation] = useLocation();
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <div>
-          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
-          <p className="text-muted-foreground">Platform overview and quick actions</p>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          {[...Array(6)].map((_, i) => (
-            <Card key={i}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <Skeleton className="h-4 w-24" />
-                <Skeleton className="h-4 w-4" />
-              </CardHeader>
-              <CardContent>
-                <Skeleton className="h-8 w-16" />
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-    );
+    return <DashboardSplash message="Loading admin dashboard…" />;
   }
 
   const stats = [
