@@ -102,6 +102,16 @@ export const filesRouter = router({
 
       const fileBuffer = Buffer.from(input.fileData, "base64");
 
+      if (fileBuffer.length === 0) {
+        throw new Error("Empty file upload");
+      }
+      if (fileBuffer.length > MAX_FILE_SIZE) {
+        throw new Error("File size exceeds maximum allowed size of 50MB");
+      }
+      if (Math.abs(fileBuffer.length - input.fileSize) > 1024) {
+        throw new Error("Declared file size does not match uploaded content");
+      }
+
       const folder =
         input.entityType === "profile" ? "profiles" :
         input.entityType === "verification" ? "verification" :

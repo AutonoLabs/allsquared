@@ -1,8 +1,26 @@
 import { z } from "zod";
-import { router, protectedProcedure } from "../_core/trpc";
+import { router, protectedProcedure, adminProcedure } from "../_core/trpc";
+import { TRPCError } from "@trpc/server";
 import { getDb } from "../db";
 import { contractTemplates } from "../../drizzle/schema";
-import { eq, and, desc } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
+
+async function getTemplateOrThrow(db: NonNullable<Awaited<ReturnType<typeof getDb>>>, id: string) {
+  const rows = await db.select().from(contractTemplates).where(eq(contractTemplates.id, id)).limit(1);
+  if (!rows[0]) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Template not found" });
+  }
+  return rows[0];
+}
+
+function assertCanMutateTemplate(template: { templateSlug: string | null }, userRole: string) {
+  if (template.templateSlug && userRole !== "admin") {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Platform legal templates can only be modified by administrators",
+    });
+  }
+}
 
 export const templatesRouter = router({
   // List all templates
@@ -60,7 +78,7 @@ export const templatesRouter = router({
         variables: z.array(z.string()).optional(),
       })
     )
-    .mutation(async ({ input }: any) => {
+    .mutation(async ({ ctx, input }) => {
       const templateId = `tmpl_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
 
       const templateContent = {
@@ -96,8 +114,14 @@ export const templatesRouter = router({
         variables: z.array(z.string()).optional(),
       })
     )
-    .mutation(async ({ input }: any) => {
+    .mutation(async ({ ctx, input }) => {
       const { id, content, variables, ...updates } = input;
+
+      const db = await getDb();
+      if (!db) throw new Error("Database not available");
+
+      const template = await getTemplateOrThrow(db, id);
+      assertCanMutateTemplate(template, ctx.user.role);
 
       const updateData: any = {
         ...updates,
@@ -112,8 +136,6 @@ export const templatesRouter = router({
         updateData.templateContent = JSON.stringify(templateContent);
       }
 
-      const db = await getDb();
-      if (!db) throw new Error("Database not available");
       await db
         .update(contractTemplates)
         .set(updateData)
@@ -129,9 +151,13 @@ export const templatesRouter = router({
         id: z.string(),
       })
     )
-    .mutation(async ({ input }: any) => {
+    .mutation(async ({ ctx, input }) => {
       const db = await getDb();
       if (!db) throw new Error("Database not available");
+
+      const template = await getTemplateOrThrow(db, input.id);
+      assertCanMutateTemplate(template, ctx.user.role);
+
       await db
         .delete(contractTemplates)
         .where(eq(contractTemplates.id, input.id));

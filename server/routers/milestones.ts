@@ -99,9 +99,6 @@ export const milestonesRouter = router({
         description: z.string().optional(),
         amount: z.number().optional(),
         dueDate: z.string().optional(),
-        status: z
-          .enum(['pending', 'in_progress', 'submitted', 'approved', 'rejected', 'paid'])
-          .optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -115,13 +112,16 @@ export const milestonesRouter = router({
       if (!contract || (contract.clientId !== ctx.user.id && contract.providerId !== ctx.user.id)) {
         throw new Error('Unauthorized');
       }
+
+      if (contract.status !== 'draft' && contract.status !== 'active') {
+        throw new Error('Milestones cannot be edited in the current contract state');
+      }
       
       const updates: any = { updatedAt: new Date() };
       if (input.title) updates.title = input.title;
       if (input.description) updates.description = input.description;
       if (input.amount) updates.amount = String(Math.round(input.amount * 100));
       if (input.dueDate) updates.dueDate = new Date(input.dueDate);
-      if (input.status) updates.status = input.status;
       
       await updateMilestone(input.id, updates);
       

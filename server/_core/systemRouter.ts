@@ -12,10 +12,16 @@ export const systemRouter = router({
       ok: true,
     })),
 
-  // Service health check — reports which env vars / integrations are configured
-  serviceHealth: publicProcedure.query(() => ({
-    openai: !!process.env.OPENAI_API_KEY,
-    lexai: !!process.env.LEXAI_API_URL,
-    companiesHouse: !!process.env.COMPANIES_HOUSE_API_KEY,
-  })),
+  // Service health check — minimal in production to avoid leaking integration config
+  serviceHealth: publicProcedure.query(() => {
+    if (process.env.NODE_ENV === 'production') {
+      return { ok: true as const };
+    }
+    return {
+      ok: true as const,
+      openai: !!process.env.OPENAI_API_KEY,
+      lexai: !!process.env.LEXAI_API_URL,
+      companiesHouse: !!process.env.COMPANIES_HOUSE_API_KEY,
+    };
+  }),
 });

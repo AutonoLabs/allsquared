@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { router, protectedProcedure, publicProcedure } from '../_core/trpc';
-import { getDb } from '../db';
+import { getDb, getContract } from '../db';
 import { payments, subscriptions, users, webhookEvents, auditLogs } from '../../drizzle/schema';
 import { eq, and } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
@@ -297,6 +297,14 @@ export const paymentsRouter = router({
     .mutation(async ({ ctx, input }) => {
       const db = await getDb();
       if (!db) throw new Error('Database not available');
+
+      const contract = await getContract(input.contractId);
+      if (!contract) {
+        throw new Error('Contract not found');
+      }
+      if (contract.clientId !== ctx.user.id) {
+        throw new Error('Only the contract client can fund escrow for this contract');
+      }
 
       const user = ctx.user;
 

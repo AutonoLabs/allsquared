@@ -8,8 +8,8 @@ import {
   getUserContractsPage,
 } from '../db';
 import { createNotification } from '../db';
-import { assertContractStatusTransition, type ContractStatus } from '../lib/contract-state';
 import { parseContractContent, serializeContractContent } from '@shared/contract-content';
+import { assertDraftEditable } from '../lib/contract-auth';
 import { nanoid } from 'nanoid';
 
 export const contractsRouter = router({
@@ -123,9 +123,6 @@ export const contractsRouter = router({
         startDate: z.string().optional(),
         endDate: z.string().optional(),
         content: z.any().optional(),
-        status: z
-          .enum(['draft', 'pending_signature', 'active', 'completed', 'cancelled', 'disputed'])
-          .optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -135,10 +132,7 @@ export const contractsRouter = router({
         throw new Error('Contract not found');
       }
       
-      // Only creator can update draft contracts
-      if (contract.clientId !== ctx.user.id && contract.providerId !== ctx.user.id) {
-        throw new Error('Unauthorized');
-      }
+      assertDraftEditable(contract, ctx.user.id);
       
       const updates: any = { updatedAt: new Date() };
       if (input.title) updates.title = input.title;
@@ -147,13 +141,6 @@ export const contractsRouter = router({
       if (input.startDate) updates.startDate = new Date(input.startDate);
       if (input.endDate) updates.endDate = new Date(input.endDate);
       if (input.content) updates.contractContent = JSON.stringify(input.content);
-      if (input.status) {
-        assertContractStatusTransition(
-          contract.status as ContractStatus,
-          input.status as ContractStatus
-        );
-        updates.status = input.status;
-      }
       
       await updateContract(input.id, updates);
       
@@ -266,9 +253,13 @@ export const contractsRouter = router({
         });
       }
 
-      const allSigned =
-        content.signatures.length >= 2 ||
-        (contract.clientId === contract.providerId && content.signatures.length >= 1);
+      const distinctParties =
+        contract.providerId &&
+        contract.providerId !== '' &&
+        contract.providerId !== contract.clientId;
+      const allSigned = distinctParties
+        ? content.signatures.length >= 2
+        : content.signatures.length >= 1;
 
       await updateContract(input.id, {
         contractContent: serializeContractContent(content),

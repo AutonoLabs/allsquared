@@ -15,6 +15,7 @@ import {
 } from '../../drizzle/schema';
 import { eq, or, desc, and, sql, count } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
+import { assertAiRateLimit } from '../lib/rate-limit';
 
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 
@@ -508,6 +509,7 @@ export const disputesRouter = router({
   analyze: protectedProcedure
     .input(z.object({ disputeId: z.string() }))
     .mutation(async ({ ctx, input }) => {
+      assertAiRateLimit(ctx.user.id);
       const db = await getDb();
       if (!db) throw new Error('Database not available');
 
@@ -568,6 +570,7 @@ export const disputesRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      assertAiRateLimit(ctx.user.id);
       const db = await getDb();
       if (!db) throw new Error('Database not available');
 

@@ -5,6 +5,8 @@ import { contractTemplates, contracts } from "../../drizzle/schema";
 import { eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { renderTemplate } from "@shared/template-render";
+import { getContract } from "../db";
+import { assertContractParty, assertDraftEditable } from "../lib/contract-auth";
 
 export const templateBuilderRouter = router({
   // List available legal templates (with variable defs and clause banks)
@@ -142,7 +144,17 @@ export const templateBuilderRouter = router({
       if (!db) throw new Error("Database not available");
 
       if (input.contractId) {
-        // Update existing
+        const existing = await getContract(input.contractId);
+        if (!existing) {
+          throw new Error("Contract not found");
+        }
+        assertDraftEditable(existing, ctx.user.id);
+
+        const nextStatus = input.status === "pending_signature" ? "pending_signature" : "draft";
+        if (nextStatus === "pending_signature") {
+          assertContractParty(existing, ctx.user.id);
+        }
+
         await db
           .update(contracts)
           .set({
@@ -150,7 +162,7 @@ export const templateBuilderRouter = router({
             selectedClauses: JSON.stringify(input.selectedClauses),
             generatedMarkdown: input.generatedMarkdown,
             contractContent: input.generatedMarkdown,
-            status: input.status as any,
+            status: nextStatus,
             updatedAt: new Date(),
           })
           .where(eq(contracts.id, input.contractId));

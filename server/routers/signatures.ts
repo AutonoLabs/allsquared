@@ -275,10 +275,15 @@ export const signaturesRouter = router({
       }> = [];
 
       if (provider === 'docuseal') {
-        // Create DocuSeal submission — upload contract as HTML document
+        const markdownBody = String(
+          contract.generatedMarkdown ||
+          contract.contractContent ||
+          contract.description ||
+          'Contract content'
+        );
         const contractHtml = `<!DOCTYPE html><html><body>
-          <h1>${contract.title}</h1>
-          <div style="white-space:pre-wrap">${contract.generatedMarkdown || contract.description || 'Contract content'}</div>
+          <h1>${escapeHtml(String(contract.title ?? 'Contract'))}</h1>
+          <div style="white-space:pre-wrap">${escapeHtml(markdownBody)}</div>
         </body></html>`;
 
         // First create template from HTML
@@ -304,11 +309,16 @@ export const signaturesRouter = router({
 
         // Create signature records for each submitter
         for (const submitter of submission.submitters || []) {
+          const matchedSigner = input.signers.find(
+            (s) =>
+              s.email.toLowerCase() === String(submitter.email || '').toLowerCase() ||
+              s.name === submitter.name
+          );
           const sigId = `sig_${nanoid()}`;
           signatureRecords.push({
             id: sigId,
             contractId: contract.id,
-            userId: ctx.user.id,
+            userId: matchedSigner?.userId ?? ctx.user.id,
             provider: 'docuseal',
             providerEnvelopeId: String(submission.id),
             status: 'sent',

@@ -7,6 +7,7 @@ import { contractTemplates } from "../../drizzle/schema";
 import { sql } from "drizzle-orm";
 import { processStripeWebhook } from "../routers/payments";
 import { processTranspactWebhook } from "../routers/escrow";
+import { processDocuSignWebhook } from "../routers/signatures";
 import { timingSafeEqual, createHmac } from "crypto";
 import { verifyStripeSignature } from "./webhookVerify";
 import { initSentry, Sentry } from "./sentry";
@@ -130,7 +131,12 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // =============================================================================
 
 app.get('/api/health', (_req: Request, res: Response) => {
+  if (process.env.NODE_ENV === 'production') {
+    res.json({ ok: true });
+    return;
+  }
   res.json({
+    ok: true,
     openai: !!process.env.OPENAI_API_KEY,
     lexai: !!process.env.LEXAI_API_URL,
     companiesHouse: !!process.env.COMPANIES_HOUSE_API_KEY,
@@ -233,11 +239,9 @@ app.post('/api/webhooks/transpact', express.raw({ type: '*/*' }), async (req: Re
 
   try {
     const rawBody = req.body as Buffer;
-    if (process.env.NODE_ENV === 'production') {
-      if (!signature || !webhookSecret || !verifyHmacSignature(rawBody, signature, webhookSecret)) {
-        res.status(400).json({ error: 'Webhook signature verification failed' });
-        return;
-      }
+    if (!webhookSecret || !signature || !verifyHmacSignature(rawBody, signature, webhookSecret)) {
+      res.status(400).json({ error: 'Webhook signature verification failed' });
+      return;
     }
 
     const event = JSON.parse(rawBody.toString('utf8'));
@@ -264,7 +268,25 @@ app.post('/api/webhooks/transpact', express.raw({ type: '*/*' }), async (req: Re
 // DocuSign webhook
 app.post('/api/webhooks/docusign', express.json(), async (req: Request, res: Response) => {
   try {
-    const event = req.body;
+    const webhookSecret = process.env.DOCUSIGN_WEBHOOK_SECRET;
+    const signature = req.headers['x-docusign-signature-1'] ?? req.headers['x-authorization-docusign'];
+
+    if (webhookSecret) {
+      const rawBody = Buffer.from(JSON.stringify(req.body));
+      if (!signature || !verifyHmacSignature(rawBody, signature, webhookSecret)) {
+        res.status(400).json({ error: 'Webhook signature verification failed' });
+        return;
+      }
+    } else if (process.env.NODE_ENV === 'production') {
+      res.status(503).json({ error: 'DocuSign webhook secret not configured' });
+      return;
+    }
+
+    const event = req.body as { event?: string; eventType?: string; data?: unknown };
+    await processDocuSignWebhook({
+      event: event.event || event.eventType || 'unknown',
+      data: event.data ?? event,
+    });
 
     res.json({ received: true });
   } catch (error) {
