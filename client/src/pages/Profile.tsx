@@ -677,12 +677,20 @@ export default function Profile() {
 
 type KycStatus = "pending" | "processing" | "verified" | "failed" | "expired" | "requires_input" | "none";
 
-function KycStatusCard({ userId }: { userId?: string }) {
-  const [kycStatus, setKycStatus] = useState<KycStatus>("none");
-  const [loading, setLoading] = useState(false);
+function KycStatusCard({ userId: _userId }: { userId?: string }) {
+  const utils = trpc.useUtils();
+  const { data: kyc, isLoading } = trpc.kyc.status.useQuery();
+  const initiateMutation = trpc.kyc.initiate.useMutation({
+    onSuccess: () => {
+      toast.success("Verification submitted. We'll review your identity.");
+      utils.kyc.status.invalidate();
+    },
+    onError: (err) => toast.error(err.message || "Failed to start verification"),
+  });
 
-  // In production this would come from a tRPC query. For now, use local state.
-  // The DB schema already has kycVerifications table.
+  const kycStatus: KycStatus = isLoading
+    ? "none"
+    : (kyc?.status as KycStatus | undefined) ?? "none";
 
   const statusConfig: Record<KycStatus, { label: string; color: string; icon: React.ReactNode; description: string }> = {
     none: {
@@ -732,19 +740,14 @@ function KycStatusCard({ userId }: { userId?: string }) {
   const config = statusConfig[kycStatus];
 
   const handleStartVerification = () => {
-    setLoading(true);
-    // Simulate starting verification — in production this would call a tRPC mutation
-    // that creates a kycVerifications row and (later) initiates Stripe Identity
-    setTimeout(() => {
-      setKycStatus("pending");
-      setLoading(false);
-      toast.success("Verification submitted. We'll review your identity.");
-    }, 1500);
+    initiateMutation.mutate();
   };
 
   const handleRetryVerification = () => {
-    setKycStatus("none");
+    initiateMutation.mutate();
   };
+
+  const loading = initiateMutation.isPending;
 
   return (
     <Card>

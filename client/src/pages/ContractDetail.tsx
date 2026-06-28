@@ -25,6 +25,7 @@ import {
   Trash2,
   Tag,
   Banknote,
+  Shield,
 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 
@@ -471,7 +472,140 @@ export default function ContractDetail() {
               </div>
             </CardContent>
           </Card>
+
+          {contract.status === "active" && <EscrowPanel contractId={contractId} isClient={!!currentUser && contract.clientId === currentUser.id} />}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function EscrowPanel({ contractId, isClient }: { contractId: string; isClient: boolean }) {
+  const utils = trpc.useUtils();
+  const { data: escrowData, isLoading } = trpc.escrow.getContractEscrows.useQuery({ contractId });
+  const createMutation = trpc.escrow.createTransaction.useMutation({
+    onSuccess: () => {
+      toast.success("Escrow deposit initiated");
+      utils.escrow.getContractEscrows.invalidate({ contractId });
+    },
+    onError: (err) => toast.error(err.message || "Failed to create escrow"),
+  });
+  const releaseMutation = trpc.escrow.releaseFunds.useMutation({
+    onSuccess: () => {
+      toast.success("Funds released to provider");
+      utils.escrow.getContractEscrows.invalidate({ contractId });
+    },
+    onError: (err) => toast.error(err.message || "Failed to release funds"),
+  });
+
+  const escrows = escrowData?.escrows ?? [];
+  const totalHeld = escrows
+    .filter((e) => e.status === "held" || e.status === "pending")
+    .reduce((sum, e) => sum + parseInt(e.amount || "0", 10), 0);
+
+  return (
+    <Card className="border-0 shadow-sm">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Shield className="h-4 w-4" />
+          Escrow
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {isLoading ? (
+          <p className="text-sm text-muted-foreground">Loading escrow…</p>
+        ) : escrows.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No escrow transactions yet.</p>
+        ) : (
+          <>
+            <div className="rounded-lg bg-muted/40 p-3 text-sm">
+              <span className="text-muted-foreground">Held in escrow: </span>
+              <span className="font-semibold">£{(totalHeld / 100).toLocaleString("en-GB", { minimumFractionDigits: 2 })}</span>
+            </div>
+            <div className="space-y-2">
+              {escrows.map((e) => (
+                <div key={e.id} className="flex items-center justify-between rounded-lg border p-2.5 text-sm">
+                  <div>
+                    <p className="font-medium">£{(parseInt(e.amount || "0", 10) / 100).toLocaleString("en-GB")}</p>
+                    <p className="text-xs text-muted-foreground capitalize">{e.status.replace(/_/g, " ")}</p>
+                  </div>
+                  {isClient && (e.status === "held" || e.status === "pending") && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => releaseMutation.mutate({ escrowId: e.id })}
+                      disabled={releaseMutation.isPending}
+                    >
+                      Release
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {isClient && (
+          <EscrowDepositForm
+            contractId={contractId}
+            onCreate={(amount) => createMutation.mutate({ contractId, amount: Math.round(amount * 100) })}
+            pending={createMutation.isPending}
+          />
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function EscrowDepositForm({
+  contractId: _contractId,
+  onCreate,
+  pending,
+}: {
+  contractId: string;
+  onCreate: (amountGbp: number) => void;
+  pending: boolean;
+}) {
+  const [amount, setAmount] = useState("");
+  const [open, setOpen] = useState(false);
+
+  if (!open) {
+    return (
+      <Button variant="outline" size="sm" className="w-full" onClick={() => setOpen(true)}>
+        <Shield className="mr-2 h-4 w-4" />
+        Deposit to Escrow
+      </Button>
+    );
+  }
+
+  return (
+    <div className="space-y-2 rounded-lg border p-3">
+      <Label htmlFor="escrow-amount">Deposit amount (£)</Label>
+      <Input
+        id="escrow-amount"
+        type="number"
+        min="1"
+        step="0.01"
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+        placeholder="e.g. 5000"
+      />
+      <div className="flex gap-2">
+        <Button variant="outline" size="sm" className="flex-1" onClick={() => setOpen(false)}>
+          Cancel
+        </Button>
+        <Button
+          size="sm"
+          className="flex-1"
+          disabled={!amount || parseFloat(amount) <= 0 || pending}
+          onClick={() => {
+            onCreate(parseFloat(amount));
+            setAmount("");
+            setOpen(false);
+          }}
+        >
+          {pending ? "Processing…" : "Deposit"}
+        </Button>
       </div>
     </div>
   );
