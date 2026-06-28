@@ -27,7 +27,7 @@ export const CHATBOT_MODELS = {
     id: "squario",
     label: "Squario",
     description: "AllSquared's contract-specialist assistant — fast & precise",
-    apiModel: "gpt-5.2-codex",
+    apiModel: "gpt-4o",
     provider: "openai" as const,
   },
 } as const;
