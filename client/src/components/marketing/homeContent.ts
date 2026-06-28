@@ -328,12 +328,14 @@ export const faqs: MarketingFaqItem[] = [
 ];
 
 export const sampleMilestones: SampleMilestone[] = [
-  ["i.", "Survey, drawings & materials schedule", "Verified · 04 Apr", "£8,400", "done"],
-  ["ii.", "Strip-out & site protection", "Verified · 08 Apr", "£11,200", "done"],
-  ["iii.", "First fix - M&E, data, HVAC", "Verified · 12 Apr", "£18,600", "done"],
-  ["iv.", "Partitions, services, glazing", "Proof submitted · 18:42", "£22,400", "active"],
-  ["v.", "Ceilings & flooring", "Scheduled · 18 Apr", "£14,800", "todo"],
-  ["vi.", "Second fix & commissioning", "Scheduled · 22 Apr", "£12,600", "todo"],
+  ["i.", "Survey, drawings & regolith analysis", "Verified · 04 Apr 2089", "£8,400", "done"],
+  ["ii.", "Strip-out & pressure-seal inspection", "Verified · 08 Apr 2089", "£11,200", "done"],
+  ["iii.", "First fix - M&E, data, life-support", "Verified · 12 Apr 2089", "£18,600", "done"],
+  ["iv.", "Partitions, services, vacuum glazing", "Proof submitted · 18:42", "£22,400", "active"],
+  ["v.", "Ceilings, flooring, dust-mitigation", "Scheduled · 18 Apr 2089", "£14,800", "todo"],
+  ["vi.", "Second fix & habitat commissioning", "Scheduled · 22 Apr 2089", "£12,600", "todo"],
+  ["vii.", "Snagging & pressure-cycle defects period", "Scheduled · 30 Apr 2089", "£6,200", "todo"],
+  ["viii.", "Final handover & Martian surveyor sign-off", "Scheduled · 06 May 2089", "£3,800", "todo"],
 ];
 
 export const marketingShell = "mx-auto w-full max-w-[1240px] px-5 md:px-8 lg:px-10";
