@@ -62,4 +62,15 @@ describe("POST /api/lead", () => {
     const response = await POST(request);
     expect(response.status).toBe(400);
   });
+
+  it("returns 400 for a non-JSON body instead of throwing", async () => {
+    const { POST } = await import("../route");
+    const request = new Request("http://localhost/api/lead", {
+      method: "POST",
+      body: "not json at all",
+    });
+
+    const response = await POST(request);
+    expect(response.status).toBe(400);
+  });
 });

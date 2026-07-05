@@ -25,3 +25,12 @@ cd checker
 vercel link   # first time only — creates a NEW project, do not link to "allsquared"
 vercel deploy --prod
 ```
+
+### Prerequisites for lead emails
+
+Lead emails are sent via Resend (see `app/api/lead/route.ts`). Before deploying:
+
+- Set `RESEND_API_KEY` as an environment variable in the Vercel project.
+- Verify the sending domain (currently `allsquared.dev`, hardcoded as the `from` address)
+  in the [Resend dashboard](https://resend.com/domains). Without a verified domain, lead
+  emails will silently fail to send.

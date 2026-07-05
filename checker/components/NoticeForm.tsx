@@ -9,6 +9,7 @@ export function NoticeForm() {
   const [payLessNoticeServedDate, setPayLessNoticeServedDate] = useState("");
   const [notifiedSumPounds, setNotifiedSumPounds] = useState("");
   const [result, setResult] = useState<NoticeResult | null>(null);
+  const [enteredNotifiedSum, setEnteredNotifiedSum] = useState(0);
   const [email, setEmail] = useState("");
   const [leadSent, setLeadSent] = useState(false);
 
@@ -22,6 +23,7 @@ export function NoticeForm() {
       notifiedSum,
     });
     setResult(computed);
+    setEnteredNotifiedSum(notifiedSum);
   }
 
   async function handleLeadSubmit(e: React.FormEvent) {
@@ -32,7 +34,7 @@ export function NoticeForm() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         email,
-        notifiedSum: result.amountLikelyPayable,
+        notifiedSum: enteredNotifiedSum,
         likelyValid: result.likelyValid,
       }),
     });
@@ -46,7 +48,7 @@ export function NoticeForm() {
           {result.likelyValid === "smash_and_grab_likely" &&
             "Good news for your payment application"}
           {result.likelyValid === "notices_served_on_time" &&
-            "A pay less notice appears to have been served on time"}
+            "Looks like a valuation dispute, not smash-and-grab"}
           {result.likelyValid === "needs_human_review" && "This needs a closer look"}
         </h2>
         <p className="mt-2 text-ink/80">{result.explanation}</p>
@@ -56,6 +58,10 @@ export function NoticeForm() {
           <dt className="text-ink/60">Pay less notice deadline</dt>
           <dd>{result.payLessNoticeDeadline}</dd>
         </dl>
+        <p className="mt-4 text-xs text-ink/60">
+          These dates use calendar days, not the England &amp; Wales bank-holiday calendar —
+          treat them as indicative.
+        </p>
 
         {!leadSent ? (
           <form onSubmit={handleLeadSubmit} className="mt-6 space-y-3">

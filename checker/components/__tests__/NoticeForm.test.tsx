@@ -55,4 +55,42 @@ describe("NoticeForm", () => {
       );
     });
   });
+
+  it("sends the actual entered notified sum, not amountLikelyPayable, for non-smash-and-grab results", async () => {
+    render(<NoticeForm />);
+
+    fireEvent.change(screen.getByLabelText(/due date/i), {
+      target: { value: "2026-06-01" },
+    });
+    fireEvent.change(screen.getByLabelText(/final date for payment/i), {
+      target: { value: "2026-06-15" },
+    });
+    fireEvent.change(screen.getByLabelText(/pay less notice served date/i), {
+      target: { value: "2026-06-07" },
+    });
+    fireEvent.change(screen.getByLabelText(/notified sum/i), {
+      target: { value: "1000" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /check my notice/i }));
+
+    await waitFor(() => screen.getByLabelText(/your email/i));
+    fireEvent.change(screen.getByLabelText(/your email/i), {
+      target: { value: "subbie@example.com" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: /send me the referral pack quote/i }));
+
+    await waitFor(() => {
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/lead",
+        expect.objectContaining({
+          method: "POST",
+          body: JSON.stringify({
+            email: "subbie@example.com",
+            notifiedSum: 100000,
+            likelyValid: "notices_served_on_time",
+          }),
+        })
+      );
+    });
+  });
 });

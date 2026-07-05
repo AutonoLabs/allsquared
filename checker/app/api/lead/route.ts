@@ -18,7 +18,12 @@ function isValidPayload(body: unknown): body is LeadPayload {
 }
 
 export async function POST(request: Request): Promise<Response> {
-  const body = await request.json();
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return Response.json({ ok: false, error: "invalid payload" }, { status: 400 });
+  }
 
   if (!isValidPayload(body)) {
     return Response.json({ ok: false, error: "invalid payload" }, { status: 400 });
