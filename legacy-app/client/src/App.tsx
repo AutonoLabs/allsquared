@@ -24,6 +24,7 @@ function lazyRetry<T extends ComponentType<any>>(
 }
 import ErrorBoundary from "./components/ErrorBoundary";
 import Footer from "./components/Footer";
+import CookieConsent from "./components/CookieConsent";
 import Header from "./components/Header";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
@@ -38,6 +39,7 @@ const Blog = lazyRetry(() => import("./pages/Blog"));
 const Terms = lazyRetry(() => import("./pages/Terms"));
 const Privacy = lazyRetry(() => import("./pages/Privacy"));
 const CookiePolicy = lazyRetry(() => import("./pages/CookiePolicy"));
+const Complaints = lazyRetry(() => import("./pages/Complaints"));
 const Freelancers = lazyRetry(() => import("./pages/Freelancers"));
 const Clients = lazyRetry(() => import("./pages/Clients"));
 const LegalServices = lazyRetry(() => import("./pages/LegalServices"));
@@ -244,6 +246,7 @@ function Router() {
                   <Route path={"/terms"} component={Terms} />
                   <Route path={"/privacy"} component={Privacy} />
                   <Route path={"/cookies"} component={CookiePolicy} />
+                  <Route path={"/complaints"} component={Complaints} />
                   <Route path={"/freelancers"} component={Freelancers} />
                   <Route path={"/clients"} component={Clients} />
                   <Route path={"/legal-services"} component={LegalServices} />
@@ -276,6 +279,7 @@ function App() {
           <Toaster />
           <NavigationLoadingBar />
           <Router />
+          <CookieConsent />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

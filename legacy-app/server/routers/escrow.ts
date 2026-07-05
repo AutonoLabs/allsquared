@@ -13,6 +13,11 @@ import { eq, and, inArray } from 'drizzle-orm';
 import { TRPCError } from '@trpc/server';
 import { nanoid } from 'nanoid';
 import * as transpact from '../lib/transpact-client';
+import {
+  calculateEscrowFee,
+  mapTranspactStatus,
+  type EscrowStatus,
+} from '../_core/escrowFees';
 
 /**
  * Transpact Escrow Integration (SOAP)
@@ -34,15 +39,11 @@ import * as transpact from '../lib/transpact-client';
  *   TRANSPACT_SOAP_URL     — SOAP service endpoint (optional override)
  */
 
-// Calculate escrow fee (Transpact typically charges 1.5-2.5%)
-function calculateEscrowFee(amount: number): number {
-  const feeRate = 0.02; // 2%
-  const minFee = 500; // £5 minimum
-  const maxFee = 25000; // £250 maximum
-
-  const calculatedFee = Math.round(amount * feeRate);
-  return Math.max(minFee, Math.min(maxFee, calculatedFee));
-}
+// Re-exported for backward compatibility. Canonical implementation + tests
+// live in `_core/escrowFees.ts` so the pure math can run without the full
+// router module graph (Drizzle, Transpact SOAP client, tRPC).
+export { calculateEscrowFee, mapTranspactStatus };
+export type { EscrowStatus };
 
 export const escrowRouter = router({
   // Create escrow transaction for a contract
@@ -717,18 +718,4 @@ export async function processTranspactWebhook(input: TranspactWebhookInput) {
   }
 }
 
-// Map Transpact status to our status enum
-function mapTranspactStatus(transpactStatus: string): 'pending' | 'held' | 'released' | 'refunded' | 'cancelled' {
-  const statusMap: Record<string, 'pending' | 'held' | 'released' | 'refunded' | 'cancelled'> = {
-    created: 'pending',
-    awaiting_deposit: 'pending',
-    deposited: 'held',
-    held: 'held',
-    released: 'released',
-    refunded: 'refunded',
-    cancelled: 'cancelled',
-    expired: 'cancelled',
-  };
-
-  return statusMap[transpactStatus.toLowerCase()] || 'pending';
-}
+// (mapTranspactStatus is now re-exported from `_core/escrowFees` above.)

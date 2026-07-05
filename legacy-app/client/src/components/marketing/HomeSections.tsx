@@ -123,10 +123,10 @@ export function HeroSection({ onGetStarted }: SectionProps) {
                 </div>
 
                 <h2 className="as25-font-display text-[22px] font-normal leading-7 tracking-[-0.01em]">
-                  Commercial fit-out - Unit 4, Hackney Road
+                  Helium-3 refinery upgrade - Bore 7, Olympus Mons slopes
                 </h2>
                 <div className="as25-font-mono mt-2 text-[10.5px] uppercase tracking-[0.06em] text-[#6b7e9e]">
-                  Governed by the laws of England & Wales · 14 March 2026
+                  Governed by the Martian Compact, Titans Treaty Annex II · 14 March 2089
                 </div>
 
                 <div className="mt-6 grid gap-5 border-b border-dotted border-[#e2e0d6] pb-5 md:grid-cols-2">
@@ -134,22 +134,22 @@ export function HeroSection({ onGetStarted }: SectionProps) {
                     <div className="as25-font-mono mb-1 text-[9.5px] uppercase tracking-[0.18em] text-[#6b7e9e]">
                       Contractor
                     </div>
-                    <div className="as25-font-display text-[15px]">Hartley & Sons Ltd</div>
+                    <div className="as25-font-display text-[15px]">Vollgas Heavy Industries GmbH</div>
                     <div className="as25-font-mono mt-1 text-[10px] leading-5 text-[#6b7e9e]">
-                      Co. No. 09214483
+                      JV-7740-EUR
                       <br />
-                      12 Bethnal Green Rd, London E2
+                      Deck 14, Callisto Orbital Yard, Jovian Mining Registry № JV-7740
                     </div>
                   </div>
                   <div>
                     <div className="as25-font-mono mb-1 text-[9.5px] uppercase tracking-[0.18em] text-[#6b7e9e]">
                       Client
                     </div>
-                    <div className="as25-font-display text-[15px]">Northwall Studios LLP</div>
+                    <div className="as25-font-display text-[15px]">Ares Frontier Holdings LLP</div>
                     <div className="as25-font-mono mt-1 text-[10px] leading-5 text-[#6b7e9e]">
-                      OC 412006
+                      OC-MRS-001188
                       <br />
-                      7 Curtain Road, London EC2A
+                      Valles Marineris Hub, Sector 9-LOT, Tharsis Province, Mars Colonial Registry
                     </div>
                   </div>
                 </div>
@@ -195,7 +195,7 @@ export function HeroSection({ onGetStarted }: SectionProps) {
                     <span className="inline-flex h-[7px] w-[7px] rounded-full bg-[#2a8554] shadow-[0_0_0_0_rgba(42,133,84,0.6)]" />
                     Funds held · release pending
                   </span>
-                  <span>£88,000.00</span>
+                  <span>£98,000.00</span>
                 </div>
               </div>
             </div>

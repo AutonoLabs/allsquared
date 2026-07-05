@@ -126,6 +126,11 @@ export default function Footer() {
                   Privacy Policy
                 </Link>
               </li>
+              <li>
+                <Link href="/complaints" className="transition-colors hover:text-[#0b1b33]">
+                  Complaints
+                </Link>
+              </li>
             </ul>
           </div>
         </div>
@@ -142,6 +147,9 @@ export default function Footer() {
               </Link>
               <Link href="/cookies" className="hover:text-[#0b1b33]">
                 Cookies
+              </Link>
+              <Link href="/complaints" className="hover:text-[#0b1b33]">
+                Complaints
               </Link>
             </div>
           </div>
