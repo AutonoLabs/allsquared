@@ -1,5 +1,6 @@
 import { useAuth } from "@/hooks/useAuth";
 import { hasClerkPublishableKey, SignIn, SignUp } from "@/lib/clerk";
+import { trpc } from "@/lib/trpc";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -78,6 +79,17 @@ export default function DashboardLayout({
   });
   const { loading, user, isAuthenticated } = useAuth();
   const [authTimeout, setAuthTimeout] = useState(false);
+
+  // Prefetch the dashboard payload as soon as the layout mounts and the user
+  // is authenticated. This way Dashboard.tsx usually finds the data already
+  // cached in React Query and can render the real UI on the first frame,
+  // skipping the splash entirely on warm navigations.
+  const utils = trpc.useUtils();
+  useEffect(() => {
+    if (isAuthenticated && !loading) {
+      utils.contracts.dashboard.prefetch(undefined, { staleTime: 30_000 });
+    }
+  }, [isAuthenticated, loading, utils]);
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
@@ -372,6 +384,26 @@ function AuthScreen() {
               {isSignUp ? "Create your account to get started" : "Sign in to continue"}
             </p>
           </div>
+        </div>
+        {/* Clerk disclosure — required because AllSquared uses a third-party
+            identity provider for account creation and login. Without this,
+            users see a Clerk-hosted UI and have no idea who is handling
+            their credentials or why. */}
+        <div className="w-full rounded-[10px] border border-[#c7d0e0] bg-[#fafaf7]/70 p-3 text-xs leading-5 text-[#2d466f]">
+          <p>
+            <span className="font-semibold text-[#0b1b33]">Account & sign-in:</span>{" "}
+            managed by{" "}
+            <a
+              href="https://clerk.com"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="text-[#1f6b3f] underline underline-offset-2 hover:text-[#0b1b33]"
+            >
+              Clerk
+            </a>
+            , a SOC 2 / GDPR-compliant identity provider. AllSquared never sees
+            your password.
+          </p>
         </div>
         <div className="flex w-full rounded-[10px] border border-[#c7d0e0] bg-white p-1">
           <button

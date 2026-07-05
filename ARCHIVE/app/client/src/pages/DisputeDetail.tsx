@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
-import { Skeleton } from "@/components/ui/skeleton";
+import { DashboardSplash } from "@/components/DashboardSplash";
 import { Separator } from "@/components/ui/separator";
 import { ArrowLeft, Bot, CheckCircle2, FileText, Gavel, MessageSquare, Send, ShieldAlert } from "lucide-react";
 import { toast } from "sonner";
@@ -38,7 +38,10 @@ export default function DisputeDetail() {
   const [message, setMessage] = useState("");
   const utils = trpc.useUtils();
 
-  const { data, isLoading } = trpc.disputes.get.useQuery({ id: disputeId }, { enabled: !!disputeId });
+  const { data, isLoading } = trpc.disputes.get.useQuery(
+    { id: disputeId },
+    { enabled: !!disputeId, staleTime: 30_000, refetchOnWindowFocus: false }
+  );
   const mediateMutation = trpc.disputes.mediate.useMutation({
     onSuccess: () => {
       toast.success("Response submitted");
@@ -56,13 +59,7 @@ export default function DisputeDetail() {
   });
 
   if (isLoading) {
-    return (
-      <div className="space-y-6 p-2">
-        <Skeleton className="h-9 w-36" />
-        <Skeleton className="h-36 w-full" />
-        <Skeleton className="h-72 w-full" />
-      </div>
-    );
+    return <DashboardSplash message="Loading dispute…" />;
   }
 
   if (!data) {

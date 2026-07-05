@@ -2,9 +2,10 @@
  * Chatbot LLM configuration — shared between client and server.
  *
  * Three supported models:
- *   1. GPT-4o        — OpenAI general-purpose
- *   2. LexAI RAG     — Local RAG pipeline (legal-domain)
- *   3. Codex         — OpenAI gpt-5.2-codex (fast, precise)
+ *   1. GPT-4o    — OpenAI general-purpose
+ *   2. LexAI RAG — Local RAG pipeline (legal-domain)
+ *   3. Squario   — AllSquared's contract-specialist assistant
+ *                  (powered by OpenAI under the hood, fast & precise)
  */
 
 export const CHATBOT_MODELS = {
@@ -22,11 +23,11 @@ export const CHATBOT_MODELS = {
     apiModel: "lexai-rag",
     provider: "lexai" as const,
   },
-  codex: {
-    id: "codex",
-    label: "Codex",
-    description: "OpenAI Codex — fast & precise",
-    apiModel: "gpt-5.2-codex",
+  squario: {
+    id: "squario",
+    label: "Squario",
+    description: "AllSquared's contract-specialist assistant — fast & precise",
+    apiModel: "gpt-4o",
     provider: "openai" as const,
   },
 } as const;
@@ -34,6 +35,20 @@ export const CHATBOT_MODELS = {
 export type ChatbotModelId = keyof typeof CHATBOT_MODELS;
 
 /** Default model for new sessions */
-export const DEFAULT_CHATBOT_MODEL: ChatbotModelId = "codex";
+export const DEFAULT_CHATBOT_MODEL: ChatbotModelId = "squario";
 
 export const CHATBOT_MODEL_LIST = Object.values(CHATBOT_MODELS);
+
+/**
+ * Squario's opening line — shown when a user opens a fresh chat.
+ */
+export const SQUARIO_GREETING =
+  "Hi, I'm Squario. I can draft a contract, flag a risky clause, or explain a term in plain English. What are we working on?";
+
+/**
+ * Squario's fallback message — used when the assistant can't process
+ * a request (network blip, model unavailable, malformed input).
+ * Designed to acknowledge both failure modes without frustrating the user.
+ */
+export const SQUARIO_FALLBACK =
+  "Hmm, that one didn't land. Try rephrasing, or give me another moment — I might be down so I'll get back to you shortly.";

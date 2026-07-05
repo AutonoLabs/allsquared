@@ -209,6 +209,76 @@ const TEMPLATES: TemplateConfig[] = [
     ],
     clauseBanks: {},
   },
+  {
+    file: "07-cookie-policy-uk.md",
+    slug: "cookie-policy-uk",
+    name: "Cookie Policy (UK PECR)",
+    description:
+      "Cookie policy compliant with UK GDPR and PECR, covering cookie categories, consent, and user controls.",
+    category: "other",
+    variables: [
+      { name: "EFFECTIVE_DATE", label: "Effective Date", type: "date", group: "Dates" },
+      { name: "LAST_UPDATED_DATE", label: "Last Updated Date", type: "date", group: "Dates" },
+      { name: "SUPPORT_EMAIL", label: "Support Email", type: "text", group: "Contact" },
+    ],
+    clauseBanks: {},
+  },
+  {
+    file: "08-data-processing-agreement-uk.md",
+    slug: "dpa-uk",
+    name: "Data Processing Agreement (UK GDPR)",
+    description:
+      "DPA between Controller and Processor compliant with UK GDPR Article 28 requirements.",
+    category: "other",
+    variables: [
+      { name: "controllerName", label: "Controller Name", type: "text", required: true, group: "Controller Details" },
+      { name: "controllerAddress", label: "Controller Address", type: "text", required: true, group: "Controller Details" },
+      { name: "controllerICORegistrationNumber", label: "Controller ICO Reg Number", type: "text", group: "Controller Details" },
+      { name: "effectiveDate", label: "Effective Date", type: "date", required: true, group: "Dates" },
+    ],
+    clauseBanks: {},
+  },
+  {
+    file: "10-adr-procedural-rules.md",
+    slug: "adr-procedural-rules",
+    name: "ADR Procedural Rules",
+    description:
+      "Public-facing Alternative Dispute Resolution procedural rules required under SI 2015/542.",
+    category: "other",
+    variables: [
+      { name: "EFFECTIVE_DATE", label: "Effective Date", type: "date", group: "Dates" },
+    ],
+    clauseBanks: {},
+  },
+  {
+    file: "15-statement-of-work-template.md",
+    slug: "sow-template-uk",
+    name: "Statement of Work Template (UK)",
+    description:
+      "SOW template for use alongside the Master Services Agreement, covering deliverables, milestones, and acceptance.",
+    category: "freelance",
+    variables: [
+      { name: "sowNumber", label: "SOW Number", type: "text", group: "Reference" },
+      { name: "effectiveDate", label: "Effective Date", type: "date", required: true, group: "Dates" },
+      { name: "CLIENT_NAME", label: "Client Name", type: "text", required: true, group: "Client Details" },
+      { name: "CLIENT_ADDRESS", label: "Client Address", type: "text", group: "Client Details" },
+      { name: "FREELANCER_NAME", label: "Freelancer Name", type: "text", required: true, group: "Freelancer Details" },
+      { name: "FREELANCER_ADDRESS", label: "Freelancer Address", type: "text", group: "Freelancer Details" },
+    ],
+    clauseBanks: {},
+  },
+  {
+    file: "16-ai-transparency-disclosure.md",
+    slug: "ai-transparency-disclosure",
+    name: "AI Transparency Disclosure",
+    description:
+      "Public disclosure of AI use in dispute resolution, addressing UK GDPR Article 22 and IBA Guidelines.",
+    category: "other",
+    variables: [
+      { name: "EFFECTIVE_DATE", label: "Effective Date", type: "date", group: "Dates" },
+    ],
+    clauseBanks: {},
+  },
 ];
 
 /** Seed templates into the given drizzle db instance. Exported for auto-seed on boot. */
@@ -384,7 +454,7 @@ async function seedFromTemplatesDir(db: ReturnType<typeof drizzle>) {
   console.log(`  [seed] Templates directory seeding complete.`);
 }
 
-async function seedAllTemplates(db: ReturnType<typeof drizzle>) {
+export async function seedAllTemplates(db: ReturnType<typeof drizzle>) {
   console.log("[seed] Seeding all contract templates...\n");
   // Seed existing legal templates
   await seedTemplates(db);

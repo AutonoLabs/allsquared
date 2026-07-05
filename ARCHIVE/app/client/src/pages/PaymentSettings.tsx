@@ -1,12 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Check, AlertCircle, ExternalLink, Loader2, Wallet, Shield, ArrowRight } from "lucide-react";
+import { Check, AlertCircle, ExternalLink, Wallet, Shield, ArrowRight, Loader2 } from "lucide-react";
+import { DashboardSplash } from "@/components/DashboardSplash";
 import { trpc } from "@/lib/trpc";
 import { toast } from "sonner";
 
 export default function PaymentSettings() {
-  const { data: connectStatus, isLoading } = trpc.payments.getConnectStatus.useQuery();
+  const { data: connectStatus, isLoading } = trpc.payments.getConnectStatus.useQuery(undefined, {
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+  });
 
   const createAccountMutation = trpc.payments.createConnectedAccount.useMutation({
     onSuccess: (data) => {
@@ -47,11 +51,7 @@ export default function PaymentSettings() {
   const status = getOnboardingStatus();
 
   if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-      </div>
-    );
+    return <DashboardSplash message="Loading payment settings…" />;
   }
 
   return (
@@ -157,7 +157,8 @@ export default function PaymentSettings() {
                   <div>
                     <p className="font-medium">Verify Identity</p>
                     <p className="text-sm text-muted-foreground">
-                      Complete identity verification for compliance
+                      UK anti-money-laundering checks (passport or driving licence + selfie).
+                      Required by our regulated payment partner before payouts can be enabled.
                     </p>
                   </div>
                 </div>
@@ -224,7 +225,7 @@ export default function PaymentSettings() {
               <h3 className="font-semibold">Client Deposits</h3>
               <p className="text-sm text-muted-foreground">
                 When a contract is signed, the client deposits funds into our
-                FCA-regulated escrow.
+                regulated escrow.
               </p>
             </div>
             <div className="space-y-2">
@@ -261,9 +262,9 @@ export default function PaymentSettings() {
             <div className="flex items-start gap-3 p-4 rounded-lg border">
               <Shield className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-medium">FCA Regulated</p>
+                <p className="font-medium">Regulated UK Escrow</p>
                 <p className="text-sm text-muted-foreground">
-                  Escrow services provided by Transpact Ltd (FCA Ref: 546279)
+                  Client funds are held in segregated accounts by our regulated UK escrow partner, under applicable client-money protections.
                 </p>
               </div>
             </div>

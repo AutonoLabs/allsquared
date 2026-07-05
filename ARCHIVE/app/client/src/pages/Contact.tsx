@@ -18,8 +18,8 @@ import { toast } from "sonner";
 
 const contactTracks = [
   {
-    title: "Founding cohort",
-    body: "You want to run the product on live deals early and are happy to give grounded product feedback.",
+    title: "Platform fit",
+    body: "You're considering AllSquared for live deals and want to pressure-test whether it fits your contract flow before you commit.",
   },
   {
     title: "High-value project fit",
@@ -58,8 +58,9 @@ export default function Contact() {
         highlights={[
           "London-based team",
           "High-value UK project focus",
-          "Founding cohort conversations welcome",
+          "Direct line to the founders",
         ]}
+        heroVariant="split"
       />
 
       <MarketingSection
@@ -75,7 +76,7 @@ export default function Contact() {
               Contact form
             </h2>
             <p className="mt-3 max-w-[540px] text-[14.5px] leading-7 text-[#2d466f]">
-              This is for early access, platform-fit conversations, legal-services questions, and
+              This is for platform-fit conversations, legal-services questions, and serious project inquiries.
               serious project inquiries.
             </p>
 

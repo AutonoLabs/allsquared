@@ -30,7 +30,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { ChevronLeft, ChevronRight, CheckCircle, XCircle } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { DashboardSplash } from "@/components/DashboardSplash";
 import { toast } from "sonner";
 
 type KycStatus = "pending" | "processing" | "verified" | "failed" | "expired" | "requires_input";
@@ -53,11 +53,14 @@ export default function AdminKyc() {
 
   const utils = trpc.useUtils();
 
-  const { data, isLoading } = trpc.admin.kyc.list.useQuery({
-    page,
-    limit: 20,
-    status: statusFilter,
-  });
+  const { data, isLoading } = trpc.admin.kyc.list.useQuery(
+    {
+      page,
+      limit: 20,
+      status: statusFilter,
+    },
+    { staleTime: 30_000, refetchOnWindowFocus: false }
+  );
 
   const approveMutation = trpc.admin.kyc.approve.useMutation({
     onSuccess: () => {
@@ -118,11 +121,7 @@ export default function AdminKyc() {
           </div>
 
           {isLoading ? (
-            <div className="space-y-2">
-              {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full" />
-              ))}
-            </div>
+            <DashboardSplash message="Loading KYC queue…" />
           ) : (
             <>
               <div className="rounded-md border">

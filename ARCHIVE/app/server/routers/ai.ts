@@ -6,6 +6,7 @@ import { eq, desc } from 'drizzle-orm';
 import { nanoid } from 'nanoid';
 import { CHATBOT_MODELS, DEFAULT_CHATBOT_MODEL, type ChatbotModelId } from '../../shared/chatbot-config';
 import { assertAiRateLimit } from '../lib/rate-limit';
+import { sanitizeChatHistory, sanitizeContractContext } from '../lib/ai-safety';
 
 // OpenAI API configuration
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
@@ -520,7 +521,7 @@ Format each clause with a title and the clause text.`;
       z.object({
         message: z.string().min(1),
         contractContext: z.string().optional(),
-        modelId: z.enum(['gpt-4o', 'lexai-rag', 'codex']).default(DEFAULT_CHATBOT_MODEL),
+        modelId: z.enum(['gpt-4o', 'lexai-rag', 'squario']).default(DEFAULT_CHATBOT_MODEL),
         history: z.array(z.object({
           role: z.enum(['user', 'assistant']),
           content: z.string(),
@@ -531,6 +532,8 @@ Format each clause with a title and the clause text.`;
       assertAiRateLimit(ctx.user.id);
       const modelCfg = CHATBOT_MODELS[input.modelId];
       const apiKey = process.env.OPENAI_API_KEY;
+      const safeHistory = sanitizeChatHistory(input.history);
+      const safeContext = sanitizeContractContext(input.contractContext);
 
       // ── LexAI RAG path (restricted to contract_draft + contract_review) ──
       if (modelCfg.provider === 'lexai') {
@@ -562,7 +565,7 @@ Format each clause with a title and the clause text.`;
 You are a helpful contract assistant for AllSquared, a UK contract platform.
 You help users understand and build their contracts under English and Welsh common law only.
 Be concise and practical. Never provide legal advice — suggest seeking a solicitor for complex matters.
-${input.contractContext ? `\nCurrent contract context:\n${input.contractContext.slice(0, 4000)}` : ''}`;
+${safeContext ? `\nCurrent contract context:\n${safeContext}` : ''}`;
 
           try {
             const resp = await fetch(OPENAI_API_URL, {
@@ -575,8 +578,8 @@ ${input.contractContext ? `\nCurrent contract context:\n${input.contractContext.
                 model: 'gpt-4o',
                 messages: [
                   { role: 'system', content: systemContent },
-                  ...(input.history?.slice(-8) || []),
-                  { role: 'user', content: input.message },
+                  ...(safeHistory),
+                  { role: 'user', content: input.message.slice(0, 4000) },
                 ],
                 max_tokens: 800,
                 temperature: 0.5,
@@ -593,15 +596,15 @@ ${input.contractContext ? `\nCurrent contract context:\n${input.contractContext.
         }
 
         return {
-          reply: chatFallback(input.message, input.contractContext || ''),
+          reply: chatFallback(input.message, safeContext),
           model: 'lexai-rag-fallback',
         };
       }
 
-      // ── OpenAI path (GPT-4o / Codex) ────────────────────────────
+      // ── OpenAI path (GPT-4o / Squario) ───────────────────────────
       if (!apiKey) {
         return {
-          reply: chatFallback(input.message, input.contractContext || ''),
+          reply: chatFallback(input.message, safeContext),
           model: `${modelCfg.id}-fallback`,
         };
       }
@@ -611,12 +614,12 @@ ${input.contractContext ? `\nCurrent contract context:\n${input.contractContext.
 You are a helpful contract assistant for AllSquared, a UK contract platform.
 You help users understand and build their contracts under English and Welsh common law only.
 Be concise and practical. Never provide legal advice — suggest seeking a solicitor for complex matters.
-${input.contractContext ? `\nCurrent contract context:\n${input.contractContext.slice(0, 4000)}` : ''}`;
+${safeContext ? `\nCurrent contract context:\n${safeContext}` : ''}`;
 
       const messages: { role: string; content: string }[] = [
         { role: 'system', content: systemContent },
-        ...(input.history?.slice(-8) || []),
-        { role: 'user', content: input.message },
+        ...safeHistory,
+        { role: 'user', content: input.message.slice(0, 4000) },
       ];
 
       try {
@@ -645,9 +648,10 @@ ${input.contractContext ? `\nCurrent contract context:\n${input.contractContext.
           reply: data.choices?.[0]?.message?.content || 'Unable to generate response.',
           model: modelCfg.apiModel,
         };
-      } catch {
+      } catch (err) {
+        console.error(`[chatbot] ${modelCfg.apiModel} failed:`, (err as Error).message);
         return {
-          reply: chatFallback(input.message, input.contractContext || ''),
+          reply: chatFallback(input.message, safeContext),
           model: `${modelCfg.id}-fallback`,
         };
       }

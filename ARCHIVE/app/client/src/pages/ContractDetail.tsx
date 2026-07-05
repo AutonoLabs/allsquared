@@ -2,11 +2,11 @@ import { useState } from "react";
 import { useRoute, useLocation } from "wouter";
 import { trpc } from "@/lib/trpc";
 import { itemVariants } from "@/lib/motion";
-import { safeJsonParse } from "@/lib/utils";
+import { parseContractContent, type ContractSignature } from "@shared/contract-content";
 import MilestoneManager from "@/components/MilestoneManager";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import { DashboardSplash } from "@/components/DashboardSplash";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -25,19 +25,17 @@ import {
   Trash2,
   Tag,
   Banknote,
+  Shield,
 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
-
-type ContractSignature = {
-  userId?: string;
-  name: string;
-  signedAt: string;
-};
 
 type ContractContent = {
   content?: string;
   variables?: unknown[];
   signatures?: ContractSignature[];
+  partyA?: { name?: string; email?: string };
+  partyB?: { name?: string; email?: string };
+  generatedMarkdown?: string;
 };
 
 export default function ContractDetail() {
@@ -52,8 +50,19 @@ export default function ContractDetail() {
   const [disputeEvidence, setDisputeEvidence] = useState("");
 
   const utils = trpc.useUtils();
-  const { data: currentUser } = trpc.auth.me.useQuery();
-  const { data: contract, isLoading } = trpc.contracts.get.useQuery({ id: contractId });
+  const { data: currentUser } = trpc.auth.me.useQuery(undefined, {
+    staleTime: 30_000,
+    refetchOnWindowFocus: false,
+  });
+  const { data: contract, isLoading } = trpc.contracts.get.useQuery(
+    { id: contractId },
+    { staleTime: 30_000, refetchOnWindowFocus: false }
+  );
+  const { data: providerInfo } = trpc.signatures.getProviderInfo.useQuery();
+  const { data: signatureStatus } = trpc.signatures.getContractSignatures.useQuery(
+    { contractId },
+    { enabled: !!contractId, staleTime: 30_000, refetchOnWindowFocus: false }
+  );
 
   const signMutation = trpc.contracts.sign.useMutation({
     onSuccess: () => {
@@ -74,6 +83,18 @@ export default function ContractDetail() {
     },
     onError: (error) => {
       toast.error(error.message || "Failed to send contract");
+    },
+  });
+
+  const createSignatureRequestMutation = trpc.signatures.createSignatureRequest.useMutation({
+    onSuccess: (data) => {
+      const label = data.provider === "docuseal" ? "DocuSeal" : data.provider;
+      toast.success(`Signature request sent via ${label}`);
+      utils.contracts.get.invalidate({ id: contractId });
+      utils.signatures.getContractSignatures.invalidate({ contractId });
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to send e-signature request");
     },
   });
 
@@ -101,35 +122,50 @@ export default function ContractDetail() {
   });
 
 
+  const contractContent: ContractContent = contract?.contractContent
+    ? parseContractContent(contract.contractContent as string)
+    : {};
+  const inlineSignatures = contractContent.signatures || [];
+  const eSignRecords = signatureStatus?.signatures ?? [];
+  const hasEsignFlow = eSignRecords.length > 0;
+
+  function handleSendForSignature() {
+    if (!contract || !currentUser) return;
+
+    const provider = providerInfo?.provider ?? "internal";
+    if (provider === "internal") {
+      sendForSignatureMutation.mutate({ id: contractId });
+      return;
+    }
+
+    const clientEmail = contractContent.partyA?.email || currentUser.email;
+    const providerEmail = contractContent.partyB?.email;
+    if (!clientEmail || !providerEmail) {
+      toast.error("Both parties need email addresses before sending for e-signature.");
+      return;
+    }
+
+    createSignatureRequestMutation.mutate({
+      contractId,
+      signers: [
+        {
+          userId: contract.clientId,
+          email: clientEmail,
+          name: contractContent.partyA?.name || currentUser.name || "Client",
+          role: "client",
+        },
+        {
+          userId: contract.providerId || contract.clientId,
+          email: providerEmail,
+          name: contractContent.partyB?.name || "Counterparty",
+          role: "provider",
+        },
+      ],
+    });
+  }
+
   if (isLoading) {
-    return (
-      <div className="space-y-6 p-2">
-        <Skeleton className="h-8 w-32" />
-        <div className="flex items-center gap-3">
-          <Skeleton className="h-9 w-64" />
-          <Skeleton className="h-6 w-20 rounded-full" />
-        </div>
-        <Skeleton className="h-5 w-96" />
-        <div className="grid gap-6 lg:grid-cols-3">
-          <div className="lg:col-span-2 space-y-6">
-            <Card className="border-0 shadow-sm">
-              <CardHeader><Skeleton className="h-6 w-40" /></CardHeader>
-              <CardContent><Skeleton className="h-32" /></CardContent>
-            </Card>
-            <Card className="border-0 shadow-sm">
-              <CardHeader><Skeleton className="h-6 w-40" /></CardHeader>
-              <CardContent><Skeleton className="h-48" /></CardContent>
-            </Card>
-          </div>
-          <div className="space-y-6">
-            <Card className="border-0 shadow-sm">
-              <CardHeader><Skeleton className="h-6 w-24" /></CardHeader>
-              <CardContent><Skeleton className="h-10 w-full" /></CardContent>
-            </Card>
-          </div>
-        </div>
-      </div>
-    );
+    return <DashboardSplash message="Loading contract…" />;
   }
 
   if (!contract) {
@@ -148,12 +184,7 @@ export default function ContractDetail() {
     );
   }
 
-  const contractContent: ContractContent = (() => {
-    if (!contract.contractContent) return {};
-    const raw = contract.contractContent as string;
-    return safeJsonParse<ContractContent>(raw, { content: raw, variables: [] });
-  })();
-  const signatures = contractContent.signatures || [];
+  const signatures = inlineSignatures;
 
   return (
     <div className="space-y-6 p-2">
@@ -298,12 +329,24 @@ export default function ContractDetail() {
               {contract.status === "draft" && (
                 <Button
                   className="w-full"
-                  onClick={() => sendForSignatureMutation.mutate({ id: contractId })}
-                  disabled={sendForSignatureMutation.isPending}
+                  onClick={handleSendForSignature}
+                  disabled={sendForSignatureMutation.isPending || createSignatureRequestMutation.isPending}
                 >
                   <Send className="mr-2 h-4 w-4" />
-                  Send for Signature
+                  {providerInfo && providerInfo.provider !== "internal"
+                    ? "Send via E-Signature"
+                    : "Send for Signature"}
                 </Button>
+              )}
+              {hasEsignFlow && (
+                <div className="rounded-lg border bg-muted/40 p-3 text-sm space-y-2">
+                  <p className="font-medium">
+                    E-signature ({providerInfo?.provider ?? "provider"})
+                  </p>
+                  <p className="text-muted-foreground">
+                    {signatureStatus?.signedCount ?? 0} of {eSignRecords.length} signed
+                  </p>
+                </div>
               )}
               {(contract.status === "pending_signature" || contract.status === "active") && (
                 <Dialog open={isSignDialogOpen} onOpenChange={setIsSignDialogOpen}>
@@ -429,7 +472,140 @@ export default function ContractDetail() {
               </div>
             </CardContent>
           </Card>
+
+          {contract.status === "active" && <EscrowPanel contractId={contractId} isClient={!!currentUser && contract.clientId === currentUser.id} />}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function EscrowPanel({ contractId, isClient }: { contractId: string; isClient: boolean }) {
+  const utils = trpc.useUtils();
+  const { data: escrowData, isLoading } = trpc.escrow.getContractEscrows.useQuery({ contractId });
+  const createMutation = trpc.escrow.createTransaction.useMutation({
+    onSuccess: () => {
+      toast.success("Escrow deposit initiated");
+      utils.escrow.getContractEscrows.invalidate({ contractId });
+    },
+    onError: (err) => toast.error(err.message || "Failed to create escrow"),
+  });
+  const releaseMutation = trpc.escrow.releaseFunds.useMutation({
+    onSuccess: () => {
+      toast.success("Funds released to provider");
+      utils.escrow.getContractEscrows.invalidate({ contractId });
+    },
+    onError: (err) => toast.error(err.message || "Failed to release funds"),
+  });
+
+  const escrows = escrowData?.escrows ?? [];
+  const totalHeld = escrows
+    .filter((e) => e.status === "held" || e.status === "pending")
+    .reduce((sum, e) => sum + parseInt(e.amount || "0", 10), 0);
+
+  return (
+    <Card className="border-0 shadow-sm">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base">
+          <Shield className="h-4 w-4" />
+          Escrow
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        {isLoading ? (
+          <p className="text-sm text-muted-foreground">Loading escrow…</p>
+        ) : escrows.length === 0 ? (
+          <p className="text-sm text-muted-foreground">No escrow transactions yet.</p>
+        ) : (
+          <>
+            <div className="rounded-lg bg-muted/40 p-3 text-sm">
+              <span className="text-muted-foreground">Held in escrow: </span>
+              <span className="font-semibold">£{(totalHeld / 100).toLocaleString("en-GB", { minimumFractionDigits: 2 })}</span>
+            </div>
+            <div className="space-y-2">
+              {escrows.map((e) => (
+                <div key={e.id} className="flex items-center justify-between rounded-lg border p-2.5 text-sm">
+                  <div>
+                    <p className="font-medium">£{(parseInt(e.amount || "0", 10) / 100).toLocaleString("en-GB")}</p>
+                    <p className="text-xs text-muted-foreground capitalize">{e.status.replace(/_/g, " ")}</p>
+                  </div>
+                  {isClient && (e.status === "held" || e.status === "pending") && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => releaseMutation.mutate({ escrowId: e.id })}
+                      disabled={releaseMutation.isPending}
+                    >
+                      Release
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
+        )}
+
+        {isClient && (
+          <EscrowDepositForm
+            contractId={contractId}
+            onCreate={(amount) => createMutation.mutate({ contractId, amount: Math.round(amount * 100) })}
+            pending={createMutation.isPending}
+          />
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+function EscrowDepositForm({
+  contractId: _contractId,
+  onCreate,
+  pending,
+}: {
+  contractId: string;
+  onCreate: (amountGbp: number) => void;
+  pending: boolean;
+}) {
+  const [amount, setAmount] = useState("");
+  const [open, setOpen] = useState(false);
+
+  if (!open) {
+    return (
+      <Button variant="outline" size="sm" className="w-full" onClick={() => setOpen(true)}>
+        <Shield className="mr-2 h-4 w-4" />
+        Deposit to Escrow
+      </Button>
+    );
+  }
+
+  return (
+    <div className="space-y-2 rounded-lg border p-3">
+      <Label htmlFor="escrow-amount">Deposit amount (£)</Label>
+      <Input
+        id="escrow-amount"
+        type="number"
+        min="1"
+        step="0.01"
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+        placeholder="e.g. 5000"
+      />
+      <div className="flex gap-2">
+        <Button variant="outline" size="sm" className="flex-1" onClick={() => setOpen(false)}>
+          Cancel
+        </Button>
+        <Button
+          size="sm"
+          className="flex-1"
+          disabled={!amount || parseFloat(amount) <= 0 || pending}
+          onClick={() => {
+            onCreate(parseFloat(amount));
+            setAmount("");
+            setOpen(false);
+          }}
+        >
+          {pending ? "Processing…" : "Deposit"}
+        </Button>
       </div>
     </div>
   );

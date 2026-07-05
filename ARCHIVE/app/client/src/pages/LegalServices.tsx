@@ -18,7 +18,7 @@ export default function LegalServices() {
         primaryAction={{ label: "Ask about legal support", onClick: handleGetStarted }}
         secondaryAction={{ label: "See core pricing", href: "/pricing" }}
         highlights={[
-          "Independent SRA-regulated solicitors",
+          "Independent UK-qualified solicitors",
           "Fixed-fee scoping where possible",
           "Faster context because the platform already has the file",
         ]}

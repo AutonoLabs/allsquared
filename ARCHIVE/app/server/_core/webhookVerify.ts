@@ -45,6 +45,11 @@ export function extractProvidedSignature(
     }
   }
 
+  // Comma-separated without v1 — use first segment
+  if (normalized.includes(",")) {
+    return normalized.split(",")[0]?.trim() || normalized;
+  }
+
   return normalized;
 }
 

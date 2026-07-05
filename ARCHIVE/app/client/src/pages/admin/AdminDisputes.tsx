@@ -28,7 +28,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Bot, ChevronLeft, ChevronRight, Eye, CheckCircle, MessageSquare } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
+import { DashboardSplash, InlineLoader } from "@/components/DashboardSplash";
 import { toast } from "sonner";
 
 type DisputeStatus = "open" | "under_review" | "resolved" | "escalated" | "closed";
@@ -58,7 +58,7 @@ export default function AdminDisputes() {
 
   const { data: disputeDetail, isLoading: loadingDetail } = trpc.admin.disputes.get.useQuery(
     { id: selectedDispute! },
-    { enabled: !!selectedDispute }
+    { enabled: !!selectedDispute, staleTime: 30_000, refetchOnWindowFocus: false }
   );
 
   const resolveMutation = trpc.admin.disputes.resolve.useMutation({
@@ -108,11 +108,7 @@ export default function AdminDisputes() {
           </div>
 
           {isLoading ? (
-            <div className="space-y-2">
-              {[...Array(5)].map((_, i) => (
-                <Skeleton key={i} className="h-12 w-full" />
-              ))}
-            </div>
+            <DashboardSplash message="Loading disputes…" />
           ) : (
             <>
               <div className="rounded-md border">
@@ -230,11 +226,7 @@ export default function AdminDisputes() {
             </DialogDescription>
           </DialogHeader>
           {loadingDetail ? (
-            <div className="space-y-4">
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-full" />
-            </div>
+            <InlineLoader message="Loading details…" />
           ) : disputeDetail ? (
             <div className="space-y-4">
               <div className="flex items-center gap-2">

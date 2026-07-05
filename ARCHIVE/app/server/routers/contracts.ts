@@ -8,7 +8,8 @@ import {
   getUserContractsPage,
 } from '../db';
 import { createNotification } from '../db';
-import { assertContractStatusTransition, type ContractStatus } from '../lib/contract-state';
+import { parseContractContent, serializeContractContent } from '@shared/contract-content';
+import { assertDraftEditable } from '../lib/contract-auth';
 import { nanoid } from 'nanoid';
 
 export const contractsRouter = router({
@@ -71,10 +72,10 @@ export const contractsRouter = router({
         templateId: z.string().optional(),
         title: z.string().min(1),
         description: z.string(),
-        category: z.string(),
+        category: z.enum(['freelance', 'home_improvement', 'event_services', 'trade_services', 'other']),
         providerId: z.string().optional(),
         providerEmail: z.string().email().optional(),
-        totalAmount: z.number().positive(),
+        totalAmount: z.number().min(0),
         startDate: z.string().optional(),
         endDate: z.string().optional(),
         content: z.any(),
@@ -82,6 +83,12 @@ export const contractsRouter = router({
     )
     .mutation(async ({ ctx, input }) => {
       const contractId = `contract_${nanoid(16)}`;
+      const contentObj = typeof input.content === 'object' && input.content !== null
+        ? (input.content as Record<string, unknown>)
+        : {};
+      const generatedMarkdown = typeof contentObj.generatedMarkdown === 'string'
+        ? contentObj.generatedMarkdown
+        : undefined;
       
       const contract = await createContract({
         id: contractId,
@@ -95,6 +102,7 @@ export const contractsRouter = router({
         currency: 'GBP',
         status: 'draft',
         contractContent: JSON.stringify(input.content),
+        generatedMarkdown,
         startDate: input.startDate ? new Date(input.startDate) : undefined,
         endDate: input.endDate ? new Date(input.endDate) : undefined,
         createdAt: new Date(),
@@ -115,9 +123,6 @@ export const contractsRouter = router({
         startDate: z.string().optional(),
         endDate: z.string().optional(),
         content: z.any().optional(),
-        status: z
-          .enum(['draft', 'pending_signature', 'active', 'completed', 'cancelled', 'disputed'])
-          .optional(),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -127,10 +132,7 @@ export const contractsRouter = router({
         throw new Error('Contract not found');
       }
       
-      // Only creator can update draft contracts
-      if (contract.clientId !== ctx.user.id && contract.providerId !== ctx.user.id) {
-        throw new Error('Unauthorized');
-      }
+      assertDraftEditable(contract, ctx.user.id);
       
       const updates: any = { updatedAt: new Date() };
       if (input.title) updates.title = input.title;
@@ -139,13 +141,6 @@ export const contractsRouter = router({
       if (input.startDate) updates.startDate = new Date(input.startDate);
       if (input.endDate) updates.endDate = new Date(input.endDate);
       if (input.content) updates.contractContent = JSON.stringify(input.content);
-      if (input.status) {
-        assertContractStatusTransition(
-          contract.status as ContractStatus,
-          input.status as ContractStatus
-        );
-        updates.status = input.status;
-      }
       
       await updateContract(input.id, updates);
       
@@ -240,17 +235,16 @@ export const contractsRouter = router({
         throw new Error('Unauthorized');
       }
       
-      // For MVP, we'll track signatures in contract content
-      const content = contract.contractContent ? JSON.parse(contract.contractContent as string) : {};
+      // Track signatures in structured contract content (JSON or markdown wrapper)
+      const content = parseContractContent(contract.contractContent as string | null);
       if (!content.signatures) {
         content.signatures = [];
       }
-      
-      // Check if user already signed
+
       const alreadySigned = content.signatures.some(
-        (sig: any) => sig.userId === ctx.user.id
+        (sig) => sig.userId === ctx.user.id
       );
-      
+
       if (!alreadySigned) {
         content.signatures.push({
           userId: ctx.user.id,
@@ -258,14 +252,17 @@ export const contractsRouter = router({
           signedAt: new Date().toISOString(),
         });
       }
-      
-      // Check if both parties have signed
-      const allSigned =
-        content.signatures.length >= 2 ||
-        (contract.clientId === contract.providerId && content.signatures.length >= 1);
-      
+
+      const distinctParties =
+        contract.providerId &&
+        contract.providerId !== '' &&
+        contract.providerId !== contract.clientId;
+      const allSigned = distinctParties
+        ? content.signatures.length >= 2
+        : content.signatures.length >= 1;
+
       await updateContract(input.id, {
-        contractContent: JSON.stringify(content),
+        contractContent: serializeContractContent(content),
         status: allSigned ? 'active' : 'pending_signature',
 
         updatedAt: new Date(),
@@ -304,21 +301,52 @@ export const contractsRouter = router({
   // Get dashboard stats
   stats: protectedProcedure.query(async ({ ctx }) => {
     const contracts = await getUserContracts(ctx.user.id);
-    
+
     const activeContracts = contracts.filter((c) => c.status === 'active').length;
     const completedContracts = contracts.filter((c) => c.status === 'completed').length;
     const draftContracts = contracts.filter((c) => c.status === 'draft').length;
-    
+
     const totalValue = contracts
       .filter((c) => c.status === 'active' || c.status === 'completed')
       .reduce((sum, c) => sum + (parseInt(c.totalAmount || '0', 10)), 0);
-    
+
     return {
       activeContracts,
       completedContracts,
       draftContracts,
       totalContracts: contracts.length,
       totalValue,
+    };
+  }),
+
+  /**
+   * Combined dashboard payload — returns stats AND the 5 most recent contracts
+   * in a single round-trip so the dashboard skeleton can disappear in one fetch
+   * instead of two sequential ones.
+   */
+  dashboard: protectedProcedure.query(async ({ ctx }) => {
+    const [{ contracts: recent }, total] = await Promise.all([
+      getUserContractsPage(ctx.user.id, { page: 1, limit: 5 }),
+      getUserContracts(ctx.user.id),
+    ]);
+
+    const activeContracts = total.filter((c) => c.status === 'active').length;
+    const completedContracts = total.filter((c) => c.status === 'completed').length;
+    const draftContracts = total.filter((c) => c.status === 'draft').length;
+
+    const totalValue = total
+      .filter((c) => c.status === 'active' || c.status === 'completed')
+      .reduce((sum, c) => sum + (parseInt(c.totalAmount || '0', 10)), 0);
+
+    return {
+      stats: {
+        activeContracts,
+        completedContracts,
+        draftContracts,
+        totalContracts: total.length,
+        totalValue,
+      },
+      contracts: recent,
     };
   }),
 });

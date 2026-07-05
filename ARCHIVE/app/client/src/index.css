@@ -6,6 +6,18 @@
 @import "tw-animate-css";
 @import "./styles/md3-theme.css";
 
+/* ─── AllSquared — paint-stable brand background ────────────────
+   Kills the white→purple flash on every route navigation. The CSS
+   above (and any lazy-loaded route chunk) takes a tick to apply,
+   so we set the brand cream directly on <html> and <body> as the
+   very first paint so the user never sees a default browser white
+   that briefly renders before our M3 Surface T99 token kicks in. */
+html, body {
+  background-color: #fafaf7;
+  color: #0b1b33;
+}
+html { scroll-behavior: smooth; }
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
@@ -114,10 +126,10 @@
   --secondary-container: oklch(0.94 0.016 270);
   --on-secondary-container: oklch(0.22 0.03 265);
 
-  /* ── M3 Tertiary ── Emerald accent #1F6B3F */
-  --tertiary: oklch(0.43 0.115 152);             /* Emerald T40 ≈ #1f6b3f */
-  --tertiary-container: oklch(0.93 0.04 152);    /* Emerald T90 */
-  --on-tertiary-container: oklch(0.22 0.07 152); /* Emerald T10 */
+  /* ── M3 Tertiary ── Brand Forest Green (was Violet #6D28D9) */
+  --tertiary: oklch(0.42 0.13 155);               /* Forest green T40 */
+  --tertiary-container: oklch(0.93 0.05 155);    /* Light green T90 */
+  --on-tertiary-container: oklch(0.22 0.08 155);  /* Deep green T10 */
 
   /* ── M3 Surface & Background ── */
   --background: oklch(0.984 0.003 247.86);       /* Surface T99 #F8FAFC */
@@ -126,8 +138,8 @@
   --surface-variant: oklch(0.94 0.012 265);      /* Surface Variant T90 */
   --on-surface-variant: oklch(0.42 0.025 265);   /* On Surface Variant T30 */
 
-  /* ── M3 Surface Tint (Emerald for elevation) ── */
-  --surface-tint: oklch(0.43 0.115 152);         /* Emerald primary tint */
+  /* ── M3 Surface Tint (Violet for elevation) ── */
+  --surface-tint: oklch(0.42 0.16 155);          /* Green tint (brand) */
 
   /* ── M3 Card / Popover / Muted ── */
   --card: oklch(1 0 0);                          /* Pure white elevated surface */
@@ -137,15 +149,15 @@
   --muted: oklch(0.955 0.012 265);
   --muted-foreground: oklch(0.50 0.025 265);     /* On Surface Variant T40 */
 
-  /* ── M3 Accent ── Emerald #1F6B3F */
-  --accent: oklch(0.43 0.115 152);
+  /* ── M3 Accent ── Brand Green (was Violet) */
+  --accent: oklch(0.55 0.16 155);                /* Forest green accent */
   --accent-foreground: oklch(1 0 0);
 
   /* ── M3 Outline ── */
   --border: oklch(0.82 0.016 265);               /* Outline T50 */
   --outline-variant: oklch(0.90 0.012 265);      /* Outline Variant T80 */
   --input: oklch(0.90 0.012 265);
-  --ring: oklch(0.43 0.115 152);
+  --ring: oklch(0.42 0.16 155);                  /* Brand green focus ring */
 
   /* ── Semantic ── */
   --destructive: oklch(0.56 0.22 29);            /* Error T40 */
@@ -155,10 +167,10 @@
   --warning: oklch(0.72 0.18 75);                /* Gold — escrow held */
   --warning-foreground: oklch(0.17 0.04 265);
 
-  /* ── Chart ── Emerald-forward palette, no violet */
-  --chart-1: oklch(0.43 0.115 152);              /* Emerald (primary) */
-  --chart-2: oklch(0.55 0.18 145);               /* Emerald Bright */
-  --chart-3: oklch(0.665 0.06 152);              /* Emerald Light */
+  /* ── Chart ── (greens + navy + gold, no purple) */
+  --chart-1: oklch(0.42 0.16 155);               /* Forest green */
+  --chart-2: oklch(0.55 0.18 145);               /* Emerald */
+  --chart-3: oklch(0.65 0.10 165);               /* Sage */
   --chart-4: oklch(0.208 0.042 265.75);          /* Navy */
   --chart-5: oklch(0.72 0.18 75);                /* Gold */
 
@@ -167,17 +179,17 @@
   --sidebar-foreground: oklch(0.17 0.04 265);
   --sidebar-primary: oklch(0.208 0.042 265.75);
   --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.93 0.04 152);
-  --sidebar-accent-foreground: oklch(0.22 0.07 152);
+  --sidebar-accent: oklch(0.93 0.04 155);        /* Light green tint (active nav) */
+  --sidebar-accent-foreground: oklch(0.22 0.08 155);
   --sidebar-border: oklch(0.90 0.012 265);
-  --sidebar-ring: oklch(0.43 0.115 152);
+  --sidebar-ring: oklch(0.42 0.16 155);
 
-  /* ── M3 Elevation Surface Colors (surface + emerald tint at opacity) ── */
-  --surface-1: color-mix(in oklch, oklch(0.43 0.115 152) 5%, oklch(1 0 0));
-  --surface-2: color-mix(in oklch, oklch(0.43 0.115 152) 8%, oklch(1 0 0));
-  --surface-3: color-mix(in oklch, oklch(0.43 0.115 152) 11%, oklch(1 0 0));
-  --surface-4: color-mix(in oklch, oklch(0.43 0.115 152) 12%, oklch(1 0 0));
-  --surface-5: color-mix(in oklch, oklch(0.43 0.115 152) 14%, oklch(1 0 0));
+  /* ── M3 Elevation Surface Colors (green tint, not purple) ── */
+  --surface-1: color-mix(in oklch, oklch(0.42 0.16 155) 5%, oklch(1 0 0));
+  --surface-2: color-mix(in oklch, oklch(0.42 0.16 155) 8%, oklch(1 0 0));
+  --surface-3: color-mix(in oklch, oklch(0.42 0.16 155) 11%, oklch(1 0 0));
+  --surface-4: color-mix(in oklch, oklch(0.42 0.16 155) 12%, oklch(1 0 0));
+  --surface-5: color-mix(in oklch, oklch(0.42 0.16 155) 14%, oklch(1 0 0));
 }
 
 /* ─── Dark Theme ───────────────────────────────────────────────── */
@@ -190,9 +202,9 @@
   --secondary: oklch(0.30 0.03 265);
   --secondary-foreground: oklch(0.88 0.015 265);
 
-  --tertiary: oklch(0.70 0.115 152);             /* Emerald T80 */
-  --tertiary-container: oklch(0.30 0.08 152);
-  --on-tertiary-container: oklch(0.88 0.04 152);
+  --tertiary: oklch(0.70 0.13 155);             /* Sage green (was Violet T80) */
+  --tertiary-container: oklch(0.30 0.10 155);
+  --on-tertiary-container: oklch(0.88 0.04 155);
 
   --background: oklch(0.14 0.018 265);          /* Surface T6 */
   --foreground: oklch(0.90 0.008 265);          /* On Surface T90 */
@@ -208,35 +220,35 @@
   --muted: oklch(0.28 0.022 265);
   --muted-foreground: oklch(0.65 0.018 265);
 
-  --accent: oklch(0.70 0.115 152);
+  --accent: oklch(0.70 0.13 155);               /* Forest green (was purple) */
   --accent-foreground: oklch(0.17 0.04 265);
 
   --border: oklch(1 0 0 / 12%);
   --outline-variant: oklch(1 0 0 / 8%);
   --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.70 0.115 152);
+  --ring: oklch(0.70 0.13 155);
 
   --destructive: oklch(0.70 0.19 29);
   --destructive-foreground: oklch(0.17 0.04 265);
 
-  --chart-1: oklch(0.70 0.115 152);
-  --chart-2: oklch(0.70 0.18 145);
-  --chart-3: oklch(0.43 0.115 152);
-  --chart-4: oklch(0.65 0.018 265);
-  --chart-5: oklch(0.78 0.16 75);
+  --chart-1: oklch(0.70 0.13 155);              /* Forest green */
+  --chart-2: oklch(0.70 0.18 145);              /* Emerald */
+  --chart-3: oklch(0.65 0.10 165);              /* Sage */
+  --chart-4: oklch(0.65 0.018 265);             /* Navy */
+  --chart-5: oklch(0.78 0.16 75);               /* Gold */
 
   --sidebar: oklch(0.20 0.022 265);
   --sidebar-foreground: oklch(0.90 0.008 265);
-  --sidebar-accent: oklch(0.30 0.08 152);
-  --sidebar-accent-foreground: oklch(0.88 0.04 152);
+  --sidebar-accent: oklch(0.30 0.10 155);        /* Dark green tint */
+  --sidebar-accent-foreground: oklch(0.88 0.04 155);
   --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.70 0.115 152);
+  --sidebar-ring: oklch(0.70 0.13 155);
 
-  --surface-1: color-mix(in oklch, oklch(0.70 0.115 152) 5%, oklch(0.14 0.018 265));
-  --surface-2: color-mix(in oklch, oklch(0.70 0.115 152) 8%, oklch(0.14 0.018 265));
-  --surface-3: color-mix(in oklch, oklch(0.70 0.115 152) 11%, oklch(0.14 0.018 265));
-  --surface-4: color-mix(in oklch, oklch(0.70 0.115 152) 12%, oklch(0.14 0.018 265));
-  --surface-5: color-mix(in oklch, oklch(0.70 0.115 152) 14%, oklch(0.14 0.018 265));
+  --surface-1: color-mix(in oklch, oklch(0.70 0.13 155) 5%, oklch(0.14 0.018 265));
+  --surface-2: color-mix(in oklch, oklch(0.70 0.13 155) 8%, oklch(0.14 0.018 265));
+  --surface-3: color-mix(in oklch, oklch(0.70 0.13 155) 11%, oklch(0.14 0.018 265));
+  --surface-4: color-mix(in oklch, oklch(0.70 0.13 155) 12%, oklch(0.14 0.018 265));
+  --surface-5: color-mix(in oklch, oklch(0.70 0.13 155) 14%, oklch(0.14 0.018 265));
 }
 
 /* ─── Base Layer ────────────────────────────────────────────────── */
@@ -440,8 +452,8 @@
     height: 2.5rem;
     padding: 0 1.5rem;
     border-radius: var(--radius-xl);
-    background: var(--tertiary-container, oklch(0.93 0.04 152));
-    color: var(--on-tertiary-container, oklch(0.22 0.07 152));
+    background: var(--tertiary-container, oklch(0.93 0.05 155));
+    color: var(--on-tertiary-container, oklch(0.22 0.08 155));
     font-family: var(--font-sans);
     font-size: 0.875rem;
     font-weight: 500;
@@ -559,9 +571,9 @@
   /* ── M3 Gradient Mesh Hero ───────────────────────────────────── */
   .gradient-mesh {
     background:
-      radial-gradient(ellipse at 20% 50%, oklch(0.43 0.115 152 / 0.25) 0%, transparent 55%),
-      radial-gradient(ellipse at 80% 20%, oklch(0.665 0.06 152 / 0.18) 0%, transparent 55%),
-      radial-gradient(ellipse at 60% 80%, oklch(0.43 0.115 152 / 0.12) 0%, transparent 45%),
+      radial-gradient(ellipse at 20% 50%, oklch(0.55 0.16 155 / 0.25) 0%, transparent 55%),
+      radial-gradient(ellipse at 80% 20%, oklch(0.65 0.10 165 / 0.18) 0%, transparent 55%),
+      radial-gradient(ellipse at 60% 80%, oklch(0.42 0.16 155 / 0.12) 0%, transparent 45%),
       oklch(0.208 0.042 265.75);
   }
 
@@ -661,6 +673,48 @@
     opacity: 0.5;
     pointer-events: none;
     z-index: -1;
+  }
+
+  /* ─── Hero variant: split (About / Contact) ──────────────────────
+     Vertical green panel on the left, cream body. Different from
+     diagonal grid (Home) and flat (Features / Pricing). */
+  .as25-hero-bg-split {
+    position: relative;
+    isolation: isolate;
+    background: #fafaf7;
+  }
+
+  .as25-hero-bg-split::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, #1f6b3f 0%, #2a8554 100%);
+    clip-path: polygon(0 0, 38% 0, 28% 100%, 0 100%);
+    opacity: 0.92;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* ─── Hero variant: flat (Features / Pricing / HowItWorks / LegalServices)
+     Cream body with a navy hairline top stripe for visual rhythm.
+     No diagonal, no panels — feels like a docs page. */
+  .as25-hero-bg-flat {
+    position: relative;
+    isolation: isolate;
+    background: #fafaf7;
+  }
+
+  .as25-hero-bg-flat::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #0b1b33 0%, #1f6b3f 50%, #2a8554 100%);
+    pointer-events: none;
+    z-index: 1;
   }
 
   .as25-marquee-track {

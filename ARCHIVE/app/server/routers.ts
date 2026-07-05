@@ -17,7 +17,6 @@ import { disputesRouter } from "./routers/disputes";
 import { templateBuilderRouter } from "./routers/templateBuilder";
 import { companiesHouseRouter } from "./routers/companiesHouse";
 import { partyProfilesRouter } from "./routers/partyProfiles";
-import { contractChatRouter } from "./routers/contractChat";
 import { kycRouter } from "./routers/kyc";
 import { updateUser, upsertUser, getUser } from "./db";
 import { z } from "zod";
@@ -119,8 +118,6 @@ export const appRouter = router({
   // Contract template builder
   templateBuilder: templateBuilderRouter,
 
-  // Contract chatbot (multi-model)
-  contractChat: contractChatRouter,
   kyc: kycRouter,
 });
 

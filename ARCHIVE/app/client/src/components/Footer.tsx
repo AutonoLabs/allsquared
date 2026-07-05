@@ -1,7 +1,21 @@
 import { AllSquaredWordmark } from "@/components/marketing/AllSquaredWordmark";
-import { Link } from "wouter";
+import { useEffect } from "react";
+import { Link, useLocation } from "wouter";
 
 export default function Footer() {
+  const [location] = useLocation();
+
+  // Footer Link clicks should always reset scroll position.
+  // Without this, navigating via the footer leaves the page scrolled
+  // partway down which feels broken on mobile where the footer is long.
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    }
+  }, [location]);
+
+  // Year recomputes on render so the footer never shows a stale year
+  // (e.g. deployed Dec 31 → Jan 1).
   const currentYear = new Date().getFullYear();
 
   return (
@@ -144,23 +158,10 @@ export default function Footer() {
             (52% B2B late payment; c.50,000 SMEs closing annually); FSB &amp; Xero Small Business
             Index, 2024 (c.£22,000 average owed in overdue invoices); QuickBooks UK SME late-payment
             research, 2023 (56 million hours lost annually). AllSquared is a trading name of
-            AllSquared Ltd, registered in England &amp; Wales (company number on request; see our{" "}
-            <Link href="/privacy" className="underline hover:text-[#0b1b33]">
-              Privacy Policy
-            </Link>
-            ). Escrow services are provided by Transpact, an FCA-authorised payment institution,
-            under client-money rules. AllSquared does not hold client money. AllSquared is not a
-            law firm; when you book a legal service we connect you with independent SRA-regulated
-            solicitors who advise directly under their own professional terms. AI-assisted
-            features (contract drafting, dispute analysis, mediation suggestions) are not legal
-            advice. For anything that could have material legal, financial, or tax consequences,
-            consult a qualified professional. Data controller: AllSquared Ltd. For our
-            Information Commissioner&rsquo;s Office registration details and how to contact us,
-            see the{" "}
-            <Link href="/privacy" className="underline hover:text-[#0b1b33]">
-              Privacy Policy
-            </Link>
-            .
+            AllSquared Ltd, registered in England &amp; Wales. Escrow services are provided by
+            a regulated UK payment institution, with client funds held in segregated accounts under applicable client-money protections. AllSquared
+            is not a law firm; when you book a legal service we connect you with independent
+            UK-qualified solicitors who advise directly under their own professional terms.
           </p>
         </div>
       </div>
