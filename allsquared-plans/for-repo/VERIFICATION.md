@@ -1,6 +1,6 @@
 # VERIFICATION.md — Codebase Audit vs. REQUIREMENTS.md (UK Adjudication Pivot)
 
-> Audit of `/Users/elibernstein/Code/allsquared-app/ARCHIVE/app/` (archived, content unchanged — a
+> Audit of `/Users/elibernstein/Code/allsquared-app/legacy-app/` (archived, content unchanged — a
 > Vite + Express + Drizzle + Postgres app, formerly the "AllSquared" UK freelance-contracts /
 > e-signature / escrow platform) against the new v1 requirements (R1–R18) for the AI-powered UK
 > construction-payment/adjudication pivot. Performed per the "Audit procedure" in REQUIREMENTS.md.
@@ -41,7 +41,7 @@ across `server/`, `shared/`, `client/src` returns zero hits for any calendar log
 
 **Secrets scan:** No committed secrets found. Only `.env.example` is tracked in git
 (`git ls-files | grep -i "\.env"` → `.env.example` only); all values in it are placeholders
-(`sk_test_...`, `sk-...`, blank strings) — see `/Users/elibernstein/Code/allsquared-app/ARCHIVE/app/.env.example`.
+(`sk_test_...`, `sk-...`, blank strings) — see `/Users/elibernstein/Code/allsquared-app/legacy-app/.env.example`.
 A repo-wide grep for live-looking key patterns (`sk_live_`, `sk_test_[0-9A-Za-z]{10,}`, `pk_live_`,
 `AKIA[A-Z0-9]{16}`, `whsec_[0-9A-Za-z]{10,}`, `-----BEGIN`) across all `.ts`/`.tsx`/`.json`/`.env*`
 files returned no matches outside the example file. One notable but non-secret data point:

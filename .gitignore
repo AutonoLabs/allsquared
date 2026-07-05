@@ -162,3 +162,4 @@ yarn.lock
 .env*.local
 .env.production
 .env.local
+.env*
