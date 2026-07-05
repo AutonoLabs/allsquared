@@ -2,6 +2,20 @@
 
 ## Milestone: UK v1 — "First £250K recovered"
 
+### Phase 00 — Validation sprint (2–4 weeks, BEFORE any engine build)
+**Goal:** Prove someone will pay before building the machine. Deliverables:
+- Free pay-less-notice / notice-validity checker live (Phase 05's SEO wedge pulled forward;
+  minimal build, no rules engine — a guided questionnaire with human-reviewed output is fine)
+- 10 interviews with UK trade subcontractors who are currently owed money
+- 1 conversation with an ANB (RICS / TeCSA / UK Adjudicators) about low-value scheme volume
+- 1 conversation with a construction solicitor about referral flow both directions
+**Kill criteria (written before starting):** if no interviewed subbie says they would pay
+£990 for a prepared referral, or the checker gets meaningful traffic but zero qualified
+leads in 4 weeks, stop and rethink before any Phase 02 spend.
+**Satisfies:** de-risks everything **Status:** ☐ Not started
+**Rationale:** 8 months were spent building the freelance product without a single customer
+conversation. This phase exists so that cannot happen again.
+
 ### Phase 01 — UK foundation (legal & ops)
 **Goal:** AllSquared Ltd can lawfully trade: entity, ICO registration, PII quote/bind,
 terms of engagement + "we are not solicitors" disclosures, partner solicitor firm signed
@@ -12,7 +26,8 @@ for enforcement handoffs, UK phone/registered office.
 ### Phase 02 — Jurisdiction & date engine
 **Goal:** E&W calendar + contract-driven payment-terms model + Scheme fallback, fully tested.
 **Satisfies:** R1, R2, R3 **Status:** ☐ Not started
-**Depends on:** code review outcome (rebuild vs. refactor decision).
+**Depends on:** Phase 00 passing its kill criteria; code review done (VERIFICATION.md:
+new construction, not refactor).
 
 ### Phase 03 — Validity & eligibility engine
 **Goal:** Deterministic notice-validity rules, smash-and-grab assessment with human gate,

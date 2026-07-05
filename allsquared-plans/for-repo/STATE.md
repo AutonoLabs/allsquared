@@ -6,6 +6,16 @@
 - Last completed: strategy reset (this document set)
 
 ## Decisions Made
+- **2026-07-05 (evening)** — **Pivot reconfirmed, validation-first.** After the repo audit
+  (VERIFICATION.md) surfaced that substantive freelance-product work (KYC, escrow panel,
+  security audit) had landed on main only 7 days before this plan was drafted, the pivot was
+  paused and reconsidered with full knowledge. Findings: the freelance product has zero
+  users/revenue after 8+ months and the June work was the founder's own agent runs, not a
+  separate team's investment. Pivot stands. Roadmap resequenced: a Phase 00 validation
+  sprint (free checker + 10 subbie interviews + kill criteria) now precedes the Phase 02
+  engine build — the last 8 months' failure mode was building without customer contact, not
+  picking the wrong product. Freelance product frozen: stays deployed from legacy-app/, zero
+  further investment.
 - **2026-07-05** — **UK-first.** E&W construction adjudication is the beachhead: unreserved
   under the Legal Services Act 2007 (no law practice needed), single national regime,
   record 2,264 referrals/yr, smash-and-grab ≈ ⅓ of cases and purely procedural, sub-£25K
