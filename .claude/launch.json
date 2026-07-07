@@ -1,0 +1,12 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "checker-dev",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["pnpm", "--dir", "checker", "dev"],
+      "port": 3000,
+      "autoPort": true
+    }
+  ]
+}
