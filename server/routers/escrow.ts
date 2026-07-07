@@ -18,6 +18,7 @@ import {
   mapTranspactStatus,
   type EscrowStatus,
 } from '../_core/escrowFees';
+import { checkPayoutCountry } from '../_core/transpact-countries';
 
 /**
  * Transpact Escrow Integration (SOAP)
@@ -48,6 +49,16 @@ export const escrowRouter = router({
         contractId: z.string(),
         milestoneId: z.string().optional(),
         amount: z.number().positive(),
+        /**
+         * ISO-3166-alpha-2 country code of the freelancer's payout bank
+         * account. Transpact does not support personal-name accounts in a
+         * small list of restricted jurisdictions (PK, ZA, CN).
+         */
+        supplierPayoutCountry: z
+          .string()
+          .trim()
+          .length(2, 'supplierPayoutCountry must be ISO-3166-alpha-2')
+          .transform((s) => s.toUpperCase()),
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -67,6 +78,27 @@ export const escrowRouter = router({
 
       if (contract[0].clientId !== ctx.user.id) {
         throw new Error('Only the client can initiate escrow deposits');
+      }
+
+      // Transpact country gate — must run before any Transpact API call.
+      const countryCheck = checkPayoutCountry(input.supplierPayoutCountry);
+      if (countryCheck.decision === 'blocked') {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: countryCheck.reason,
+        });
+      }
+      if (countryCheck.decision === 'unknown') {
+        // Treat unknown as a hard fail: we cannot confirm Transpact will
+        // accept this payout destination, so we decline rather than risk
+        // bouncing at the gateway with funds already promised.
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            countryCheck.reason +
+            ' Ask the freelancer to set a valid payout country in their ' +
+            'payment settings before retrying.',
+        });
       }
 
       // Verify milestone if specified
@@ -103,6 +135,7 @@ export const escrowRouter = router({
           allsquaredContractId: input.contractId,
           allsquaredMilestoneId: input.milestoneId || '',
           allsquaredEscrowId: escrowId,
+          allsquaredSupplierPayoutCountry: input.supplierPayoutCountry,
         },
       });
 
