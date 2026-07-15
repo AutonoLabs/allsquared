@@ -74,6 +74,21 @@ const sections: MarketingLegalSection[] = [
       "We may update these Terms from time to time. Continued use of AllSquared after changes constitutes acceptance of the updated Terms.",
     ],
   },
+  {
+    title: "11. Legal Entity & Registered Office",
+    paragraphs: [
+      "AllSquared is a trading name of AllSquared Ltd, a private company limited by shares and incorporated in England and Wales. We are not a partnership and we are not a sole trader. The information below is provided in line with the UK Companies Act 2006 (electronic communications) Regulations.",
+    ],
+    bullets: [
+      "Company name: AllSquared Ltd",
+      "Company number: 17313974 (Companies House, England & Wales)",
+      "Registered office: Suite 15, 137–139 Brent Street, London NW4 4DJ, United Kingdom",
+      "Registered email (Companies House correspondence): hi@allsquared.uk",
+      "Director: Eliahu Bernstein",
+      "Shareholder of record: Autono Labs LLP (Companies House No. OC460890) — 75%+ ownership / voting control",
+      "Standard email for general enquiries: hello@allsquared.uk",
+    ],
+  },
 ];
 
 export default function Terms() {

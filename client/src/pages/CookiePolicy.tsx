@@ -57,6 +57,19 @@ const sections: MarketingLegalSection[] = [
       "We may update this Cookie Policy as our product, providers, or legal obligations change. The latest version will be published on this page.",
     ],
   },
+  {
+    title: "8. Legal Entity & Registered Office",
+    paragraphs: [
+      "This Cookie Policy is issued by the company identified below. We publish it on behalf of that entity and on behalf of any group companies where relevant.",
+    ],
+    bullets: [
+      "Company name: AllSquared Ltd",
+      "Company number: 17313974 (Companies House, England & Wales)",
+      "Registered office: Suite 15, 137–139 Brent Street, London NW4 4DJ, United Kingdom",
+      "Registered email: hi@allsquared.uk",
+      "Cookie / privacy enquiries: privacy@allsquared.uk",
+    ],
+  },
 ];
 
 export default function CookiePolicy() {

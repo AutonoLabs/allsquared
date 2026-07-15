@@ -56,8 +56,8 @@ export default function Contact() {
         description="The best introductions are concrete: the kind of work, the deal size, where trust tends to break down, and whether you need core platform flow or additional legal support."
         primaryAction={{ label: "Draft a contract instead", onClick: handleGetStarted }}
         highlights={[
-          "London-based team",
-          "High-value UK project focus",
+          "AllSquared Ltd — Company No. 17313974",
+          "Registered office: Brent Street, London NW4 4DJ",
           "Founding cohort conversations welcome",
         ]}
       />
@@ -180,9 +180,46 @@ export default function Contact() {
                 </div>
                 <div>
                   <div className="as25-font-mono text-[10.5px] uppercase tracking-[0.16em] text-[#6b7e9e]">
-                    Base
+                    Registered office
                   </div>
-                  <p className="mt-2 text-[14.5px] leading-7 text-[#2d466f]">London, United Kingdom.</p>
+                  <p className="mt-2 text-[14.5px] leading-7 text-[#2d466f]">
+                    Suite 15, 137–139 Brent Street
+                    <br />
+                    London NW4 4DJ
+                    <br />
+                    United Kingdom
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[14px] border border-[#e2e0d6] bg-white p-7">
+              <div className="flex items-start gap-4">
+                <div className="grid h-11 w-11 place-items-center rounded-[8px] border border-[#c7d0e0] bg-[#fafaf7] text-[#0b1b33]">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-5 w-5"
+                  >
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="as25-font-mono text-[10.5px] uppercase tracking-[0.16em] text-[#6b7e9e]">
+                    Legal entity
+                  </div>
+                  <p className="mt-2 text-[14.5px] leading-7 text-[#2d466f]">
+                    AllSquared Ltd
+                    <br />
+                    Company number: 17313974
+                    <br />
+                    Registered in England &amp; Wales
+                  </p>
                 </div>
               </div>
             </div>

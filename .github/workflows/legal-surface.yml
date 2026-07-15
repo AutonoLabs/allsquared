@@ -10,7 +10,8 @@ on:
   pull_request:
     paths:
       - "client/src/pages/Terms.tsx"
-      - "client/src/pages/PrivacyPolicy.tsx"
+      - "client/src/pages/Privacy.tsx"
+      - "client/src/pages/CookiePolicy.tsx"
       - "client/src/pages/Complaints.tsx"
       - "client/src/components/Footer.tsx"
       - "client/src/components/CookieConsent.tsx"

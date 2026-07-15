@@ -123,7 +123,7 @@ export default function Footer() {
 
         <div className="mt-14 flex flex-col gap-6 border-t border-[#c7d0e0] pt-8">
           <div className="as25-font-mono flex flex-col gap-3 text-[11px] uppercase tracking-[0.1em] text-[#6b7e9e] md:flex-row md:items-center md:justify-between">
-            <p>© AllSquared Ltd · {currentYear} · London</p>
+            <p>© AllSquared Ltd · Company No. 17313974 · {currentYear} · Brent Street, London NW4 4DJ</p>
             <div className="flex gap-6">
               <Link href="/terms" className="hover:text-[#0b1b33]">
                 Terms
@@ -144,7 +144,9 @@ export default function Footer() {
             (52% B2B late payment; c.50,000 SMEs closing annually); FSB &amp; Xero Small Business
             Index, 2024 (c.£22,000 average owed in overdue invoices); QuickBooks UK SME late-payment
             research, 2023 (56 million hours lost annually). AllSquared is a trading name of
-            AllSquared Ltd, registered in England &amp; Wales (company number on request; see our{" "}
+            AllSquared Ltd, registered in England &amp; Wales (company number{" "}
+            <strong>17313974</strong>; registered office: Suite 15, 137–139 Brent Street,
+            London&nbsp;NW4&nbsp;4DJ, United Kingdom; registered email: hi@allsquared.uk). See our{" "}
             <Link href="/privacy" className="underline hover:text-[#0b1b33]">
               Privacy Policy
             </Link>

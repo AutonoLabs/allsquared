@@ -58,6 +58,10 @@
           },
           "address": {
             "@type": "PostalAddress",
+            "streetAddress": "Suite 15, 137–139 Brent Street",
+            "addressLocality": "London",
+            "postalCode": "NW4 4DJ",
+            "addressRegion": "London",
             "addressCountry": "GB"
           },
           "areaServed": {
@@ -67,12 +71,26 @@
           "sameAs": [
             "https://github.com/AutonoLabs/allsquared-app"
           ],
-          "contactPoint": {
-            "@type": "ContactPoint",
-            "contactType": "customer support",
-            "email": "hello@allsquared.io",
-            "availableLanguage": "English"
-          }
+          "contactPoint": [
+            {
+              "@type": "ContactPoint",
+              "contactType": "customer support",
+              "email": "hello@allsquared.uk",
+              "availableLanguage": "English"
+            },
+            {
+              "@type": "ContactPoint",
+              "contactType": "privacy",
+              "email": "privacy@allsquared.uk",
+              "availableLanguage": "English"
+            },
+            {
+              "@type": "ContactPoint",
+              "contactType": "complaints",
+              "email": "complaints@allsquared.uk",
+              "availableLanguage": "English"
+            }
+          ]
         },
         {
           "@type": "SoftwareApplication",
@@ -90,7 +108,14 @@
             "price": "0",
             "description": "Free tier available; paid plans from £X/month"
           },
-          "publisher": { "@id": "https://allsquared.io/#organization" }
+          "publisher": {
+            "@type": "Organization",
+            "@id": "https://allsquared.io/#organization",
+            "name": "AllSquared Ltd",
+            "legalName": "AllSquared Ltd",
+            "identifier": "17313974",
+            "url": "https://find-and-update.company-information.service.gov.uk/company/17313974"
+          }
         },
         {
           "@type": "WebSite",

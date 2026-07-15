@@ -67,6 +67,19 @@ const sections: MarketingLegalSection[] = [
       "We record all complaints and use them to improve our service. Anonymised complaint data is reviewed quarterly by the leadership team.",
     ],
   },
+  {
+    title: "8. Legal Entity",
+    paragraphs: [
+      "This complaints procedure is operated by the company identified below. Where statutory timeframes apply (for example, FCA complaints-handling rules), they run from receipt of your complaint by the entity named.",
+    ],
+    bullets: [
+      "Company name: AllSquared Ltd",
+      "Company number: 17313974 (Companies House, England & Wales)",
+      "Registered office: Suite 15, 137–139 Brent Street, London NW4 4DJ, United Kingdom",
+      "Registered email: hi@allsquared.uk",
+      "Complaints contact: complaints@allsquared.uk",
+    ],
+  },
 ];
 
 export default function Complaints() {

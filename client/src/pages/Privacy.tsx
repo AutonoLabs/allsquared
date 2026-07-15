@@ -89,6 +89,20 @@ const sections: MarketingLegalSection[] = [
       "We may update this Privacy Policy from time to time. We will notify you of significant changes by email or through our platform where appropriate.",
     ],
   },
+  {
+    title: "11. Data Controller & Legal Entity",
+    paragraphs: [
+      "For the purposes of the UK GDPR and the Data Protection Act 2018, the data controller is identified below. Where personal data is processed by an escrow partner, payment processor, or solicitor on our behalf, that party acts as our data processor under a written contract.",
+    ],
+    bullets: [
+      "Data controller: AllSquared Ltd",
+      "Company number: 17313974 (Companies House, England & Wales)",
+      "Registered office: Suite 15, 137–139 Brent Street, London NW4 4DJ, United Kingdom",
+      "Registered email (Companies House correspondence): hi@allsquared.uk",
+      "Privacy enquiries: privacy@allsquared.uk",
+      "Information Commissioner's Office (ICO): AllSquared Ltd is registered with the ICO as a data controller. The registration reference can be provided on request.",
+    ],
+  },
 ];
 
 export default function Privacy() {
