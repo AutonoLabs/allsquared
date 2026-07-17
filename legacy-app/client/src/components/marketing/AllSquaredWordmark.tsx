@@ -29,7 +29,7 @@ export function AllSquaredWordmark({ className, dark = false }: AllSquaredWordma
         <path
           data-part="verification"
           fill={dark ? "#8fd1aa" : "#1f6b3f"}
-          d="m18.2 23.8 3.1 3.1L31 17.2l2.8 2.8-12.5 12.5-5.9-5.9 2.8-2.8Z"
+          d="M17.01 22.99L22.08 28.06L29.06 19.91L26.94 18.09L21.92 23.94L18.99 21.01Z"
         />
       </svg>
       <span className="as25-font-display inline-flex items-baseline text-[23px] leading-none tracking-[-0.02em]">
