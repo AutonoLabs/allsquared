@@ -15,6 +15,13 @@
       "when": 1777908554689,
       "tag": "0001_condemned_sunfire",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1784269117199,
+      "tag": "0002_broad_nightmare",
+      "breakpoints": true
     }
   ]
 }

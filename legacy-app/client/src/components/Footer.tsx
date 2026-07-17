@@ -56,7 +56,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/dashboard" className="transition-colors hover:text-[#0b1b33]">
+                <Link href="/waitlist" className="transition-colors hover:text-[#0b1b33]">
                   Dashboard
                 </Link>
               </li>

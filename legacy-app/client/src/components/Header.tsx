@@ -3,8 +3,6 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "wouter";
-import { useUser } from "@clerk/react";
-import { hasClerkPublishableKey, UserButton } from "@/lib/clerk";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 
 export default function Header() {
@@ -12,8 +10,6 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const [location] = useLocation();
   const reduceMotion = useReducedMotion();
-  const clerkUser = hasClerkPublishableKey ? useUser() : { isSignedIn: false };
-  const { isSignedIn } = clerkUser;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -54,47 +50,24 @@ export default function Header() {
         </div>
 
         <div className="hidden md:flex md:items-center md:gap-3">
-          {isSignedIn ? (
-            <>
-              <Button
-                size="sm"
-                className="rounded-[8px] bg-[#1f6b3f] px-5 py-5 text-white shadow-none hover:bg-[#2a8554]"
-                asChild
-              >
-                <Link href="/dashboard">Dashboard</Link>
-              </Button>
-              <UserButton
-                appearance={{
-                  elements: {
-                    userButtonPopoverCard: { boxShadow: 'none' },
-                    userButtonPopoverActionButton: 'text-[#0b1b33]',
-                    userButtonPopoverActionButtonText: 'text-[#0b1b33]',
-                  },
-                }}
-              />
-            </>
-          ) : (
-            <>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="rounded-[8px] border border-[#c7d0e0] bg-transparent px-5 py-5 text-[#0b1b33] hover:border-[#0b1b33] hover:bg-[rgba(11,27,51,0.03)]"
-                asChild
-              >
-                <Link href="/sign-in">Sign in</Link>
-              </Button>
-              <Button
-                size="sm"
-                className="rounded-[8px] bg-[#1f6b3f] px-5 py-5 text-white shadow-none hover:bg-[#2a8554]"
-                asChild
-              >
-                <Link href="/sign-up">
-                  Get started
-                  <ArrowRight className="ml-1 h-4 w-4" />
-                </Link>
-              </Button>
-            </>
-          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            className="rounded-[8px] border border-[#c7d0e0] bg-transparent px-5 py-5 text-[#0b1b33] hover:border-[#0b1b33] hover:bg-[rgba(11,27,51,0.03)]"
+            asChild
+          >
+            <Link href="/waitlist">Sign in</Link>
+          </Button>
+          <Button
+            size="sm"
+            className="rounded-[8px] bg-[#1f6b3f] px-5 py-5 text-white shadow-none hover:bg-[#2a8554]"
+            asChild
+          >
+            <Link href="/waitlist">
+              Get started
+              <ArrowRight className="ml-1 h-4 w-4" />
+            </Link>
+          </Button>
         </div>
 
         <button
@@ -133,28 +106,18 @@ export default function Header() {
               </Link>
             ))}
             <div className="mt-2 space-y-2 border-t border-[#c7d0e0] pt-4">
-              {isSignedIn ? (
-                <Button className="w-full rounded-[8px] bg-[#1f6b3f] text-white hover:bg-[#2a8554]" asChild>
-                  <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)}>
-                    Dashboard
-                  </Link>
-                </Button>
-              ) : (
-                <>
-                  <Button
-                    variant="outline"
-                    className="w-full rounded-[8px] border-[#c7d0e0] bg-transparent text-[#0b1b33]"
-                    asChild
-                  >
-                    <Link href="/sign-in" onClick={() => setMobileMenuOpen(false)}>Sign in</Link>
-                  </Button>
-                  <Button className="w-full rounded-[8px] bg-[#1f6b3f] text-white hover:bg-[#2a8554]" asChild>
-                    <Link href="/sign-up" onClick={() => setMobileMenuOpen(false)}>
-                      Get started
-                    </Link>
-                  </Button>
-                </>
-              )}
+              <Button
+                variant="outline"
+                className="w-full rounded-[8px] border-[#c7d0e0] bg-transparent text-[#0b1b33]"
+                asChild
+              >
+                <Link href="/waitlist" onClick={() => setMobileMenuOpen(false)}>Sign in</Link>
+              </Button>
+              <Button className="w-full rounded-[8px] bg-[#1f6b3f] text-white hover:bg-[#2a8554]" asChild>
+                <Link href="/waitlist" onClick={() => setMobileMenuOpen(false)}>
+                  Get started
+                </Link>
+              </Button>
             </div>
           </div>
           </motion.div>

@@ -10,6 +10,7 @@ import {
   litlReferrals,
   notifications,
   contractTemplates,
+  waitlistEntries,
   type Contract,
   type InsertContract,
   type Milestone,
@@ -141,6 +142,21 @@ export async function updateUser(id: string, updates: Partial<InsertUser>) {
     .where(eq(users.id, id));
 
   return getUser(id);
+}
+
+export type WaitlistJoinStatus = "added" | "already_registered";
+
+export async function addWaitlistEmail(email: string): Promise<WaitlistJoinStatus> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const inserted = await db
+    .insert(waitlistEntries)
+    .values({ email })
+    .onConflictDoNothing({ target: waitlistEntries.email })
+    .returning({ email: waitlistEntries.email });
+
+  return inserted.length > 0 ? "added" : "already_registered";
 }
 
 // ===== Contract Templates =====
