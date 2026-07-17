@@ -162,6 +162,15 @@ export const users = pgTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
+/** Public prelaunch email signups. Email is the natural unique key so retries are idempotent. */
+export const waitlistEntries = pgTable("waitlistEntries", {
+  email: varchar("email", { length: 320 }).primaryKey(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+export type WaitlistEntry = typeof waitlistEntries.$inferSelect;
+export type InsertWaitlistEntry = typeof waitlistEntries.$inferInsert;
+
 // Contract templates for different service categories
 export const contractTemplates = pgTable("contractTemplates", {
   id: varchar("id", { length: 64 }).primaryKey(),

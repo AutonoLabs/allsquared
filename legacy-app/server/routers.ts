@@ -18,6 +18,7 @@ import { templateBuilderRouter } from "./routers/templateBuilder";
 import { companiesHouseRouter } from "./routers/companiesHouse";
 import { partyProfilesRouter } from "./routers/partyProfiles";
 import { kycRouter } from "./routers/kyc";
+import { waitlistRouter } from "./routers/waitlist";
 import { updateUser, upsertUser, getUser } from "./db";
 import { z } from "zod";
 
@@ -93,6 +94,8 @@ export const appRouter = router({
         return updatedUser;
       }),
   }),
+
+  waitlist: waitlistRouter,
 
   // Feature routers
   contracts: contractsRouter,

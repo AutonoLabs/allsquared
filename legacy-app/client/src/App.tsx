@@ -1,7 +1,7 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch, useLocation } from "wouter";
+import { Redirect, Route, Switch, useLocation } from "wouter";
 import { lazy, Suspense, useEffect, useState, useRef, ComponentType } from "react";
 import { DashboardSplash } from "@/components/DashboardSplash";
 
@@ -27,6 +27,7 @@ import Footer from "./components/Footer";
 import CookieConsent from "./components/CookieConsent";
 import Header from "./components/Header";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { getPrelaunchRedirect } from "@shared/prelaunch";
 
 // Lazy-loaded page components
 const Home = lazyRetry(() => import("./pages/Home"));
@@ -43,7 +44,7 @@ const Complaints = lazyRetry(() => import("./pages/Complaints"));
 const Freelancers = lazyRetry(() => import("./pages/Freelancers"));
 const Clients = lazyRetry(() => import("./pages/Clients"));
 const LegalServices = lazyRetry(() => import("./pages/LegalServices"));
-const AuthPage = lazyRetry(() => import("./pages/Auth"));
+const Waitlist = lazyRetry(() => import("./pages/Waitlist"));
 
 const Dashboard = lazyRetry(() => import("./pages/Dashboard"));
 const Contracts = lazyRetry(() => import("./pages/Contracts"));
@@ -108,7 +109,13 @@ function NavigationLoadingBar() {
 }
 
 function Router() {
-  // make sure to consider if you need authentication for certain routes
+  const [location] = useLocation();
+  const redirect = getPrelaunchRedirect(location);
+
+  if (redirect) {
+    return <Redirect to={redirect} replace />;
+  }
+
   return (
     <Suspense fallback={<DashboardSplash message="Loading…" />}>
       <Switch>
@@ -234,12 +241,7 @@ function Router() {
                   <Route path={"/how-it-works"} component={HowItWorks} />
                   <Route path={"/features"} component={Features} />
                   <Route path={"/pricing"} component={Pricing} />
-                  <Route path={"/sign-in"}>
-                    <AuthPage mode="sign-in" />
-                  </Route>
-                  <Route path={"/sign-up"}>
-                    <AuthPage mode="sign-up" />
-                  </Route>
+                  <Route path={"/waitlist"} component={Waitlist} />
                   <Route path={"/about"} component={About} />
                   <Route path={"/blog"} component={Blog} />
                   <Route path={"/contact"} component={Contact} />

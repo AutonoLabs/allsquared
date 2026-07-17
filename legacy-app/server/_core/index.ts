@@ -13,6 +13,7 @@ import { verifyStripeSignature } from "./webhookVerify";
 import { initSentry, Sentry } from "./sentry";
 import { checkRateLimit, isDistributedRateLimitEnabled } from "./rateLimit";
 import { CSP_DIRECTIVES, PERMISSIONS_POLICY } from "./csp";
+import { isAllowedPrelaunchTrpcPath } from "../../shared/prelaunch";
 
 // Initialize Sentry before anything else
 initSentry();
@@ -23,6 +24,19 @@ const app = express();
 // Sentry request handler must be the FIRST middleware
 app.use(Sentry.Handlers.requestHandler());
 app.use(Sentry.Handlers.tracingHandler());
+
+// During prelaunch, the public app exposes only the waitlist mutation. This blocks
+// product APIs for unauthenticated callers and for users with existing sessions.
+app.use('/api/trpc', (req: Request, res: Response, next: NextFunction) => {
+  if (!isAllowedPrelaunchTrpcPath(req.path)) {
+    res.status(403).json({
+      error: 'PRELAUNCH_WAITLIST_ONLY',
+      message: 'AllSquared is currently available by waitlist only.',
+    });
+    return;
+  }
+  next();
+});
 
 // =============================================================================
 // SECURITY MIDDLEWARE
