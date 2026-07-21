@@ -12,7 +12,13 @@
 **Kill criteria (written before starting):** if no interviewed subbie says they would pay
 £990 for a prepared referral, or the checker gets meaningful traffic but zero qualified
 leads in 4 weeks, stop and rethink before any Phase 02 spend.
-**Satisfies:** de-risks everything **Status:** ☐ Not started
+**Satisfies:** de-risks everything **Status:** 🔶 In progress (2026-07-07)
+- ✅ Checker + SEO pages LIVE at https://allsquared-checker.vercel.app (own Vercel project,
+  separate from the legacy app; built via `docs/superpowers/plans/2026-07-05-*.md`, PR #16)
+- ☐ Set `RESEND_API_KEY` on the Vercel project + verify sending domain in Resend —
+  until then, submitted leads only appear in Vercel function logs, not email
+- ☐ 10 subbie interviews  ☐ ANB conversation  ☐ solicitor conversation
+- ☐ Kill-criteria review at 4 weeks (by ~2026-08-04)
 **Rationale:** 8 months were spent building the freelance product without a single customer
 conversation. This phase exists so that cannot happen again.
 

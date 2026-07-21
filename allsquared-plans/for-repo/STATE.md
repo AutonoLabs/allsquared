@@ -2,8 +2,12 @@
 
 ## Current Position
 - Active milestone: UK v1
-- Active phase: 01 (UK foundation) + pending code review to size Phase 02
-- Last completed: strategy reset (this document set)
+- Active phase: 00 (validation sprint — checker LIVE at allsquared-checker.vercel.app
+  since 2026-07-07; interviews/outreach pending) + 01 (UK foundation) in parallel
+- Last completed: Phase 00 build — checker app + SEO pages shipped (PR #16),
+  deployed to its own Vercel project
+- Open operational gap: RESEND_API_KEY not set on the Vercel project — leads land in
+  function logs only until it is; sending domain must be verified in Resend
 
 ## Decisions Made
 - **2026-07-05 (evening)** — **Pivot reconfirmed, validation-first.** After the repo audit
