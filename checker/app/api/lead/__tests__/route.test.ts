@@ -1,4 +1,7 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { describe, expect, it, vi, beforeEach, afterEach } from "vitest";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 
 const sendMock = vi.fn().mockResolvedValue({ data: { id: "test-id" }, error: null });
 
@@ -9,9 +12,21 @@ vi.mock("resend", () => ({
 }));
 
 describe("POST /api/lead", () => {
-  beforeEach(() => {
+  let tmpDir: string;
+  let prevCwd: string;
+
+  beforeEach(async () => {
     sendMock.mockClear();
     process.env.RESEND_API_KEY = "test-key";
+    prevCwd = process.cwd();
+    tmpDir = await mkdtemp(path.join(os.tmpdir(), "lead-route-"));
+    process.chdir(tmpDir);
+    vi.resetModules();
+  });
+
+  afterEach(async () => {
+    process.chdir(prevCwd);
+    await rm(tmpDir, { recursive: true, force: true });
   });
 
   it("returns ok:true and emails the lead when RESEND_API_KEY is set", async () => {
@@ -31,9 +46,14 @@ describe("POST /api/lead", () => {
     expect(response.status).toBe(200);
     expect(body).toEqual({ ok: true });
     expect(sendMock).toHaveBeenCalledTimes(1);
+
+    const jsonl = await readFile(path.join(tmpDir, "data", "leads.jsonl"), "utf8");
+    const row = JSON.parse(jsonl.trim());
+    expect(row.email).toBe("subbie@example.com");
+    expect(row.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
 
-  it("returns ok:true without emailing when RESEND_API_KEY is missing", async () => {
+  it("returns 200 and writes jsonl when RESEND_API_KEY is missing", async () => {
     delete process.env.RESEND_API_KEY;
     const { POST } = await import("../route");
     const request = new Request("http://localhost/api/lead", {
@@ -50,6 +70,16 @@ describe("POST /api/lead", () => {
 
     expect(response.status).toBe(200);
     expect(body).toEqual({ ok: true });
+    expect(sendMock).not.toHaveBeenCalled();
+
+    const jsonl = await readFile(path.join(tmpDir, "data", "leads.jsonl"), "utf8");
+    const row = JSON.parse(jsonl.trim());
+    expect(row).toMatchObject({
+      email: "subbie@example.com",
+      notifiedSum: 500000,
+      likelyValid: "smash_and_grab_likely",
+    });
+    expect(row.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T/);
   });
 
   it("returns 400 for an invalid payload", async () => {

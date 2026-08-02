@@ -1,3 +1,5 @@
+import { appendFile, mkdir } from "node:fs/promises";
+import path from "node:path";
 import { Resend } from "resend";
 
 type LeadPayload = {
@@ -47,6 +49,13 @@ function persistLeadToLog(payload: LeadPayload): void {
   );
 }
 
+async function appendLeadJsonl(body: LeadPayload): Promise<void> {
+  const dir = path.join(process.cwd(), "data");
+  await mkdir(dir, { recursive: true });
+  const line = JSON.stringify({ ...body, timestamp: new Date().toISOString() }) + "\n";
+  await appendFile(path.join(dir, "leads.jsonl"), line, "utf8");
+}
+
 export async function POST(request: Request): Promise<Response> {
   let body: unknown;
   try {
@@ -64,7 +73,8 @@ export async function POST(request: Request): Promise<Response> {
 
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
-    console.warn("[lead] RESEND_API_KEY not set — lead persisted to logs only:", body.email);
+    console.warn("[lead] RESEND_API_KEY not set — persisting lead to data/leads.jsonl:", body.email);
+    await appendLeadJsonl(body);
     return Response.json({ ok: true });
   }
 
@@ -86,5 +96,6 @@ export async function POST(request: Request): Promise<Response> {
     console.error("[lead] email send failed (lead already persisted to logs):", (err as Error).message);
   }
 
+  await appendLeadJsonl(body);
   return Response.json({ ok: true });
 }
