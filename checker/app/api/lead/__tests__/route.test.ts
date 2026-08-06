@@ -6,9 +6,9 @@ import path from "node:path";
 const sendMock = vi.fn().mockResolvedValue({ data: { id: "test-id" }, error: null });
 
 vi.mock("resend", () => ({
-  Resend: vi.fn().mockImplementation(() => ({
-    emails: { send: sendMock },
-  })),
+  Resend: vi.fn().mockImplementation(function (this: unknown) {
+    return { emails: { send: sendMock } };
+  }),
 }));
 
 describe("POST /api/lead", () => {
