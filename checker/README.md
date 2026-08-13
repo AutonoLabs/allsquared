@@ -31,6 +31,12 @@ vercel deploy --prod
 Lead emails are sent via Resend (see `app/api/lead/route.ts`). Before deploying:
 
 - Set `RESEND_API_KEY` as an environment variable in the Vercel project.
-- Verify the sending domain (currently `allsquared.dev`, hardcoded as the `from` address)
-  in the [Resend dashboard](https://resend.com/domains). Without a verified domain, lead
-  emails will silently fail to send.
+- Verify the sending domain in the [Resend dashboard](https://resend.com/domains).
+  The `from` address defaults to `checker@allsquared.dev` and can be overridden
+  with `RESEND_FROM_EMAIL`. Set `LEAD_NOTIFICATION_EMAIL` to control where
+  leads are sent (defaults to `eli@autonolabs.ai`).
+
+**Lead persistence:** every lead is written to the function log as a structured
+JSON line *before* email is attempted, so a lead is never lost to an email
+failure (unverified domain, rate limit, transient error). Recover leads from
+Vercel function logs until a durable store is wired in Phase 01.

@@ -15,7 +15,11 @@ export function NoticeForm() {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const notifiedSum = Math.round(parseFloat(notifiedSumPounds) * 100);
+    const parsed = parseFloat(notifiedSumPounds);
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      return;
+    }
+    const notifiedSum = Math.round(parsed * 100);
     const computed = assessNotice({
       dueDate,
       finalDateForPayment,
