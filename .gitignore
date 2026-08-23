@@ -155,6 +155,9 @@ screenshots/
 *.cert
 secrets/
 
+# Checker lead fallback log (keep dir via .gitkeep)
+checker/data/leads.jsonl
+
 # Lock files (keep pnpm-lock.yaml)
 package-lock.json
 yarn.lock
